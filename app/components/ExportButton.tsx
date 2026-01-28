@@ -43,30 +43,73 @@ export default function ExportButton() {
     }
   };
 
+  const getProgressIcon = () => {
+    if (progress.includes('complete')) {
+      return (
+        <svg className="w-4 h-4 text-success-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      );
+    }
+    if (progress.includes('failed')) {
+      return (
+        <svg className="w-4 h-4 text-error-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+        </svg>
+      );
+    }
+    return <div className="spinner text-primary-400" />;
+  };
+
   return (
-    <div className="px-4 py-3 bg-white border-t border-gray-200">
+    <div className="glass border-t border-surface-700/50 px-4 py-3">
       <div className="flex items-center justify-between">
-        <div className="text-sm text-gray-600">
+        {/* Progress Status */}
+        <div className="flex items-center gap-3">
           {progress && (
-            <span className={progress.includes('failed') ? 'text-red-600' : 'text-blue-600'}>
-              {progress}
-            </span>
+            <div className="flex items-center gap-2 animate-fade-in">
+              {getProgressIcon()}
+              <span className={`text-sm font-medium ${
+                progress.includes('failed') 
+                  ? 'text-error-400' 
+                  : progress.includes('complete')
+                    ? 'text-success-400'
+                    : 'text-primary-400'
+              }`}>
+                {progress}
+              </span>
+            </div>
+          )}
+          
+          {!progress && (
+            <div className="flex items-center gap-2 text-sm text-surface-400">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+              </svg>
+              <span>Press <kbd className="px-1.5 py-0.5 rounded bg-surface-700 text-surface-300 text-xs font-mono">Ctrl+S</kbd> to export</span>
+            </div>
           )}
         </div>
         
+        {/* Export Button */}
         <button
           onClick={handleExport}
           disabled={!hasPages || isExporting}
-          className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-medium flex items-center gap-2"
+          data-export-button
+          className="btn-lg btn-success group"
+          title="Export PDF (Ctrl+S)"
         >
           {isExporting ? (
             <>
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-              Exporting...
+              <div className="spinner text-white" />
+              <span>Exporting...</span>
             </>
           ) : (
             <>
-              ↓ Download PDF
+              <svg className="w-5 h-5 transition-transform group-hover:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+              </svg>
+              <span>Download PDF</span>
             </>
           )}
         </button>

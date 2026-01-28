@@ -68,8 +68,15 @@ export default function PdfViewer() {
 
   if (!selectedPage || activePages.length === 0) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-gray-50">
-        <div className="text-gray-500">No pages to display</div>
+      <div className="flex-1 flex items-center justify-center bg-surface-900/50">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-surface-800 flex items-center justify-center">
+            <svg className="w-8 h-8 text-surface-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+            </svg>
+          </div>
+          <p className="text-surface-400">No pages to display</p>
+        </div>
       </div>
     );
   }
@@ -77,58 +84,79 @@ export default function PdfViewer() {
   const currentPageNumber = activePages.findIndex((p) => p.id === selectedPageId) + 1;
 
   return (
-    <div className="flex-1 flex flex-col bg-gray-50">
+    <div className="flex-1 flex flex-col bg-surface-900/30">
       {/* Pagination Controls */}
-      <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-center gap-4">
-        <button
-          onClick={handlePrevPage}
-          disabled={currentPageNumber === 1}
-          className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          ← Previous
-        </button>
-
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600">Page</span>
-          <select
-            value={selectedPageId || ''}
-            onChange={handlePageJump}
-            className="px-2 py-1 border border-gray-300 rounded text-sm"
+      <div className="glass border-b border-surface-700/50 px-4 py-2.5">
+        <div className="flex items-center justify-center gap-2">
+          {/* Previous Button */}
+          <button
+            onClick={handlePrevPage}
+            disabled={currentPageNumber === 1}
+            className="btn-icon-sm btn-ghost"
+            title="Previous page"
           >
-            {activePages.map((page, index) => (
-              <option key={page.id} value={page.id}>
-                {index + 1}
-              </option>
-            ))}
-          </select>
-          <span className="text-sm text-gray-600">of {activePages.length}</span>
-        </div>
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+          </button>
 
-        <button
-          onClick={handleNextPage}
-          disabled={currentPageNumber === activePages.length}
-          className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Next →
-        </button>
+          {/* Page Selector */}
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-surface-800/50">
+            <span className="text-xs text-surface-400 font-medium">Page</span>
+            <select
+              value={selectedPageId || ''}
+              onChange={handlePageJump}
+              className="bg-transparent text-sm font-medium text-surface-100 focus:outline-none cursor-pointer appearance-none text-center min-w-[2.5rem] pr-1"
+            >
+              {activePages.map((page, index) => (
+                <option key={page.id} value={page.id} className="bg-surface-800 text-surface-100">
+                  {index + 1}
+                </option>
+              ))}
+            </select>
+            <span className="text-xs text-surface-500">of</span>
+            <span className="text-sm font-medium text-surface-300">{activePages.length}</span>
+          </div>
+
+          {/* Next Button */}
+          <button
+            onClick={handleNextPage}
+            disabled={currentPageNumber === activePages.length}
+            className="btn-icon-sm btn-ghost"
+            title="Next page"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
+          </button>
+
+          {/* Keyboard Hint */}
+          <div className="hidden lg:flex items-center gap-1 ml-4 text-xs text-surface-500">
+            <kbd className="px-1.5 py-0.5 rounded bg-surface-700 text-surface-400 font-mono">←</kbd>
+            <kbd className="px-1.5 py-0.5 rounded bg-surface-700 text-surface-400 font-mono">→</kbd>
+            <span className="ml-1">to navigate</span>
+          </div>
+        </div>
       </div>
 
       {/* Canvas Display Area */}
       <div className="flex-1 overflow-auto p-8">
         <div className="flex justify-center">
           <div className="relative inline-block">
+            {/* Loading Overlay */}
             {isRendering && (
-              <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
-                <div className="text-gray-600">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-2"></div>
-                  Rendering...
+              <div className="absolute inset-0 bg-surface-900/80 backdrop-blur-sm flex items-center justify-center z-10 rounded-lg">
+                <div className="flex flex-col items-center gap-3">
+                  <div className="spinner-lg text-primary-400" />
+                  <span className="text-sm text-surface-300">Rendering page...</span>
                 </div>
               </div>
             )}
             
+            {/* PDF Canvas */}
             <canvas
               ref={canvasRef}
-              className="shadow-lg bg-white"
+              className="pdf-canvas-container"
               style={{ maxWidth: '100%', height: 'auto' }}
             />
             

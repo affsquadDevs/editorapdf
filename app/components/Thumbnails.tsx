@@ -115,16 +115,26 @@ export default function Thumbnails() {
   }
 
   return (
-    <div className="w-64 bg-gray-100 border-r border-gray-200 overflow-y-auto">
-      <div className="p-4">
-        <h2 className="text-sm font-semibold text-gray-700 mb-3">
-          Pages ({visiblePages.length})
-        </h2>
-        
+    <div className="w-72 glass border-r border-surface-700/50 flex flex-col">
+      {/* Header */}
+      <div className="px-4 py-3 border-b border-surface-700/50">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-surface-200 flex items-center gap-2">
+            <svg className="w-4 h-4 text-surface-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+            Pages
+          </h2>
+          <span className="badge-primary">{visiblePages.length}</span>
+        </div>
+      </div>
+      
+      {/* Thumbnails List */}
+      <div className="flex-1 overflow-y-auto p-3">
         {isLoading ? (
-          <div className="text-center py-8 text-gray-500">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-            Loading thumbnails...
+          <div className="flex flex-col items-center justify-center py-12 gap-3">
+            <div className="spinner-lg text-primary-400" />
+            <p className="text-sm text-surface-400">Loading thumbnails...</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -144,42 +154,76 @@ export default function Thumbnails() {
                   onDragEnd={handleDragEnd}
                   onClick={() => setSelectedPageId(page.id)}
                   className={`
-                    relative cursor-move rounded border-2 p-2 transition-all
-                    ${isSelected 
-                      ? 'border-blue-500 bg-blue-50' 
-                      : 'border-gray-300 bg-white hover:border-gray-400'
-                    }
-                    ${isDragging ? 'opacity-50' : ''}
-                    ${isDropTarget ? 'border-blue-400 border-dashed' : ''}
+                    thumbnail-item p-2 transition-all duration-200
+                    ${isSelected ? 'thumbnail-selected' : ''}
+                    ${isDragging ? 'opacity-50 scale-95' : ''}
+                    ${isDropTarget && !isDragging ? 'border-primary-400 border-dashed scale-[1.02]' : ''}
                   `}
                 >
-                  <div className="text-xs text-gray-600 mb-1">
-                    Page {index + 1}
+                  {/* Page Number Badge */}
+                  <div className="flex items-center justify-between mb-2">
+                    <span className={`
+                      text-xs font-medium px-2 py-0.5 rounded-md
+                      ${isSelected 
+                        ? 'bg-primary-500/20 text-primary-300' 
+                        : 'bg-surface-700/50 text-surface-400'
+                      }
+                    `}>
+                      Page {index + 1}
+                    </span>
+                    
+                    {/* Rotation Badge */}
+                    {page.rotation !== 0 && (
+                      <span className="flex items-center gap-1 text-xs text-surface-400 bg-surface-700/50 px-1.5 py-0.5 rounded">
+                        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        {page.rotation}°
+                      </span>
+                    )}
                   </div>
                   
-                  {thumbnail ? (
-                    <img
-                      src={thumbnail.dataUrl}
-                      alt={`Page ${index + 1}`}
-                      className="w-full rounded shadow-sm"
-                      draggable={false}
-                    />
-                  ) : (
-                    <div className="w-full aspect-[8.5/11] bg-gray-200 rounded flex items-center justify-center">
-                      <span className="text-gray-400">Loading...</span>
-                    </div>
-                  )}
+                  {/* Thumbnail Image */}
+                  <div className="relative rounded-lg overflow-hidden bg-white shadow-lg">
+                    {thumbnail ? (
+                      <img
+                        src={thumbnail.dataUrl}
+                        alt={`Page ${index + 1}`}
+                        className="w-full"
+                        draggable={false}
+                      />
+                    ) : (
+                      <div className="w-full aspect-[8.5/11] bg-surface-700 flex items-center justify-center">
+                        <div className="spinner text-primary-400" />
+                      </div>
+                    )}
+                    
+                    {/* Selected Overlay */}
+                    {isSelected && (
+                      <div className="absolute inset-0 bg-primary-500/10 pointer-events-none" />
+                    )}
+                  </div>
                   
-                  {page.rotation !== 0 && (
-                    <div className="absolute top-2 right-2 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded">
-                      {page.rotation}°
+                  {/* Drag Handle Indicator */}
+                  <div className="flex justify-center mt-2">
+                    <div className="flex gap-0.5">
+                      <span className="w-1 h-1 rounded-full bg-surface-500" />
+                      <span className="w-1 h-1 rounded-full bg-surface-500" />
+                      <span className="w-1 h-1 rounded-full bg-surface-500" />
                     </div>
-                  )}
+                  </div>
                 </div>
               );
             })}
           </div>
         )}
+      </div>
+      
+      {/* Footer Hint */}
+      <div className="px-4 py-3 border-t border-surface-700/50">
+        <p className="text-xs text-surface-500 text-center">
+          Drag to reorder pages
+        </p>
       </div>
     </div>
   );

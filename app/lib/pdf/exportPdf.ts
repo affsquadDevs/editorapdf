@@ -1,4 +1,4 @@
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { PDFDocument, rgb, StandardFonts, degrees } from 'pdf-lib';
 import type { PdfPage, TextOverlay, ImageOverlay, ShapeOverlay } from '@/app/store/pdfStore';
 
 /**
@@ -34,10 +34,7 @@ export async function exportPdf(
     const [copiedPage] = await pdfDoc.copyPages(srcPdf, [page.index]);
     
     const currentRotation = copiedPage.getRotation().angle;
-    copiedPage.setRotation({
-      type: 'degrees',
-      angle: currentRotation + page.rotation,
-    });
+    copiedPage.setRotation(degrees(currentRotation + page.rotation));
     
     pdfDoc.addPage(copiedPage);
     
@@ -198,8 +195,44 @@ async function applyImageOverlay(
     const y = pageHeight - (image.y * pageHeight) - (image.height * pageHeight);
     const width = image.width * pageWidth;
     const height = image.height * pageHeight;
+    const rotation = image.rotation || 0;
     
-    page.drawImage(embeddedImage, { x, y, width, height });
+    if (rotation !== 0) {
+      // Calculate center point for rotation
+      const centerX = x + width / 2;
+      const centerY = y + height / 2;
+      
+      // Convert rotation to radians
+      const angleRad = (rotation * Math.PI) / 180;
+      const cos = Math.cos(angleRad);
+      const sin = Math.sin(angleRad);
+      
+      // Create transformation matrix for rotation around center
+      // PDF transformation matrix: [a b c d e f]
+      // a = cos, b = sin, c = -sin, d = cos, e = tx, f = ty
+      const tx = centerX - centerX * cos + centerY * sin;
+      const ty = centerY - centerX * sin - centerY * cos;
+      
+      // Save graphics state
+      page.pushGraphicsState();
+      
+      // Apply transformation matrix [a b c d e f] for rotation around center
+      // a = cos, b = sin, c = -sin, d = cos, e = tx, f = ty
+      page.pushOperators(
+        page.doc.context.operators.pushGraphicsState(),
+        page.doc.context.operators.transform([cos, sin, -sin, cos, tx, ty])
+      );
+      
+      // Draw image
+      page.drawImage(embeddedImage, { x, y, width, height });
+      
+      // Restore graphics state
+      page.pushOperators(page.doc.context.operators.popGraphicsState());
+      page.popGraphicsState();
+    } else {
+      // No rotation, draw normally
+      page.drawImage(embeddedImage, { x, y, width, height });
+    }
   } catch (err) {
     console.error('Error applying image overlay:', err);
   }
@@ -220,12 +253,32 @@ function applyShapeOverlay(
   const height = shape.height * pageHeight;
   const color = hexToRgb(shape.color);
   const rgbColor = rgb(color.r / 255, color.g / 255, color.b / 255);
+  const opacity = shape.opacity !== undefined ? shape.opacity : (shape.type === 'highlight' ? 0.3 : 1);
+  
+  const strokeEnabled = shape.type === 'highlight' ? false : shape.strokeEnabled !== false;
+  const fillEnabled =
+    shape.type === 'highlight'
+      ? true
+      : shape.fillEnabled !== undefined
+        ? shape.fillEnabled
+        : !!shape.fillColor;
+
+  // Parse fill color if present
+  let fillRgbColor = undefined;
+  if (fillEnabled && shape.fillColor) {
+    const fillColor = hexToRgb(shape.fillColor);
+    fillRgbColor = rgb(fillColor.r / 255, fillColor.g / 255, fillColor.b / 255);
+  }
   
   if (shape.type === 'rectangle') {
     page.drawRectangle({
       x, y, width, height,
-      borderColor: rgbColor,
-      borderWidth: shape.lineWidth || 2,
+      color: fillRgbColor,
+      borderColor: strokeEnabled ? rgbColor : undefined,
+      borderWidth: strokeEnabled ? (shape.lineWidth || 2) : 0,
+      opacity: fillRgbColor ? opacity : 1,
+      borderOpacity: strokeEnabled ? opacity : 1,
+      // Note: pdf-lib doesn't support dashArray, so dashed lines won't show in export
     });
   } else if (shape.type === 'circle') {
     page.drawEllipse({
@@ -233,41 +286,72 @@ function applyShapeOverlay(
       y: y + height / 2,
       xScale: width / 2,
       yScale: height / 2,
-      borderColor: rgbColor,
-      borderWidth: shape.lineWidth || 2,
+      color: fillRgbColor,
+      borderColor: strokeEnabled ? rgbColor : undefined,
+      borderWidth: strokeEnabled ? (shape.lineWidth || 2) : 0,
+      opacity: fillRgbColor ? opacity : 1,
+      borderOpacity: strokeEnabled ? opacity : 1,
     });
   } else if (shape.type === 'line') {
+    if (!strokeEnabled) return;
     page.drawLine({
       start: { x, y: y + height },
       end: { x: x + width, y },
       color: rgbColor,
       thickness: shape.lineWidth || 2,
+      opacity,
     });
   } else if (shape.type === 'arrow') {
+    if (!strokeEnabled) return;
+    // Малюємо стрілку від (x, y + height) до (x + width, y)
+    const startX = x;
+    const startY = y + height;
+    const endX = x + width;
+    const endY = y;
+    
+    // Малюємо основну лінію
     page.drawLine({
-      start: { x, y: y + height / 2 },
-      end: { x: x + width, y: y + height / 2 },
+      start: { x: startX, y: startY },
+      end: { x: endX, y: endY },
       color: rgbColor,
       thickness: shape.lineWidth || 2,
+      opacity,
     });
-    const arrowSize = 10;
+    
+    // Розраховуємо кут стрілки
+    const angle = Math.atan2(endY - startY, endX - startX);
+    const arrowLength = Math.min(20, Math.sqrt(width * width + height * height) / 5);
+    const arrowAngle = Math.PI / 6; // 30 градусів
+    
+    // Верхня частина голівки стрілки
+    const arrow1X = endX - arrowLength * Math.cos(angle - arrowAngle);
+    const arrow1Y = endY - arrowLength * Math.sin(angle - arrowAngle);
+    
+    // Нижня частина голівки стрілки
+    const arrow2X = endX - arrowLength * Math.cos(angle + arrowAngle);
+    const arrow2Y = endY - arrowLength * Math.sin(angle + arrowAngle);
+    
     page.drawLine({
-      start: { x: x + width, y: y + height / 2 },
-      end: { x: x + width - arrowSize, y: y + height / 2 + arrowSize },
+      start: { x: endX, y: endY },
+      end: { x: arrow1X, y: arrow1Y },
       color: rgbColor,
       thickness: shape.lineWidth || 2,
+      opacity,
     });
+    
     page.drawLine({
-      start: { x: x + width, y: y + height / 2 },
-      end: { x: x + width - arrowSize, y: y + height / 2 - arrowSize },
+      start: { x: endX, y: endY },
+      end: { x: arrow2X, y: arrow2Y },
       color: rgbColor,
       thickness: shape.lineWidth || 2,
+      opacity,
     });
   } else if (shape.type === 'highlight') {
+    const highlightColor = shape.fillColor ? hexToRgb(shape.fillColor) : color;
     page.drawRectangle({
       x, y, width, height,
-      color: rgb(color.r / 255, color.g / 255, color.b / 255),
-      opacity: 0.3,
+      color: rgb(highlightColor.r / 255, highlightColor.g / 255, highlightColor.b / 255),
+      opacity,
     });
   }
 }
@@ -291,6 +375,7 @@ function dataUrlToBytes(dataUrl: string): Uint8Array {
 }
 
 export function downloadPdf(pdfBytes: Uint8Array, filename: string): void {
+  // @ts-ignore - Uint8Array is compatible with Blob constructor
   const blob = new Blob([pdfBytes], { type: 'application/pdf' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');

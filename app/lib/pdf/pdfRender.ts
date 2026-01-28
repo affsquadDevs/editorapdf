@@ -32,6 +32,7 @@ export async function getPdfPagesInfo(
   
   for (let i = 1; i <= pdfDoc.numPages; i++) {
     const page = await pdfDoc.getPage(i);
+    // Use PDF.js default rotation (page.rotate) for size, so it matches the rendered canvas.
     const viewport = page.getViewport({ scale: 1 });
     pagesInfo.push({
       index: i - 1,
@@ -54,7 +55,13 @@ export async function renderPageToCanvas(
   rotation: number = 0
 ): Promise<void> {
   const page = await pdfDoc.getPage(pageNumber);
-  const viewport = page.getViewport({ scale, rotation });
+  // Important: if we pass `rotation: 0`, PDF.js will override the page's inherent rotation
+  // and some PDFs appear upside-down. So when the user rotation is 0, don't pass rotation
+  // at all and let PDF.js use its default (page.rotate).
+  const viewport =
+    rotation === 0
+      ? page.getViewport({ scale })
+      : page.getViewport({ scale, rotation: ((page.rotate || 0) + rotation) % 360 });
   
   const context = canvas.getContext('2d');
   if (!context) {
@@ -82,10 +89,16 @@ export async function renderPageToDataUrl(
   rotation: number = 0
 ): Promise<string> {
   const page = await pdfDoc.getPage(pageNumber);
-  const viewport = page.getViewport({ scale: 1, rotation });
+  const viewport =
+    rotation === 0
+      ? page.getViewport({ scale: 1 })
+      : page.getViewport({ scale: 1, rotation: ((page.rotate || 0) + rotation) % 360 });
   
   const scale = maxWidth / viewport.width;
-  const scaledViewport = page.getViewport({ scale, rotation });
+  const scaledViewport =
+    rotation === 0
+      ? page.getViewport({ scale })
+      : page.getViewport({ scale, rotation: ((page.rotate || 0) + rotation) % 360 });
   
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('2d');

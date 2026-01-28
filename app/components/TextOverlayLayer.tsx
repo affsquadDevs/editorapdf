@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { usePdfStore } from '../store/pdfStore';
 import type { TextOverlay } from '../store/pdfStore';
+import ConfirmDialog from './ConfirmDialog';
 
 interface Props {
   pageId: string;
@@ -17,6 +18,7 @@ export default function TextOverlayLayer({ pageId, pageWidth, pageHeight, zoom }
   const [editingOverlayId, setEditingOverlayId] = useState<string | null>(null);
   const [draggingOverlayId, setDraggingOverlayId] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const layerRef = useRef<HTMLDivElement>(null);
 
   const page = pages.find((p) => p.id === pageId);
@@ -100,6 +102,7 @@ export default function TextOverlayLayer({ pageId, pageWidth, pageHeight, zoom }
   }, [draggingOverlayId, dragOffset, updateTextOverlay]);
 
   return (
+    <>
     <div className="absolute top-0 left-0 w-full">
       {/* Add Text Mode Toggle */}
       <div className="absolute -top-12 left-0 z-20">
@@ -191,10 +194,7 @@ export default function TextOverlayLayer({ pageId, pageWidth, pageHeight, zoom }
                       
                       <button
                         onClick={() => {
-                          if (confirm('Delete this text?')) {
-                            deleteTextOverlay(overlay.id);
-                            setEditingOverlayId(null);
-                          }
+                          setDeleteConfirmId(overlay.id);
                         }}
                         className="px-2 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700"
                       >
@@ -227,5 +227,23 @@ export default function TextOverlayLayer({ pageId, pageWidth, pageHeight, zoom }
         })}
       </div>
     </div>
+    
+    <ConfirmDialog
+      isOpen={deleteConfirmId !== null}
+      title="Delete text?"
+      message="Are you sure you want to delete this text overlay?"
+      confirmText="Delete"
+      cancelText="Cancel"
+      type="danger"
+      onCancel={() => setDeleteConfirmId(null)}
+      onConfirm={() => {
+        if (deleteConfirmId) {
+          deleteTextOverlay(deleteConfirmId);
+          setEditingOverlayId(null);
+        }
+        setDeleteConfirmId(null);
+      }}
+    />
+    </>
   );
 }
