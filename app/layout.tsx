@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Outfit, JetBrains_Mono, Lexend } from 'next/font/google'
 import './globals.css'
+import Script from 'next/script'
 
 // Primary font - Modern geometric sans
 const outfit = Outfit({
@@ -26,22 +27,138 @@ const jetbrains = JetBrains_Mono({
   weight: ['400', '500', '600'],
 })
 
+const siteUrl = 'https://editorapdf.com' // Replace with your actual domain
+const siteName = 'EditoraPDF'
+const siteDescription = 'Edit PDF documents online instantly without installing software or creating an account. Quick, powerful PDF editing in your browser. No downloads, no signup, 100% free and private.'
+const siteTitle = 'Edit PDF Online Free - No Installation, No Signup Required | EditoraPDF'
+
 export const metadata: Metadata = {
-  title: 'DocuFlow | Professional PDF Editor',
-  description: 'Enterprise-grade PDF editing in your browser. No uploads, no subscriptions — just powerful document tools.',
-  keywords: ['PDF editor', 'document editing', 'PDF tools', 'browser PDF', 'online PDF editor'],
-  authors: [{ name: 'DocuFlow' }],
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: siteTitle,
+    template: `%s | ${siteName}`,
+  },
+  description: siteDescription,
+  keywords: [
+    'edit PDF online',
+    'PDF editor no installation',
+    'PDF editor no signup',
+    'instant PDF editor',
+    'quick PDF editor',
+    'edit PDF without software',
+    'online PDF editor free',
+    'PDF editor no download',
+    'browser PDF editor',
+    'edit PDF in browser',
+    'no account PDF editor',
+    'free PDF editor online',
+    'fast PDF editing',
+    'PDF editor no registration',
+    'edit PDF instantly',
+    'web-based PDF editor',
+    'PDF annotation online',
+    'modify PDF online',
+    'update PDF documents',
+    'client-side PDF editor',
+    'private PDF editor',
+    'secure PDF editing',
+    'no upload PDF editor',
+  ],
+  authors: [{ name: 'EditoraPDF Team', url: siteUrl }],
+  creator: 'EditoraPDF',
+  publisher: 'EditoraPDF',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
   openGraph: {
-    title: 'DocuFlow | Professional PDF Editor',
-    description: 'Enterprise-grade PDF editing in your browser.',
     type: 'website',
+    locale: 'en_US',
+    url: siteUrl,
+    title: siteTitle,
+    description: siteDescription,
+    siteName: siteName,
+    images: [
+      {
+        url: `${siteUrl}/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: 'EditoraPDF - Professional PDF Editor',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: siteTitle,
+    description: siteDescription,
+    images: [`${siteUrl}/og-image.png`],
+    creator: '@editora_pdf',
+    site: '@editora_pdf',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  alternates: {
+    canonical: siteUrl,
+    languages: {
+      'en-US': siteUrl,
+      'en': siteUrl,
+    },
+  },
+  category: 'technology',
+  applicationName: 'EditoraPDF',
+  referrer: 'origin-when-cross-origin',
+  appleWebApp: {
+    capable: true,
+    title: 'EditoraPDF',
+    statusBarStyle: 'black-translucent',
+  },
+  verification: {
+    // Add your verification codes here after registering with search engines
+    // google: 'your-google-site-verification-code',
+    // yandex: 'your-yandex-verification-code',
+    // bing: 'your-bing-verification-code',
+    // other: 'your-other-verification-code',
+  },
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: 'any' },
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+  },
+  manifest: '/manifest.json',
+  other: {
+    'mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'black-translucent',
+    'format-detection': 'telephone=no',
+    'geo.region': 'US',
+    'geo.placename': 'United States',
+    'ICBM': '39.8283, -98.5795',
   },
 }
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#0f172a',
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#0f172a' },
+    { media: '(prefers-color-scheme: dark)', color: '#0f172a' },
+  ],
 }
 
 export default function RootLayout({
@@ -49,15 +166,284 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  // Note: WebApplication schema moved to page.tsx (only on actual tool page)
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: siteUrl,
+      },
+    ],
+  }
+
+  // VideoObject schema (if you add video content later)
+  const videoJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'VideoObject',
+    name: 'EditoraPDF PDF Editor Demo',
+    description: 'Watch how to use EditoraPDF to edit PDFs online for free',
+    thumbnailUrl: `${siteUrl}/og-image.png`,
+    uploadDate: '2024-01-01',
+    contentUrl: `${siteUrl}/video/demo.mp4`,
+    embedUrl: `${siteUrl}/video/embed`,
+    duration: 'PT3M',
+    publisher: {
+      '@type': 'Organization',
+      name: 'EditoraPDF',
+      logo: {
+        '@type': 'ImageObject',
+        url: `${siteUrl}/logo.png`,
+      },
+    },
+  }
+
+  const organizationJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    '@id': `${siteUrl}/#organization`,
+    name: 'EditoraPDF',
+    alternateName: 'EditoraPDF Online PDF Editor',
+    url: siteUrl,
+    logo: {
+      '@type': 'ImageObject',
+      url: `${siteUrl}/logo.png`,
+      width: 512,
+      height: 512,
+    },
+    image: `${siteUrl}/og-image.png`,
+    description: 'EditoraPDF provides easy-to-use online tools for editing, modifying, and managing PDF documents directly in the browser.',
+    foundingDate: '2026',
+    sameAs: [
+      'https://www.instagram.com/editora_pdf',
+      'https://www.facebook.com/people/Editorapdf/61587362633003/',
+      'https://www.youtube.com/@EditoraPDF',
+      'https://www.threads.com/@editora_pdf',
+    ],
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'customer support',
+      email: 'hello@affsquad.com',
+      availableLanguage: ['English'],
+    },
+    publishingPrinciples: `${siteUrl}/terms`,
+    privacyPolicy: `${siteUrl}/privacy-policy`,
+    termsOfService: `${siteUrl}/terms`,
+    knowsAbout: [
+      'PDF editing',
+      'Online document tools',
+      'PDF management',
+      'Document editing software',
+      'Browser-based PDF tools',
+    ],
+    makesOffer: {
+      '@type': 'Offer',
+      name: 'Online PDF Editing Tools',
+      price: '0',
+      priceCurrency: 'USD',
+      availability: 'https://schema.org/InStock',
+      url: siteUrl,
+    },
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${siteUrl}/search?q={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
+  }
+
+  const websiteJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: siteName,
+    url: siteUrl,
+    description: siteDescription,
+    publisher: {
+      '@type': 'Organization',
+      name: 'EditoraPDF',
+      logo: {
+        '@type': 'ImageObject',
+        url: `${siteUrl}/logo.png`,
+      },
+    },
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${siteUrl}/search?q={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
+    inLanguage: 'en-US',
+    copyrightYear: new Date().getFullYear(),
+    copyrightHolder: {
+      '@type': 'Organization',
+      name: 'EditoraPDF',
+    },
+  }
+
+  const itemListJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'EditoraPDF Features',
+    description: 'Key features of EditoraPDF PDF Editor',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'View & Navigate',
+        description: 'Render pages with crystal clarity, zoom seamlessly, and navigate with smart thumbnails',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Edit & Annotate',
+        description: 'Reorder, rotate, delete pages. Add text, images, shapes, and highlights',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: 'Export Instantly',
+        description: 'Download your edited PDF with all changes applied. No quality loss guaranteed',
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: '100% Private',
+        description: 'All processing happens locally in your browser. Your documents never leave your device',
+      },
+      {
+        '@type': 'ListItem',
+        position: 5,
+        name: 'No Uploads Required',
+        description: 'Enterprise-level security by design. No server uploads, no subscriptions',
+      },
+    ],
+  }
+
   return (
-    <html lang="en" className={`${outfit.variable} ${lexend.variable} ${jetbrains.variable}`}>
+    <html lang="en-US" className={`${outfit.variable} ${lexend.variable} ${jetbrains.variable}`}>
+      <head>
+        {/* Performance: Preconnect to external domains */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+        <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
+        <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossOrigin="anonymous" />
+        
+        {/* Preload critical resources */}
+        <link rel="preload" href="/logo.svg" as="image" type="image/svg+xml" />
+        <link rel="preload" href="/favicon.svg" as="image" type="image/svg+xml" />
+        
+        {/* Additional SEO meta tags */}
+        <meta name="language" content="English" />
+        <meta name="geo.region" content="US" />
+        <meta name="geo.placename" content="United States" />
+        <meta name="coverage" content="Worldwide" />
+        <meta name="distribution" content="Global" />
+        <meta name="rating" content="General" />
+        <meta name="revisit-after" content="7 days" />
+        <meta name="expires" content="never" />
+        <meta name="copyright" content="EditoraPDF" />
+        <meta name="reply-to" content="hello@affsquad.com" />
+        <meta name="owner" content="EditoraPDF" />
+        <meta name="url" content={siteUrl} />
+        <meta name="identifier-URL" content={siteUrl} />
+        <meta name="directory" content="submission" />
+        <meta name="category" content="Software, PDF Editor, Document Tools" />
+        <meta name="target" content="all" />
+        <meta name="audience" content="all" />
+        <meta name="HandheldFriendly" content="True" />
+        <meta name="MobileOptimized" content="320" />
+        <meta name="apple-itunes-app" content="app-id=YOUR_APP_ID" />
+        
+        {/* OpenSearch */}
+        <link rel="search" type="application/opensearchdescription+xml" title={siteName} href={`${siteUrl}/opensearch.xml`} />
+        
+        {/* Social Media Profile Links */}
+        <meta property="og:see_also" content="https://www.facebook.com/people/Editorapdf/61587362633003/" />
+        <meta property="og:see_also" content="https://www.instagram.com/editora_pdf" />
+        <meta property="og:see_also" content="https://www.threads.com/@editora_pdf" />
+        <meta property="og:see_also" content="https://www.youtube.com/@EditoraPDF" />
+        
+        {/* Additional structured data hints */}
+        <meta name="application-name" content={siteName} />
+        <meta name="msapplication-TileColor" content="#0f172a" />
+        <meta name="msapplication-TileImage" content="/icon-192.png" />
+        <meta name="msapplication-config" content="/browserconfig.xml" />
+        
+        {/* Rich snippets support - Add verification codes after registering */}
+        {/* <meta name="google-site-verification" content="your-code" /> */}
+        {/* <meta name="msvalidate.01" content="your-code" /> */}
+        {/* <meta name="yandex-verification" content="your-code" /> */}
+        
+        {/* Google AdSense */}
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2980943706375055"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
+        
+        {/* Content Security Policy hints */}
+        <meta httpEquiv="Content-Security-Policy" content="upgrade-insecure-requests" />
+        
+        {/* JSON-LD Structured Data */}
+        {/* Note: WebApplication schema is on page.tsx only (actual tool page) */}
+        <Script
+          id="jsonld-breadcrumb"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+          strategy="beforeInteractive"
+        />
+        <Script
+          id="jsonld-organization"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+          strategy="beforeInteractive"
+        />
+        <Script
+          id="jsonld-website"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+          strategy="beforeInteractive"
+        />
+        <Script
+          id="jsonld-itemlist"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
+          strategy="beforeInteractive"
+        />
+        {/* Video schema - uncomment when you have video content */}
+        {/* <Script
+          id="jsonld-video"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(videoJsonLd) }}
+          strategy="beforeInteractive"
+        /> */}
+      </head>
       <body className={`${outfit.className} antialiased`}>
+        {/* Skip to main content link for accessibility */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary-500 focus:text-white focus:rounded-md focus:shadow-lg"
+        >
+          Skip to main content
+        </a>
+        
         {/* Background with gradient mesh */}
-        <div className="fixed inset-0 bg-mesh -z-10" />
-        <div className="fixed inset-0 bg-grid opacity-30 -z-10" />
+        <div className="fixed inset-0 bg-mesh -z-10" aria-hidden="true" />
+        <div className="fixed inset-0 bg-grid opacity-30 -z-10" aria-hidden="true" />
         
         {/* Main Content */}
-        <div className="relative min-h-screen">
+        <div id="main-content" className="relative min-h-screen">
           {children}
         </div>
       </body>

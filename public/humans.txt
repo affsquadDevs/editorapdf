@@ -1,0 +1,24 @@
+/* TEAM */
+Developer: EditoraPDF Team
+Site: https://editorapdf.com
+Location: Global
+
+/* SITE */
+Last update: 2026/01/29
+Standards: HTML5, CSS3, JavaScript ES6+
+Components: Next.js, React, TypeScript
+Software: Visual Studio Code, Cursor AI
+
+/* THANKS */
+PDF.js - Mozilla Foundation
+pdf-lib - Community
+Tailwind CSS - Tailwind Labs
+Zustand - Community
+
+/* BUILT WITH */
+Framework: Next.js 14
+Language: TypeScript
+Styling: Tailwind CSS
+State: Zustand
+PDF Rendering: PDF.js
+PDF Export: pdf-lib

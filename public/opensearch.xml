@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+  <ShortName>EditoraPDF</ShortName>
+  <Description>Search EditoraPDF PDF Editor</Description>
+  <Tags>PDF editor document tools</Tags>
+  <Contact>support@editorapdf.com</Contact>
+  <Url type="text/html" method="get" template="https://editorapdf.com/search?q={searchTerms}"/>
+  <Image height="16" width="16" type="image/x-icon">https://editorapdf.com/favicon.ico</Image>
+</OpenSearchDescription>

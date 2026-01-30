@@ -223,6 +223,18 @@
            shadow-lg shadow-success-500/25
            hover:shadow-xl hover:shadow-success-500/30;
   }
+
+  /* Navigation Link */
+  .nav-link {
+    @apply px-4 py-2 text-sm font-medium text-surface-300 
+           hover:text-white hover:bg-surface-800/50 
+           rounded-lg transition-all duration-200
+           relative;
+  }
+  
+  .nav-link:hover {
+    @apply shadow-sm;
+  }
   
   .btn-accent {
     @apply bg-gradient-to-r from-accent-600 to-accent-500 text-white

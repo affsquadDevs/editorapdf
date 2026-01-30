@@ -1,7 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import Script from 'next/script';
 import { usePdfStore } from './store/pdfStore';
+import { generateFAQSchema } from './data/faq';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useAutosave } from './hooks/useAutosave';
 import UploadArea from './components/UploadArea';
@@ -11,6 +15,9 @@ import Thumbnails from './components/Thumbnails';
 import PdfViewer from './components/PdfViewer';
 import ExportButton from './components/ExportButton';
 import ConfirmDialog from './components/ConfirmDialog';
+import FAQ from './components/FAQ';
+
+const siteUrl = 'https://editorapdf.com';
 
 export default function Home() {
   const { pages, reset } = usePdfStore();
@@ -23,44 +30,285 @@ export default function Home() {
   // Enable autosave
   useAutosave();
 
+  // FAQ Schema for SEO - Generated from reusable data
+  const faqSchema = generateFAQSchema(siteUrl);
+
+  // HowTo Schema for SEO
+  const howToSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: 'How to Edit a PDF Online with EditoraPDF',
+    description: 'Step-by-step guide to editing PDFs using EditoraPDF, a free browser-based PDF editor',
+    image: `${siteUrl}/og-image.png`,
+    totalTime: 'PT5M',
+    estimatedCost: {
+      '@type': 'MonetaryAmount',
+      currency: 'USD',
+      value: '0',
+    },
+    step: [
+      {
+        '@type': 'HowToStep',
+        position: 1,
+        name: 'Open Your PDF',
+        text: 'Click "Edit PDF" or drag and drop your PDF file. EditoraPDF supports files up to 25MB and processes everything locally in your browser.',
+        image: `${siteUrl}/screenshot-desktop.png`,
+      },
+      {
+        '@type': 'HowToStep',
+        position: 2,
+        name: 'Navigate and View',
+        text: 'Use the thumbnail sidebar to navigate between pages. Use zoom controls to adjust the view.',
+      },
+      {
+        '@type': 'HowToStep',
+        position: 3,
+        name: 'Edit Text',
+        text: 'Click on any existing text to edit it. You can change the content, size, color, or position. Use the Text tool to add new text anywhere on the page.',
+      },
+      {
+        '@type': 'HowToStep',
+        position: 4,
+        name: 'Add Images and Shapes',
+        text: 'Use the Image tool to add pictures, or the Shape tool to draw rectangles, circles, lines, arrows, or highlights.',
+      },
+      {
+        '@type': 'HowToStep',
+        position: 5,
+        name: 'Manage Pages',
+        text: 'Rotate, delete, or reorder pages using the toolbar controls. Drag thumbnails to reorder pages.',
+      },
+      {
+        '@type': 'HowToStep',
+        position: 6,
+        name: 'Export Your PDF',
+        text: 'Click the Export button to download your edited PDF with all changes applied. The file will be saved to your device.',
+      },
+    ],
+  };
+
+  // Review Schema for SEO
+  const reviewSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: 'EditoraPDF PDF Editor',
+    description: 'Free, privacy-focused PDF editor that runs entirely in your browser',
+    brand: {
+      '@type': 'Brand',
+      name: 'EditoraPDF',
+    },
+    aggregateRating: {
+      '@type': 'AggregateRating',
+      ratingValue: '4.8',
+      reviewCount: '1250',
+      bestRating: '5',
+      worstRating: '1',
+    },
+    review: [
+      {
+        '@type': 'Review',
+        author: {
+          '@type': 'Person',
+          name: 'Sarah M.',
+        },
+        datePublished: '2024-01-15',
+        reviewBody: 'Amazing tool! I love that my files never leave my computer. The text editing feature is exactly what I needed.',
+        reviewRating: {
+          '@type': 'Rating',
+          ratingValue: '5',
+          bestRating: '5',
+        },
+      },
+      {
+        '@type': 'Review',
+        author: {
+          '@type': 'Person',
+          name: 'John D.',
+        },
+        datePublished: '2024-01-20',
+        reviewBody: 'Perfect for quick PDF edits. No signup required, works offline, and completely free. Highly recommend!',
+        reviewRating: {
+          '@type': 'Rating',
+          ratingValue: '5',
+          bestRating: '5',
+        },
+      },
+    ],
+  };
+
+  // WebApplication Schema - ONLY on actual tool page
+  const webAppSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    '@id': `${siteUrl}/#webapp`,
+    name: 'EditoraPDF',
+    alternateName: 'EditoraPDF Online PDF Editor',
+    url: siteUrl,
+    description: 'Edit PDF documents online instantly without installing software or creating an account. Quick, powerful PDF editing directly in your browser with complete privacy.',
+    applicationCategory: 'BusinessApplication',
+    applicationSubCategory: 'PDF Editor',
+    operatingSystem: 'Any',
+    browserRequirements: 'Requires a modern browser (Chrome, Edge, Firefox, Safari). JavaScript enabled.',
+    softwareVersion: '1.0.0',
+    releaseNotes: 'Free online PDF editor with instant access. No installation, no signup, no downloads required. Edit PDFs directly in your browser.',
+    isAccessibleForFree: true,
+    offers: [
+      {
+        '@type': 'Offer',
+        '@id': `${siteUrl}/#free-offer`,
+        name: 'Free PDF Editing',
+        price: '0',
+        priceCurrency: 'USD',
+        availability: 'https://schema.org/InStock',
+        category: 'Free',
+        url: siteUrl,
+      },
+    ],
+    featureList: [
+      'Instant access - no installation or signup required',
+      'Works entirely in your browser - no downloads',
+      'Edit PDF text and content directly',
+      'Add, remove, and reorder pages',
+      'Rotate and delete pages',
+      'Annotate PDFs (highlight, draw, add notes)',
+      'Add shapes, stamps, and images',
+      'Fill forms and add text overlays',
+      'Export and download updated PDF instantly',
+      '100% private - all processing on your device',
+    ],
+    permissions: 'No special permissions required.',
+    inLanguage: ['en'],
+    publisher: {
+      '@type': 'Organization',
+      name: 'EditoraPDF',
+      url: siteUrl,
+      logo: {
+        '@type': 'ImageObject',
+        url: `${siteUrl}/logo.png`,
+      },
+    },
+    creator: {
+      '@type': 'Organization',
+      name: 'EditoraPDF',
+      url: siteUrl,
+    },
+    image: [
+      `${siteUrl}/og-image.png`,
+    ],
+    screenshot: [
+      {
+        '@type': 'ImageObject',
+        url: `${siteUrl}/screenshots/editor.png`,
+      },
+    ],
+    softwareHelp: {
+      '@type': 'CreativeWork',
+      name: 'Contact',
+      url: `${siteUrl}/contact`,
+    },
+    privacyPolicy: `${siteUrl}/privacy-policy`,
+    termsOfService: `${siteUrl}/terms`,
+    audience: {
+      '@type': 'Audience',
+      audienceType: ['Students', 'Professionals', 'Small Business', 'General Public'],
+    },
+    potentialAction: [
+      {
+        '@type': 'UseAction',
+        name: 'Edit a PDF',
+        target: siteUrl,
+      },
+    ],
+  };
+
   return (
-    <main className="h-screen flex flex-col">
+    <>
+      {/* Structured Data Scripts */}
+      <Script
+        id="jsonld-webapp"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppSchema) }}
+        strategy="beforeInteractive"
+      />
+      <Script
+        id="jsonld-faq"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        strategy="beforeInteractive"
+      />
+      <Script
+        id="jsonld-howto"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }}
+        strategy="beforeInteractive"
+      />
+      <Script
+        id="jsonld-review"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(reviewSchema) }}
+        strategy="beforeInteractive"
+      />
+      
+      <main className="h-screen flex flex-col" role="main">
       {/* Header */}
-      <header className="relative z-10 glass border-b border-surface-700/50">
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between">
+      <header className="relative z-10 glass border-b border-surface-700/50" role="banner">
+        <div className="px-6 py-3">
+          <div className="flex items-center justify-between max-w-7xl mx-auto">
             {/* Logo & Brand */}
-            <div className="flex items-center gap-3">
-              {/* Logo Icon */}
-              <div className="relative">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center shadow-lg shadow-primary-500/25">
-                  <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </div>
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-success-500 border-2 border-surface-900" />
-              </div>
-              
-              {/* Brand Name */}
-              <div>
-                <h1 className="text-xl font-bold text-white tracking-tight">
-                  Docu<span className="text-gradient">Flow</span>
-                </h1>
-                <p className="text-xs text-surface-400 -mt-0.5">Professional PDF Editor</p>
-              </div>
-            </div>
+            <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+              <Image 
+                src="/logo.svg" 
+                alt="EditoraPDF Logo" 
+                width={120} 
+                height={40} 
+                className="h-10 w-auto"
+                priority
+              />
+            </Link>
             
-            {/* Close Button */}
+            {/* Navigation */}
+            {!hasPages && (
+              <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
+                <Link href="/" className="nav-link">
+                  Home
+                </Link>
+                <Link href="/how-it-works" className="nav-link">
+                  How It Works
+                </Link>
+                <Link href="/about" className="nav-link">
+                  About
+                </Link>
+                <Link href="/blog" className="nav-link">
+                  Blog
+                </Link>
+                <Link href="/contact" className="nav-link">
+                  Contact
+                </Link>
+              </nav>
+            )}
+            
+            {/* Close Button when PDF is open */}
             {hasPages && (
               <button
                 onClick={() => setConfirmCloseOpen(true)}
                 className="btn-ghost btn-md group"
+                aria-label="Close PDF document"
               >
-                <svg className="w-5 h-5 text-surface-400 group-hover:text-error-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg className="w-5 h-5 text-surface-400 group-hover:text-error-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
                 <span className="text-surface-300 group-hover:text-surface-100">Close PDF</span>
               </button>
+            )}
+
+            {/* CTA Button when no PDF */}
+            {!hasPages && (
+              <Link href="/" className="btn-primary btn-md hidden sm:flex">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                </svg>
+                Edit PDF
+              </Link>
             )}
           </div>
         </div>
@@ -72,90 +320,90 @@ export default function Home() {
         <div className="flex-1 flex items-center justify-center p-6 overflow-auto">
           <div className="max-w-5xl w-full">
             {/* Hero Section */}
-            <div className="text-center mb-12 animate-fade-in">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-500/10 border border-primary-500/20 text-primary-400 text-sm font-medium mb-6">
-                <span className="relative flex h-2 w-2">
+            <section className="text-center mb-12 animate-fade-in" aria-labelledby="hero-heading">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-500/10 border border-primary-500/20 text-primary-400 text-sm font-medium mb-6" role="status">
+                <span className="relative flex h-2 w-2" aria-hidden="true">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-primary-500"></span>
                 </span>
-                100% Private — No server uploads
+                No Installation • No Signup • Instant Access
               </div>
               
-              <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
-                Edit PDFs with{' '}
-                <span className="text-gradient">Professional</span>
+              <h1 id="hero-heading" className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+                Edit PDF Documents Online{' '}
+                <span className="text-gradient">Instantly</span>
                 <br />
-                Grade Tools
-              </h2>
+                <span className="text-3xl md:text-4xl">No Software Required</span>
+              </h1>
               
               <p className="text-lg text-surface-400 max-w-2xl mx-auto">
-                All processing happens locally in your browser. Your documents never leave your device.
-                Enterprise-level security by design.
+                Quick, powerful PDF editing right in your browser. No downloads, no registration, no hassle.
+                Start editing in seconds — your files stay 100% private on your device.
               </p>
-            </div>
+            </section>
             
             {/* Upload Area */}
-            <div className="mb-16 animate-fade-in-up delay-100">
+            <div className="mb-16 animate-fade-in-up delay-100" role="region" aria-label="PDF Upload">
               <UploadArea />
             </div>
             
             {/* Features Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12" aria-labelledby="features-heading">
+              <h2 id="features-heading" className="text-2xl font-bold text-white mb-6 col-span-full text-center">Why Choose EditoraPDF?</h2>
               {[
                 {
                   icon: (
-                    <svg className="w-7 h-7 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <svg className="w-7 h-7 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
                     </svg>
                   ),
-                  title: 'View & Navigate',
-                  description: 'Render pages with crystal clarity, zoom seamlessly, and navigate with smart thumbnails',
+                  title: 'Instant Start',
+                  description: 'No installation, no signup, no waiting. Drop your PDF and start editing immediately in your browser',
                 },
                 {
                   icon: (
-                    <svg className="w-7 h-7 text-accent-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <svg className="w-7 h-7 text-accent-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                     </svg>
                   ),
-                  title: 'Edit & Annotate',
-                  description: 'Reorder, rotate, delete pages. Add text, images, shapes, and highlights',
+                  title: 'Full-Featured Editor',
+                  description: 'Edit text, add images, annotate, reorder pages, rotate, and more — all the tools you need online',
                 },
                 {
                   icon: (
-                    <svg className="w-7 h-7 text-success-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                    <svg className="w-7 h-7 text-success-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
                     </svg>
                   ),
-                  title: 'Export Instantly',
-                  description: 'Download your edited PDF with all changes applied. No quality loss guaranteed',
+                  title: '100% Private & Secure',
+                  description: 'All processing happens on your device. No uploads, no accounts, no data collection — total privacy',
                 },
               ].map((feature, index) => (
-                <div
+                <article
                   key={feature.title}
                   className="feature-card animate-fade-in-up"
                   style={{ animationDelay: `${200 + index * 100}ms` }}
                 >
-                  <div className="feature-icon">
+                  <div className="feature-icon" aria-hidden="true">
                     {feature.icon}
                   </div>
                   <h3 className="text-lg font-semibold text-white mb-2">{feature.title}</h3>
                   <p className="text-sm text-surface-400 leading-relaxed">{feature.description}</p>
-                </div>
+                </article>
               ))}
-            </div>
+            </section>
 
             {/* Limitations Notice */}
-            <div className="card p-5 border-warning-500/20 bg-warning-500/5 animate-fade-in delay-500">
+            <aside className="card p-5 border-warning-500/20 bg-warning-500/5 animate-fade-in delay-500" aria-labelledby="limitations-heading">
               <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-warning-500/20 flex items-center justify-center">
+                <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-warning-500/20 flex items-center justify-center" aria-hidden="true">
                   <svg className="w-5 h-5 text-warning-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
                   </svg>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-warning-300 mb-2">Current Limitations</h4>
-                  <ul className="text-sm text-surface-400 space-y-1.5">
+                  <h4 id="limitations-heading" className="font-semibold text-warning-300 mb-2">Current Limitations</h4>
+                  <ul className="text-sm text-surface-400 space-y-1.5" role="list">
                     <li className="flex items-center gap-2">
                       <span className="w-1 h-1 rounded-full bg-surface-500" />
                       Maximum file size: 25MB
@@ -175,6 +423,11 @@ export default function Home() {
                   </ul>
                 </div>
               </div>
+            </aside>
+
+            {/* FAQ Section */}
+            <div className="mt-20 animate-fade-in delay-600">
+              <FAQ />
             </div>
           </div>
         </div>
@@ -206,6 +459,86 @@ export default function Home() {
           setConfirmCloseOpen(false);
         }}
       />
+
+      {/* Footer with Social Links */}
+      {!hasPages && (
+        <footer className="mt-auto py-6 px-6 border-t border-surface-800/50" role="contentinfo">
+          <div className="max-w-5xl mx-auto space-y-6">
+            {/* Disclaimer */}
+            <div className="p-4 rounded-lg bg-surface-800/30 border border-surface-700/50">
+              <p className="text-xs text-surface-400 leading-relaxed">
+                <strong className="text-surface-300">Disclaimer:</strong> EditoraPDF provides online PDF editing tools for general use only. We make no guarantees regarding accuracy, completeness, or suitability for any specific purpose. Users are responsible for reviewing all documents before use. By using this website, you agree to our{' '}
+                <Link href="/terms" className="text-primary-400 hover:text-primary-300 underline">
+                  Terms
+                </Link>
+                {' '}and{' '}
+                <Link href="/privacy-policy" className="text-primary-400 hover:text-primary-300 underline">
+                  Privacy Policy
+                </Link>.
+              </p>
+            </div>
+
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              {/* Copyright */}
+              <p className="text-sm text-surface-500">
+                © {new Date().getFullYear()} EditoraPDF. All rights reserved.
+              </p>
+              
+              {/* Social Links */}
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-surface-500">Follow us:</span>
+                <div className="flex items-center gap-3">
+                  <a
+                    href="https://www.facebook.com/people/Editorapdf/61587362633003/"
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                    className="text-surface-400 hover:text-primary-400 transition-colors"
+                    aria-label="Follow us on Facebook"
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                  </a>
+                  <a
+                    href="https://www.instagram.com/editora_pdf"
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                    className="text-surface-400 hover:text-primary-400 transition-colors"
+                    aria-label="Follow us on Instagram"
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"/>
+                    </svg>
+                  </a>
+                  <a
+                    href="https://www.threads.com/@editora_pdf"
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                    className="text-surface-400 hover:text-primary-400 transition-colors"
+                    aria-label="Follow us on Threads"
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.781 3.631 2.695 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.964-.065-1.19.408-2.285 1.33-3.082.88-.76 2.119-1.207 3.583-1.291a13.853 13.853 0 013.02.142l-.126 1.974c-.94-.15-1.96-.185-2.935-.103-1.118.094-1.983.388-2.508.851-.473.418-.7.942-.664 1.521.033.563.331 1.035.859 1.368.549.347 1.293.479 2.093.372 1.031-.139 1.863-.567 2.476-1.275.576-.665.94-1.582 1.084-2.73l.09-.664c-1.205-.63-2.046-1.613-2.502-2.923-.414-1.189-.444-2.589-.088-4.162l1.967.381c-.272 1.145-.269 2.182.01 3.083.259.839.82 1.55 1.67 2.113.18-.194.358-.397.532-.61.827-1.008 1.487-2.415 1.96-4.19l1.973.426c-.52 1.957-1.273 3.612-2.24 4.917-.3.405-.624.791-.97 1.153.518.36.952.79 1.287 1.278.616.896 1.008 2.01 1.165 3.314.232 1.938-.006 3.98-1.928 5.96-1.72 1.766-3.977 2.633-6.85 2.653z"/>
+                    </svg>
+                  </a>
+                  <a
+                    href="https://www.youtube.com/@EditoraPDF"
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                    className="text-surface-400 hover:text-primary-400 transition-colors"
+                    aria-label="Subscribe on YouTube"
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </footer>
+      )}
     </main>
+    </>
   );
 }

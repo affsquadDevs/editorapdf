@@ -2,6 +2,19 @@
 
 A client-side PDF editor built with Next.js that runs entirely in your browser. No server-side processing, no data uploads - everything happens locally on your machine.
 
+## ⭐ SEO Optimized
+
+This project includes **comprehensive SEO optimizations** following 2026 best practices:
+- ✅ Complete metadata (Open Graph, Twitter Cards, structured data)
+- ✅ JSON-LD schemas (SoftwareApplication, Organization, Breadcrumb)
+- ✅ Dynamic sitemap & robots.txt
+- ✅ PWA manifest for app stores
+- ✅ Performance headers & caching
+- ✅ Semantic HTML5 & ARIA accessibility
+- ✅ Mobile-first responsive design
+
+📚 **SEO Documentation**: See `SEO_IMPLEMENTATION.md`, `SEO_CHECKLIST.md`, and `IMAGE_REQUIREMENTS.md` for complete setup guide.
+
 ## Features
 
 ### 🎯 Core Functionality
@@ -45,6 +58,7 @@ A client-side PDF editor built with Next.js that runs entirely in your browser. 
 - **State Management**: Zustand
 - **PDF Rendering**: pdfjs-dist (Mozilla's PDF.js)
 - **PDF Manipulation**: pdf-lib
+- **SEO**: Complete implementation with structured data, OG tags, PWA manifest
 - **Hosting Ready**: Static export compatible (Vercel, Netlify, etc.)
 
 ## Getting Started

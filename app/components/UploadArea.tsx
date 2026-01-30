@@ -209,26 +209,26 @@ export default function UploadArea() {
               <>
                 <div className="space-y-2">
                   <p className="text-lg font-medium text-surface-200">
-                    {isDragging ? 'Drop your PDF here' : 'Drop PDF here or click to upload'}
+                    {isDragging ? 'Drop to Edit PDF' : 'Drop PDF to Edit or Click Below'}
                   </p>
                   <p className="text-sm text-surface-500">
                     Maximum file size: 25MB
                   </p>
                 </div>
                 
-                {/* Upload Button */}
+                {/* Primary CTA Button */}
                 <div className="pt-2">
                   <span className={`
-                    btn btn-md inline-flex
+                    btn btn-lg inline-flex font-semibold
                     ${isDragging 
                       ? 'btn-primary' 
-                      : 'btn-secondary'
+                      : 'btn-primary'
                     }
                   `}>
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                     </svg>
-                    Choose File
+                    Edit PDF
                   </span>
                 </div>
               </>
