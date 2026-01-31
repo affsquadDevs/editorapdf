@@ -146,7 +146,7 @@
   
   /* Glass Effect */
   .glass {
-    @apply bg-surface-800/60 backdrop-blur-xl;
+    @apply bg-surface-800/95 backdrop-blur-xl;
     border: 1px solid rgb(var(--color-border) / 0.5);
   }
   

@@ -251,7 +251,7 @@ export default function Home() {
       
       <main className="h-screen flex flex-col" role="main">
       {/* Header */}
-      <header className="relative z-10 glass border-b border-surface-700/50" role="banner">
+      <header className="sticky top-0 z-50 glass border-b border-surface-700/50" role="banner">
         <div className="px-6 py-3">
           <div className="flex items-center justify-between max-w-7xl mx-auto">
             {/* Logo & Brand */}
@@ -327,26 +327,103 @@ export default function Home() {
         <div className="flex-1 flex items-center justify-center p-6 overflow-auto">
           <div className="max-w-5xl w-full">
             {/* Hero Section */}
-            <section className="text-center mb-12 animate-fade-in" aria-labelledby="hero-heading">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-500/10 border border-primary-500/20 text-primary-400 text-sm font-medium mb-6" role="status">
-                <span className="relative flex h-2 w-2" aria-hidden="true">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary-500"></span>
-                </span>
-                No Installation • No Signup • Instant Access
+            <section className="relative mb-16 animate-fade-in" aria-labelledby="hero-heading">
+              {/* Hero Card Container */}
+              <div className="relative card p-8 md:p-12 lg:p-16 bg-gradient-to-br from-surface-800/80 via-surface-800/60 to-surface-900/80 border-primary-500/20 backdrop-blur-xl overflow-hidden">
+                {/* Decorative Background Elements */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" aria-hidden="true"></div>
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" aria-hidden="true"></div>
+                
+                <div className="relative z-10 text-center">
+                  {/* Logo */}
+                  <div className="flex justify-center mb-8 animate-fade-in-up">
+                    <div className="relative">
+                      <img 
+                        src="/logo.svg" 
+                        alt="EditoraPDF Logo" 
+                        width={180} 
+                        height={60} 
+                        className="h-14 md:h-16 w-auto mx-auto drop-shadow-lg"
+                      />
+                      <div className="absolute -inset-2 bg-primary-500/20 rounded-xl blur-xl opacity-50 -z-10"></div>
+                    </div>
+                  </div>
+
+                  {/* Badge */}
+                  <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary-500/15 border border-primary-500/30 text-primary-300 text-sm font-semibold mb-6 shadow-lg shadow-primary-500/10 animate-fade-in-up delay-100" role="status">
+                    <span className="relative flex h-2 w-2" aria-hidden="true">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-primary-500"></span>
+                    </span>
+                    <span className="hidden sm:inline">No Installation • No Signup • </span>Instant Access
+                  </div>
+                  
+                  {/* Main Heading */}
+                  <h1 id="hero-heading" className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 tracking-tight leading-tight animate-fade-in-up delay-200">
+                    Edit PDF Documents{' '}
+                    <span className="text-gradient-animated">Online Instantly</span>
+                    <br className="hidden sm:block" />
+                    <span className="text-3xl md:text-4xl lg:text-5xl font-bold text-surface-200">No Software Required</span>
+                  </h1>
+                  
+                  {/* Description */}
+                  <p className="text-lg md:text-xl text-surface-300 max-w-3xl mx-auto mb-8 leading-relaxed animate-fade-in-up delay-300">
+                    <span className="font-medium text-surface-200">Professional PDF editing</span> right in your browser.{' '}
+                    <span className="text-surface-400">No downloads, no registration, no hassle.</span>
+                    <br className="hidden md:block" />
+                    <span className="text-base md:text-lg text-surface-400">Start editing in seconds — your files stay 100% private on your device.</span>
+                  </p>
+
+                  {/* Trust Indicators */}
+                  <div className="flex flex-wrap items-center justify-center gap-6 md:gap-8 mb-8 text-sm text-surface-400 animate-fade-in-up delay-400">
+                    <div className="flex items-center gap-2">
+                      <svg className="w-5 h-5 text-success-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                      </svg>
+                      <span className="font-medium text-surface-300">100% Free</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <svg className="w-5 h-5 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                      <span className="font-medium text-surface-300">100% Private</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <svg className="w-5 h-5 text-accent-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+                      </svg>
+                      <span className="font-medium text-surface-300">Instant Processing</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <svg className="w-5 h-5 text-success-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+                      </svg>
+                      <span className="font-medium text-surface-300">No Data Upload</span>
+                    </div>
+                  </div>
+
+                  {/* CTA Button */}
+                  <div className="animate-fade-in-up delay-500">
+                    <button
+                      onClick={() => {
+                        const fileInput = document.getElementById('file-input') as HTMLInputElement;
+                        if (fileInput) {
+                          fileInput.click();
+                        }
+                      }}
+                      className="group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-primary-600 via-primary-500 to-accent-500 text-white font-bold text-lg md:text-xl rounded-2xl shadow-2xl shadow-primary-500/40 hover:shadow-2xl hover:shadow-primary-500/60 transition-all duration-300 hover:scale-105 active:scale-95 overflow-hidden transform hover:-translate-y-1"
+                    >
+                      <span className="absolute inset-0 bg-gradient-to-r from-primary-400 via-accent-400 to-primary-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></span>
+                      <svg className="w-6 h-6 relative z-10 transform group-hover:rotate-12 group-hover:scale-110 transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                      </svg>
+                      <span className="relative z-10">Start Editing PDF Now</span>
+                      <span className="absolute inset-0 bg-white/30 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></span>
+                      <div className="absolute -inset-1 bg-gradient-to-r from-primary-400 to-accent-400 rounded-2xl blur opacity-30 group-hover:opacity-50 transition-opacity duration-300 -z-10"></div>
+                    </button>
+                  </div>
+                </div>
               </div>
-              
-              <h1 id="hero-heading" className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
-                Edit PDF Documents Online{' '}
-                <span className="text-gradient">Instantly</span>
-                <br />
-                <span className="text-3xl md:text-4xl">No Software Required</span>
-              </h1>
-              
-              <p className="text-lg text-surface-400 max-w-2xl mx-auto">
-                Quick, powerful PDF editing right in your browser. No downloads, no registration, no hassle.
-                Start editing in seconds — your files stay 100% private on your device.
-              </p>
             </section>
             
             {/* Upload Area */}
@@ -469,10 +546,10 @@ export default function Home() {
 
       {/* Footer with Social Links */}
       {!hasPages && (
-        <footer className="mt-auto py-6 px-6 border-t border-surface-800/50" role="contentinfo">
-          <div className="max-w-5xl mx-auto space-y-6">
+        <footer className="mt-auto py-4 px-6 border-t border-surface-800/50" role="contentinfo">
+          <div className="max-w-5xl mx-auto space-y-3">
             {/* Disclaimer */}
-            <div className="p-4 rounded-lg bg-surface-800/30 border border-surface-700/50">
+            <div className="p-3 rounded-lg bg-surface-800/30 border border-surface-700/50">
               <p className="text-xs text-surface-400 leading-relaxed">
                 <strong className="text-surface-300">Disclaimer:</strong> EditoraPDF provides online PDF editing tools for general use only. We make no guarantees regarding accuracy, completeness, or suitability for any specific purpose. Users are responsible for reviewing all documents before use. By using this website, you agree to our{' '}
                 <Link href="/terms" className="text-primary-400 hover:text-primary-300 underline">
