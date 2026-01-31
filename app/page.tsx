@@ -39,7 +39,7 @@ export default function Home() {
     '@type': 'HowTo',
     name: 'How to Edit a PDF Online with EditoraPDF',
     description: 'Step-by-step guide to editing PDFs using EditoraPDF, a free browser-based PDF editor',
-    image: `${siteUrl}/og-image.png`,
+    image: `${siteUrl}/og/og-image.png`,
     totalTime: 'PT5M',
     estimatedCost: {
       '@type': 'MonetaryAmount',
@@ -184,7 +184,7 @@ export default function Home() {
       url: siteUrl,
       logo: {
         '@type': 'ImageObject',
-        url: `${siteUrl}/logo.png`,
+        url: `${siteUrl}/logo.svg`,
       },
     },
     creator: {
@@ -193,7 +193,7 @@ export default function Home() {
       url: siteUrl,
     },
     image: [
-      `${siteUrl}/og-image.png`,
+      `${siteUrl}/og/og-image.png`,
     ],
     screenshot: [
       {
@@ -256,13 +256,12 @@ export default function Home() {
           <div className="flex items-center justify-between max-w-7xl mx-auto">
             {/* Logo & Brand */}
             <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-              <Image 
+              <img 
                 src="/logo.svg" 
                 alt="EditoraPDF Logo" 
                 width={120} 
                 height={40} 
                 className="h-10 w-auto"
-                priority
               />
             </Link>
             
@@ -303,12 +302,20 @@ export default function Home() {
 
             {/* CTA Button when no PDF */}
             {!hasPages && (
-              <Link href="/" className="btn-primary btn-md hidden sm:flex">
+              <button
+                onClick={() => {
+                  const fileInput = document.getElementById('file-input') as HTMLInputElement;
+                  if (fileInput) {
+                    fileInput.click();
+                  }
+                }}
+                className="btn-primary btn-md hidden sm:flex"
+              >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                 </svg>
                 Edit PDF
-              </Link>
+              </button>
             )}
           </div>
         </div>

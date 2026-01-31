@@ -32,6 +32,9 @@ const siteName = 'EditoraPDF'
 const siteDescription = 'Edit PDF documents online instantly without installing software or creating an account. Quick, powerful PDF editing in your browser. No downloads, no signup, 100% free and private.'
 const siteTitle = 'Edit PDF Online Free - No Installation, No Signup Required | EditoraPDF'
 
+// Google Tag Manager Container ID
+const GTM_ID = 'GTM-53GDGKBZ'
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
@@ -81,10 +84,10 @@ export const metadata: Metadata = {
     siteName: siteName,
     images: [
       {
-        url: `${siteUrl}/og-image.png`,
+        url: `${siteUrl}/og/og-image.png`,
         width: 1200,
         height: 630,
-        alt: 'EditoraPDF - Professional PDF Editor',
+        alt: 'EditoraPDF - Professional PDF Editor - Edit PDF documents online instantly without installation or signup',
       },
     ],
   },
@@ -92,7 +95,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: siteTitle,
     description: siteDescription,
-    images: [`${siteUrl}/og-image.png`],
+    images: [`${siteUrl}/og/og-image.png`],
     creator: '@editora_pdf',
     site: '@editora_pdf',
   },
@@ -132,6 +135,7 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.png', type: 'image/png', sizes: '32x32' },
       { url: '/favicon.ico', sizes: 'any' },
     ],
     apple: [
@@ -187,7 +191,7 @@ export default function RootLayout({
     '@type': 'VideoObject',
     name: 'EditoraPDF PDF Editor Demo',
     description: 'Watch how to use EditoraPDF to edit PDFs online for free',
-    thumbnailUrl: `${siteUrl}/og-image.png`,
+    thumbnailUrl: `${siteUrl}/og/og-image.png`,
     uploadDate: '2024-01-01',
     contentUrl: `${siteUrl}/video/demo.mp4`,
     embedUrl: `${siteUrl}/video/embed`,
@@ -197,7 +201,7 @@ export default function RootLayout({
       name: 'EditoraPDF',
       logo: {
         '@type': 'ImageObject',
-        url: `${siteUrl}/logo.png`,
+        url: `${siteUrl}/logo.svg`,
       },
     },
   }
@@ -211,11 +215,11 @@ export default function RootLayout({
     url: siteUrl,
     logo: {
       '@type': 'ImageObject',
-      url: `${siteUrl}/logo.png`,
-      width: 512,
-      height: 512,
+      url: `${siteUrl}/logo.svg`,
+      width: 120,
+      height: 40,
     },
-    image: `${siteUrl}/og-image.png`,
+    image: `${siteUrl}/og/og-image.png`,
     description: 'EditoraPDF provides easy-to-use online tools for editing, modifying, and managing PDF documents directly in the browser.',
     foundingDate: '2026',
     sameAs: [
@@ -269,7 +273,7 @@ export default function RootLayout({
       name: 'EditoraPDF',
       logo: {
         '@type': 'ImageObject',
-        url: `${siteUrl}/logo.png`,
+        url: `${siteUrl}/logo.svg`,
       },
     },
     potentialAction: {
@@ -330,6 +334,31 @@ export default function RootLayout({
   return (
     <html lang="en-US" className={`${outfit.variable} ${lexend.variable} ${jetbrains.variable}`}>
       <head>
+        {/* Google Tag Manager - Initialize dataLayer and load GTM */}
+        <Script
+          id="gtm-init"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+            `,
+          }}
+        />
+        <Script
+          id="gtm-script"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+              new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+              j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+              'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+              })(window,document,'script','dataLayer','${GTM_ID}');
+            `,
+          }}
+        />
+        
         {/* Performance: Preconnect to external domains */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -341,6 +370,12 @@ export default function RootLayout({
         {/* Preload critical resources */}
         <link rel="preload" href="/logo.svg" as="image" type="image/svg+xml" />
         <link rel="preload" href="/favicon.svg" as="image" type="image/svg+xml" />
+        
+        {/* Favicon links */}
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         
         {/* Additional SEO meta tags */}
         <meta name="language" content="English" />
@@ -366,6 +401,27 @@ export default function RootLayout({
         
         {/* OpenSearch */}
         <link rel="search" type="application/opensearchdescription+xml" title={siteName} href={`${siteUrl}/opensearch.xml`} />
+        
+        {/* Open Graph Meta Tags - Explicit for full compatibility */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={siteUrl} />
+        <meta property="og:title" content={siteTitle} />
+        <meta property="og:description" content={siteDescription} />
+        <meta property="og:site_name" content={siteName} />
+        <meta property="og:image" content={`${siteUrl}/og/og-image.png`} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="EditoraPDF - Professional PDF Editor - Edit PDF documents online instantly without installation or signup" />
+        <meta property="og:locale" content="en_US" />
+        
+        {/* Twitter Card Meta Tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@editora_pdf" />
+        <meta name="twitter:creator" content="@editora_pdf" />
+        <meta name="twitter:title" content={siteTitle} />
+        <meta name="twitter:description" content={siteDescription} />
+        <meta name="twitter:image" content={`${siteUrl}/og/og-image.png`} />
+        <meta name="twitter:image:alt" content="EditoraPDF - Professional PDF Editor" />
         
         {/* Social Media Profile Links */}
         <meta property="og:see_also" content="https://www.facebook.com/people/Editorapdf/61587362633003/" />
@@ -430,6 +486,16 @@ export default function RootLayout({
         /> */}
       </head>
       <body className={`${outfit.className} antialiased`}>
+        {/* Google Tag Manager (noscript) */}
+        <noscript>
+          <iframe
+            src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+            height="0"
+            width="0"
+            style={{ display: 'none', visibility: 'hidden' }}
+          />
+        </noscript>
+        
         {/* Skip to main content link for accessibility */}
         <a
           href="#main-content"

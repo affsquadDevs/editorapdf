@@ -7,14 +7,16 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "analyze": "cross-env ANALYZE=true next build"
+    "analyze": "cross-env ANALYZE=true next build",
+    "submit-indexnow": "node scripts/submit-indexnow.js",
+    "generate-favicons": "node scripts/generate-favicons.js"
   },
   "dependencies": {
     "next": "^14.1.0",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^3.11.174",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "pdfjs-dist": "^3.11.174",
-    "pdf-lib": "^1.17.1",
     "zustand": "^4.5.0"
   },
   "devDependencies": {
@@ -23,6 +25,7 @@
     "@types/react-dom": "^18",
     "autoprefixer": "^10.4.17",
     "postcss": "^8.4.33",
+    "sharp": "^0.34.5",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }

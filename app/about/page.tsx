@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import Image from 'next/image'
 
 export const metadata: Metadata = {
   title: 'About Us - Free PDF Editor',
@@ -15,7 +14,7 @@ export default function AboutPage() {
         <div className="px-6 py-3">
           <div className="flex items-center justify-between max-w-7xl mx-auto">
             <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-              <Image src="/logo.svg" alt="EditoraPDF Logo" width={120} height={40} className="h-10 w-auto" priority />
+              <img src="/logo.svg" alt="EditoraPDF Logo" width={120} height={40} className="h-10 w-auto" />
             </Link>
             
             <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
