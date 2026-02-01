@@ -76,7 +76,7 @@ interface PdfState {
   fileName: string;
   fileSize: number;
   isExporting: boolean;
-  editMode: 'text' | 'image' | 'shape' | 'none';
+  editMode: 'text' | 'image' | 'shape' | 'signature' | 'none';
   selectedShapeType: ShapeOverlay['type'];
   selectedShapeStyle: 'outline' | 'filled';
   extractTextOnLoad: boolean;
@@ -109,7 +109,7 @@ interface PdfState {
   addShapeOverlay: (pageId: string, shape: Omit<ShapeOverlay, 'id' | 'pageId'>) => void;
   updateShapeOverlay: (shapeId: string, updates: Partial<ShapeOverlay>) => void;
   deleteShapeOverlay: (shapeId: string) => void;
-  setEditMode: (mode: 'text' | 'image' | 'shape' | 'none') => void;
+  setEditMode: (mode: 'text' | 'image' | 'shape' | 'signature' | 'none') => void;
   setSelectedShapeType: (type: ShapeOverlay['type']) => void;
   setSelectedShapeStyle: (style: 'outline' | 'filled') => void;
   setExtractTextOnLoad: (extract: boolean) => void;

@@ -10,7 +10,12 @@ export default function EditToolbar() {
     setSelectedShapeType,
     selectedShapeStyle,
     setSelectedShapeStyle,
+    pages,
+    selectedPageId,
+    addImageOverlay,
+    saveHistory,
   } = usePdfStore();
+  
 
   const tools = [
     { 
@@ -54,6 +59,7 @@ export default function EditToolbar() {
       title: 'Draw shapes' 
     },
   ];
+
 
   const shapeTypes = [
     { 
@@ -108,6 +114,7 @@ export default function EditToolbar() {
     text: 'Click on text to edit, or click empty area to add new text',
     image: 'Click to upload and place an image',
     shape: 'Click and drag to draw shape',
+    signature: 'Click on PDF to place signature',
   };
 
   return (
@@ -137,6 +144,24 @@ export default function EditToolbar() {
               <span className="hidden md:inline">{tool.label}</span>
             </button>
           ))}
+          
+          {/* Signature Button - Inside toolbar group */}
+          <button
+            onClick={() => setEditMode(editMode === 'signature' ? 'none' : 'signature')}
+            className={`
+              btn-sm transition-all duration-200
+              ${editMode === 'signature'
+                ? 'btn-primary shadow-lg shadow-primary-500/25'
+                : 'btn-ghost hover:bg-accent-500/20 hover:text-accent-300'
+              }
+            `}
+            title="Add signature"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+            </svg>
+            <span className="hidden md:inline">Signature</span>
+          </button>
         </div>
 
         {/* Shape Types (visible when shape mode is active) */}

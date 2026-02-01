@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { usePdfStore } from '../store/pdfStore';
 import ConfirmDialog from './ConfirmDialog';
+import SignaturePad from './SignaturePad';
 import type { TextOverlay, ImageOverlay, ShapeOverlay } from '../store/pdfStore';
 
 interface Props {
@@ -71,6 +72,8 @@ export default function AdvancedOverlayLayer({ pageId, pageWidth, pageHeight, zo
     itemId: null,
     itemType: 'text',
   });
+  const [signaturePadOpen, setSignaturePadOpen] = useState(false);
+  const [signaturePadPosition, setSignaturePadPosition] = useState({ x: 0, y: 0 });
   
   const measureTextBox = (
     text: string,
@@ -240,6 +243,10 @@ export default function AdvancedOverlayLayer({ pageId, pageWidth, pageHeight, zo
       // Відкриваємо діалог вибору файлу для додавання нового зображення
       fileInputRef.current?.click();
       (window as any).__pendingImagePosition = { x, y };
+    } else if (editMode === 'signature') {
+      // Відкриваємо блок малювання підпису у місці кліку
+      setSignaturePadPosition({ x, y });
+      setSignaturePadOpen(true);
     }
   };
 
@@ -591,6 +598,34 @@ export default function AdvancedOverlayLayer({ pageId, pageWidth, pageHeight, zo
     };
   }, [resizingItemId, resizeDirection, resizeStart, updateTextOverlay, updateImageOverlay, updateShapeOverlay]);
 
+  // Handle signature save
+  const handleSignatureSave = (dataUrl: string) => {
+    if (!pageId) return;
+    
+    const img = new Image();
+    img.onload = () => {
+      const aspectRatio = img.width / img.height;
+      const width = 0.2; // 20% of page width
+      const height = width / aspectRatio;
+
+      addImageOverlay(pageId, {
+        x: signaturePadPosition.x,
+        y: signaturePadPosition.y,
+        width,
+        height,
+        dataUrl,
+        rotation: 0,
+      });
+      saveHistory();
+      
+      // Switch to image mode so user can move/resize the signature
+      setEditMode('image');
+    };
+    img.src = dataUrl;
+    
+    setSignaturePadOpen(false);
+  };
+
   // Handle delete confirmation
   const handleDeleteClick = (itemId: string, itemType: 'text' | 'image' | 'shape') => {
     setDeleteConfirm({ isOpen: true, itemId, itemType });
@@ -629,11 +664,12 @@ export default function AdvancedOverlayLayer({ pageId, pageWidth, pageHeight, zo
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
-        className={`
+          className={`
           absolute inset-0
           ${editMode === 'text' ? 'cursor-crosshair' : ''}
           ${editMode === 'image' ? 'cursor-copy' : ''}
           ${editMode === 'shape' ? 'cursor-crosshair' : ''}
+          ${editMode === 'signature' ? 'cursor-crosshair' : ''}
         `}
         style={{
           width: `${pageWidth * zoom}px`,
@@ -1670,6 +1706,19 @@ export default function AdvancedOverlayLayer({ pageId, pageWidth, pageHeight, zo
           />
         )}
       </div>
+
+      {/* Signature Pad */}
+      {signaturePadOpen && (
+        <SignaturePad
+          isOpen={signaturePadOpen}
+          onClose={() => setSignaturePadOpen(false)}
+          onSave={handleSignatureSave}
+          position={signaturePadPosition}
+          pageWidth={pageWidth}
+          pageHeight={pageHeight}
+          zoom={zoom}
+        />
+      )}
 
       {/* Confirm Delete Dialog */}
       <ConfirmDialog

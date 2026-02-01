@@ -347,7 +347,7 @@ export default function RootLayout({
         />
         <Script
           id="gtm-script"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `
               (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -440,12 +440,12 @@ export default function RootLayout({
         {/* <meta name="msvalidate.01" content="your-code" /> */}
         {/* <meta name="yandex-verification" content="your-code" /> */}
         
-        {/* Google AdSense */}
+        {/* Google AdSense - Load after page is interactive */}
         <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2980943706375055"
           crossOrigin="anonymous"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
         
         {/* Content Security Policy hints */}
@@ -457,25 +457,25 @@ export default function RootLayout({
           id="jsonld-breadcrumb"
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-          strategy="beforeInteractive"
+          strategy="afterInteractive"
         />
         <Script
           id="jsonld-organization"
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
-          strategy="beforeInteractive"
+          strategy="afterInteractive"
         />
         <Script
           id="jsonld-website"
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
-          strategy="beforeInteractive"
+          strategy="afterInteractive"
         />
         <Script
           id="jsonld-itemlist"
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
-          strategy="beforeInteractive"
+          strategy="afterInteractive"
         />
         {/* Video schema - uncomment when you have video content */}
         {/* <Script

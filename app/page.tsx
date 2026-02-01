@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Script from 'next/script';
 import { generateFAQSchema } from './data/faq';
 import FAQ from './components/FAQ';
+import MobileMenu from './components/MobileMenu';
 
 const siteUrl = 'https://editorapdf.com';
 
@@ -208,25 +209,25 @@ export default function Home() {
         id="jsonld-webapp"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppSchema) }}
-        strategy="beforeInteractive"
+        strategy="afterInteractive"
       />
       <Script
         id="jsonld-faq"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-        strategy="beforeInteractive"
+        strategy="afterInteractive"
       />
       <Script
         id="jsonld-howto"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }}
-        strategy="beforeInteractive"
+        strategy="afterInteractive"
       />
       <Script
         id="jsonld-review"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(reviewSchema) }}
-        strategy="beforeInteractive"
+        strategy="afterInteractive"
       />
       
       <main className="h-screen flex flex-col" role="main">
@@ -234,16 +235,23 @@ export default function Home() {
       <header className="sticky top-0 z-50 glass border-b border-surface-700/50" role="banner">
         <div className="px-6 py-3">
           <div className="flex items-center justify-between max-w-7xl mx-auto">
-            {/* Logo & Brand */}
-            <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-              <img 
-                src="/logo.svg" 
-                alt="EditoraPDF Logo" 
-                width={120} 
-                height={40} 
-                className="h-10 w-auto"
-              />
-            </Link>
+            <div className="flex items-center gap-3">
+              {/* Mobile Menu Button */}
+              <MobileMenu />
+              
+              {/* Logo & Brand */}
+              <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                <img 
+                  src="/logo.svg" 
+                  alt="EditoraPDF Logo" 
+                  width={120} 
+                  height={40} 
+                  className="h-10 w-auto"
+                  loading="eager"
+                  fetchPriority="high"
+                />
+              </Link>
+            </div>
             
             {/* Navigation */}
             <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">

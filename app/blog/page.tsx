@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import MobileMenu from '../components/MobileMenu'
 
 export const metadata: Metadata = {
   title: 'Blog - Tips & Guides',
@@ -13,9 +14,12 @@ export default function BlogPage() {
       <header className="relative z-10 glass border-b border-surface-700/50" role="banner">
         <div className="px-6 py-3">
           <div className="flex items-center justify-between max-w-7xl mx-auto">
-            <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-              <img src="/logo.svg" alt="EditoraPDF Logo" width={120} height={40} className="h-10 w-auto" />
-            </Link>
+            <div className="flex items-center gap-3">
+              <MobileMenu />
+              <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                <img src="/logo.svg" alt="EditoraPDF Logo" width={120} height={40} className="h-10 w-auto" />
+              </Link>
+            </div>
             
             <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
               <Link href="/" className="nav-link">Home</Link>
@@ -47,18 +51,30 @@ export default function BlogPage() {
 
           {/* Blog Posts Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Coming Soon Card */}
-            <div className="card p-6 text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary-500/10 flex items-center justify-center">
-                <svg className="w-8 h-8 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                </svg>
+            {/* Blog Post: How to Edit a PDF Online */}
+            <Link href="/blog/how-to-edit-a-pdf-online" className="card overflow-hidden hover:scale-105 transition-transform duration-300 group">
+              <div className="relative w-full h-48 overflow-hidden bg-surface-800">
+                <img
+                  src="/blog1.png"
+                  alt="Step-by-step guide on how to edit a PDF file online"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Coming Soon</h3>
-              <p className="text-surface-400">
-                We're working on bringing you helpful PDF editing tips and tutorials. Check back soon!
-              </p>
-            </div>
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-primary-400 transition-colors">
+                  How to Edit a PDF Online
+                </h3>
+                <p className="text-surface-400 mb-4 line-clamp-3">
+                  Learn how to edit PDF files online without installing software. Step-by-step guide covering text editing, images, shapes, page management, and more.
+                </p>
+                <span className="text-primary-400 text-sm font-medium inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+                  Read more
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                  </svg>
+                </span>
+              </div>
+            </Link>
           </div>
         </div>
       </div>
