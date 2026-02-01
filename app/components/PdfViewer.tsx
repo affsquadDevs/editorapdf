@@ -86,8 +86,8 @@ export default function PdfViewer() {
   return (
     <div className="flex-1 flex flex-col bg-surface-900/30">
       {/* Pagination Controls */}
-      <div className="glass border-b border-surface-700/50 px-4 py-2.5">
-        <div className="flex items-center justify-center gap-2">
+      <div className="glass border-b border-surface-700/50 px-2 sm:px-4 py-2 sm:py-2.5">
+        <div className="flex items-center justify-center gap-1 sm:gap-2">
           {/* Previous Button */}
           <button
             onClick={handlePrevPage}
@@ -101,12 +101,12 @@ export default function PdfViewer() {
           </button>
 
           {/* Page Selector */}
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-surface-800/50">
-            <span className="text-xs text-surface-400 font-medium">Page</span>
+          <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-surface-800/50">
+            <span className="text-xs text-surface-400 font-medium hidden sm:inline">Page</span>
             <select
               value={selectedPageId || ''}
               onChange={handlePageJump}
-              className="bg-transparent text-sm font-medium text-surface-100 focus:outline-none cursor-pointer appearance-none text-center min-w-[2.5rem] pr-1"
+              className="bg-transparent text-xs sm:text-sm font-medium text-surface-100 focus:outline-none cursor-pointer appearance-none text-center min-w-[2rem] sm:min-w-[2.5rem] pr-1"
             >
               {activePages.map((page, index) => (
                 <option key={page.id} value={page.id} className="bg-surface-800 text-surface-100">
@@ -114,8 +114,8 @@ export default function PdfViewer() {
                 </option>
               ))}
             </select>
-            <span className="text-xs text-surface-500">of</span>
-            <span className="text-sm font-medium text-surface-300">{activePages.length}</span>
+            <span className="text-xs text-surface-500">/</span>
+            <span className="text-xs sm:text-sm font-medium text-surface-300">{activePages.length}</span>
           </div>
 
           {/* Next Button */}
@@ -140,7 +140,7 @@ export default function PdfViewer() {
       </div>
 
       {/* Canvas Display Area */}
-      <div className="flex-1 overflow-auto p-8">
+      <div className="flex-1 overflow-auto p-2 sm:p-4 md:p-8">
         <div className="flex justify-center">
           <div className="relative inline-block">
             {/* Loading Overlay */}

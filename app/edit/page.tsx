@@ -129,7 +129,7 @@ export default function EditPage() {
             <Toolbar />
             <EditToolbar />
             
-            <div className="flex-1 flex overflow-hidden">
+            <div className="flex-1 flex overflow-hidden relative">
               <Thumbnails />
               <PdfViewer />
             </div>

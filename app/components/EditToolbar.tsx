@@ -118,15 +118,15 @@ export default function EditToolbar() {
   };
 
   return (
-    <div className="glass border-b border-surface-700/50 px-4 py-2.5">
-      <div className="flex items-center gap-3">
+    <div className="glass border-b border-surface-700/50 px-2 sm:px-4 py-2 sm:py-2.5 overflow-x-auto">
+      <div className="flex items-center gap-2 sm:gap-3 min-w-max">
         {/* Tools Label */}
-        <span className="text-xs font-medium text-surface-500 uppercase tracking-wider hidden sm:block">
+        <span className="text-xs font-medium text-surface-500 uppercase tracking-wider hidden lg:block flex-shrink-0">
           Tools
         </span>
         
         {/* Main Tools */}
-        <div className="toolbar-group">
+        <div className="toolbar-group flex-shrink-0">
           {tools.map((tool) => (
             <button
               key={tool.mode}
@@ -141,7 +141,7 @@ export default function EditToolbar() {
               title={tool.title}
             >
               {tool.icon}
-              <span className="hidden md:inline">{tool.label}</span>
+              <span className="hidden lg:inline">{tool.label}</span>
             </button>
           ))}
           
@@ -160,7 +160,7 @@ export default function EditToolbar() {
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
             </svg>
-            <span className="hidden md:inline">Signature</span>
+            <span className="hidden lg:inline">Signature</span>
           </button>
         </div>
 
@@ -233,11 +233,11 @@ export default function EditToolbar() {
         )}
 
         {/* Instructions */}
-        <div className="ml-auto flex items-center gap-2 text-xs text-surface-400">
-          <svg className="w-4 h-4 text-surface-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <div className="ml-auto flex items-center gap-2 text-xs text-surface-400 flex-shrink-0">
+          <svg className="w-4 h-4 text-surface-500 hidden sm:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <span className="hidden sm:inline">{instructions[editMode]}</span>
+          <span className="hidden md:inline">{instructions[editMode]}</span>
         </div>
       </div>
     </div>

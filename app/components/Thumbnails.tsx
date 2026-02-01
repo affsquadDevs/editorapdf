@@ -15,6 +15,20 @@ export default function Thumbnails() {
   const [isLoading, setIsLoading] = useState(false);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  // Auto-expand on large screens
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setIsCollapsed(false);
+      }
+    };
+
+    handleResize(); // Check on mount
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Generate thumbnails when PDF is loaded
   useEffect(() => {
@@ -115,19 +129,52 @@ export default function Thumbnails() {
   }
 
   return (
-    <div className="w-72 glass border-r border-surface-700/50 flex flex-col">
-      {/* Header */}
-      <div className="px-4 py-3 border-b border-surface-700/50">
-        <div className="flex items-center justify-between">
+    <>
+      {/* Mobile Toggle Button - Only visible on small screens when collapsed */}
+      {isCollapsed && (
+        <button
+          onClick={() => setIsCollapsed(false)}
+          className="lg:hidden fixed top-24 left-2 z-40 bg-surface-800/90 backdrop-blur-sm border border-surface-700/50 rounded-lg p-2.5 shadow-lg hover:bg-surface-700/90 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+          aria-label="Show pages"
+        >
+          <svg className="w-5 h-5 text-surface-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      )}
+
+      {/* Sidebar */}
+      <div className={`
+        glass border-r border-surface-700/50 flex flex-col
+        w-64 sm:w-72 lg:w-72
+        fixed lg:static
+        top-0 left-0 h-full lg:h-auto
+        z-30 lg:z-auto
+        transform transition-transform duration-300 ease-in-out
+        ${isCollapsed ? '-translate-x-full lg:translate-x-0' : 'translate-x-0'}
+      `}>
+        {/* Header */}
+        <div className="px-4 py-3 border-b border-surface-700/50 flex items-center justify-between">
           <h2 className="text-sm font-semibold text-surface-200 flex items-center gap-2">
             <svg className="w-4 h-4 text-surface-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
             </svg>
             Pages
           </h2>
-          <span className="badge-primary">{visiblePages.length}</span>
+          <div className="flex items-center gap-2">
+            <span className="badge-primary">{visiblePages.length}</span>
+            {/* Close button for mobile */}
+            <button
+              onClick={() => setIsCollapsed(true)}
+              className="lg:hidden p-1 rounded hover:bg-surface-700/50 transition-colors"
+              aria-label="Close pages sidebar"
+            >
+              <svg className="w-4 h-4 text-surface-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
-      </div>
       
       {/* Thumbnails List */}
       <div className="flex-1 overflow-y-auto p-3">
@@ -219,12 +266,22 @@ export default function Thumbnails() {
         )}
       </div>
       
-      {/* Footer Hint */}
-      <div className="px-4 py-3 border-t border-surface-700/50">
-        <p className="text-xs text-surface-500 text-center">
-          Drag to reorder pages
-        </p>
+        {/* Footer Hint */}
+        <div className="px-4 py-3 border-t border-surface-700/50">
+          <p className="text-xs text-surface-500 text-center">
+            Drag to reorder pages
+          </p>
+        </div>
       </div>
-    </div>
+
+      {/* Mobile Overlay - Only visible when sidebar is open on mobile */}
+      {!isCollapsed && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/50 z-20"
+          onClick={() => setIsCollapsed(true)}
+          aria-hidden="true"
+        />
+      )}
+    </>
   );
 }

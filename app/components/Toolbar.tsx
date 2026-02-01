@@ -54,21 +54,21 @@ export default function Toolbar() {
 
   return (
     <>
-      <div className="glass border-b border-surface-700/50 px-4 py-3">
-        <div className="flex items-center justify-between flex-wrap gap-4">
+      <div className="glass border-b border-surface-700/50 px-2 sm:px-4 py-2 sm:py-3 overflow-x-auto">
+        <div className="flex items-center justify-between gap-2 sm:gap-4 min-w-max">
           {/* File Info */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
             {hasPages && (
               <>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3">
                   {/* File Icon */}
-                  <div className="w-9 h-9 rounded-lg bg-error-500/10 border border-error-500/20 flex items-center justify-center">
-                    <svg className="w-5 h-5 text-error-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-error-500/10 border border-error-500/20 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5 text-error-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
                     </svg>
                   </div>
                   
-                  <div>
+                  <div className="hidden sm:block">
                     <p className="text-sm font-medium text-surface-100 line-clamp-1 max-w-[200px]">
                       {fileName}
                     </p>
@@ -78,13 +78,19 @@ export default function Toolbar() {
                       <span>{activePages.length} {activePages.length === 1 ? 'page' : 'pages'}</span>
                     </div>
                   </div>
+                  {/* Mobile: Show only file name */}
+                  <div className="sm:hidden">
+                    <p className="text-xs font-medium text-surface-100 line-clamp-1 max-w-[120px]">
+                      {fileName}
+                    </p>
+                  </div>
                 </div>
               </>
             )}
           </div>
 
           {/* Controls */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
             {/* Undo/Redo */}
             {hasPages && (
               <div className="toolbar-group">
@@ -141,7 +147,7 @@ export default function Toolbar() {
                     </svg>
                   </button>
                   
-                  <span className="px-3 text-sm font-medium text-surface-200 min-w-[4rem] text-center font-mono">
+                  <span className="px-2 sm:px-3 text-xs sm:text-sm font-medium text-surface-200 min-w-[3rem] sm:min-w-[4rem] text-center font-mono">
                     {Math.round(zoom * 100)}%
                   </span>
                   
