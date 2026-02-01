@@ -34,9 +34,8 @@ export default function SignaturePad({ isOpen, onClose, onSave, position, pageWi
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 
-    // Clear canvas
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Clear canvas with transparent background for signatures
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     setHasSignature(false);
   }, [isOpen]);
 
@@ -84,8 +83,8 @@ export default function SignaturePad({ isOpen, onClose, onSave, position, pageWi
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Clear with transparent background
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     setHasSignature(false);
   };
 
@@ -131,7 +130,8 @@ export default function SignaturePad({ isOpen, onClose, onSave, position, pageWi
         <div className="mb-4 p-4 bg-white rounded-lg border-2 border-dashed border-surface-600">
           <canvas
             ref={canvasRef}
-            className="w-full h-48 cursor-crosshair touch-none"
+            className="w-full h-48 cursor-crosshair touch-none bg-white"
+            style={{ backgroundColor: '#ffffff' }}
             onMouseDown={startDrawing}
             onMouseMove={draw}
             onMouseUp={stopDrawing}

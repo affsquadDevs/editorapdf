@@ -31,6 +31,7 @@ export interface ImageOverlay {
   dataUrl: string;
   rotation?: number; // rotation in degrees (0-360)
   deleted?: boolean;
+  isSignature?: boolean; // true if this is a signature (transparent background)
 }
 
 export interface ShapeOverlay {

@@ -339,7 +339,7 @@ export default function AdvancedOverlayLayer({ pageId, pageWidth, pageHeight, zo
     setIsDrawing(false);
   };
 
-  // Handle item dragging
+  // Handle item dragging (mouse)
   const handleItemMouseDown = (e: React.MouseEvent, itemId: string, itemX: number, itemY: number) => {
     e.stopPropagation();
     
@@ -381,7 +381,39 @@ export default function AdvancedOverlayLayer({ pageId, pageWidth, pageHeight, zo
     });
   };
 
-  // Handle resize - змінюємо розмір білого фону (boxWidth/boxHeight) для тексту
+  // Handle item dragging (touch)
+  const handleItemTouchStart = (e: React.TouchEvent, itemId: string, itemX: number, itemY: number) => {
+    e.stopPropagation();
+    
+    if ((e.target as HTMLElement).closest('.resize-handle') ||
+        (e.target as HTMLElement).closest('.edit-panel') ||
+        (e.target as HTMLElement).tagName === 'INPUT' || 
+        (e.target as HTMLElement).tagName === 'BUTTON' ||
+        (e.target as HTMLElement).tagName === 'SELECT' ||
+        (e.target as HTMLElement).tagName === 'TEXTAREA') {
+      return;
+    }
+
+    const touch = e.touches[0];
+    if (!touch) return;
+
+    // Single select
+    selectItem(itemId, false);
+
+    const rect = layerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    const currentX = itemX * rect.width;
+    const currentY = itemY * rect.height;
+
+    setDraggingItemId(itemId);
+    setDragOffset({
+      x: touch.clientX - currentX,
+      y: touch.clientY - currentY,
+    });
+  };
+
+  // Handle resize - змінюємо розмір білого фону (boxWidth/boxHeight) для тексту (mouse)
   const handleResizeMouseDown = (e: React.MouseEvent, overlay: TextOverlay, direction: 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right') => {
     e.stopPropagation();
     
@@ -403,7 +435,29 @@ export default function AdvancedOverlayLayer({ pageId, pageWidth, pageHeight, zo
     });
   };
 
-  // Handle image resize
+  // Handle resize for text (touch)
+  const handleResizeTouchStart = (e: React.TouchEvent, overlay: TextOverlay, direction: 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right') => {
+    e.stopPropagation();
+    
+    const rect = layerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    const touch = e.touches[0];
+    updateTextOverlay(overlay.id, { autoFit: false });
+    
+    setResizingItemId(overlay.id);
+    setResizeDirection(direction);
+    setResizeStart({
+      boxWidth: (overlay.boxWidth || 0.2) * rect.width,
+      boxHeight: (overlay.boxHeight || 0.05) * rect.height,
+      x: overlay.x * rect.width,
+      y: overlay.y * rect.height,
+      mouseX: touch.clientX,
+      mouseY: touch.clientY,
+    });
+  };
+
+  // Handle image resize (mouse)
   const handleImageResizeMouseDown = (e: React.MouseEvent, image: ImageOverlay, direction: 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right') => {
     e.stopPropagation();
     
@@ -422,7 +476,27 @@ export default function AdvancedOverlayLayer({ pageId, pageWidth, pageHeight, zo
     });
   };
 
-  // Handle shape resize
+  // Handle image resize (touch)
+  const handleImageResizeTouchStart = (e: React.TouchEvent, image: ImageOverlay, direction: 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right') => {
+    e.stopPropagation();
+    
+    const rect = layerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    
+    const touch = e.touches[0];
+    setResizingItemId(image.id);
+    setResizeDirection(direction);
+    setResizeStart({
+      boxWidth: image.width * rect.width,
+      boxHeight: image.height * rect.height,
+      x: image.x * rect.width,
+      y: image.y * rect.height,
+      mouseX: touch.clientX,
+      mouseY: touch.clientY,
+    });
+  };
+
+  // Handle shape resize (mouse)
   const handleShapeResizeMouseDown = (e: React.MouseEvent, shape: ShapeOverlay, direction: 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right') => {
     e.stopPropagation();
     
@@ -441,16 +515,38 @@ export default function AdvancedOverlayLayer({ pageId, pageWidth, pageHeight, zo
     });
   };
 
-  // Dragging effect
+  // Handle shape resize (touch)
+  const handleShapeResizeTouchStart = (e: React.TouchEvent, shape: ShapeOverlay, direction: 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right') => {
+    e.stopPropagation();
+    
+    const rect = layerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    
+    const touch = e.touches[0];
+    if (!touch) return;
+    
+    setResizingItemId(shape.id);
+    setResizeDirection(direction);
+    setResizeStart({
+      boxWidth: shape.width * rect.width,
+      boxHeight: shape.height * rect.height,
+      x: shape.x * rect.width,
+      y: shape.y * rect.height,
+      mouseX: touch.clientX,
+      mouseY: touch.clientY,
+    });
+  };
+
+  // Dragging effect (mouse and touch)
   useEffect(() => {
     if (!draggingItemId) return;
 
-    const handleMouseMove = (e: MouseEvent) => {
+    const handleMove = (clientX: number, clientY: number) => {
       const rect = layerRef.current?.getBoundingClientRect();
       if (!rect) return;
 
-      const x = Math.max(0, Math.min(1, (e.clientX - dragOffset.x) / rect.width));
-      const y = Math.max(0, Math.min(1, (e.clientY - dragOffset.y) / rect.height));
+      const x = Math.max(0, Math.min(1, (clientX - dragOffset.x) / rect.width));
+      const y = Math.max(0, Math.min(1, (clientY - dragOffset.y) / rect.height));
 
       if (draggingItemId.startsWith('text-') || draggingItemId.startsWith('overlay-')) {
         updateTextOverlay(draggingItemId, { x, y });
@@ -461,17 +557,32 @@ export default function AdvancedOverlayLayer({ pageId, pageWidth, pageHeight, zo
       }
     };
 
-    const handleMouseUp = () => {
+    const handleMouseMove = (e: MouseEvent) => {
+      handleMove(e.clientX, e.clientY);
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      e.preventDefault(); // Prevent scrolling
+      if (e.touches.length > 0) {
+        handleMove(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    };
+
+    const handleEnd = () => {
       setDraggingItemId(null);
       saveHistory(); // Save state after drag
     };
 
     document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('mouseup', handleEnd);
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchend', handleEnd);
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('mouseup', handleEnd);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleEnd);
     };
   }, [draggingItemId, dragOffset, updateTextOverlay, updateImageOverlay, updateShapeOverlay]);
 
@@ -480,12 +591,12 @@ export default function AdvancedOverlayLayer({ pageId, pageWidth, pageHeight, zo
   useEffect(() => {
     if (!resizingItemId || !resizeDirection) return;
 
-    const handleMouseMove = (e: MouseEvent) => {
+    const handleResize = (clientX: number, clientY: number) => {
       const rect = layerRef.current?.getBoundingClientRect();
       if (!rect) return;
 
-      const deltaX = e.clientX - resizeStart.mouseX;
-      const deltaY = e.clientY - resizeStart.mouseY;
+      const deltaX = clientX - resizeStart.mouseX;
+      const deltaY = clientY - resizeStart.mouseY;
 
       let newBoxWidth = resizeStart.boxWidth;
       let newBoxHeight = resizeStart.boxHeight;
@@ -583,20 +694,35 @@ export default function AdvancedOverlayLayer({ pageId, pageWidth, pageHeight, zo
       }
     };
 
-    const handleMouseUp = () => {
+    const handleMouseMove = (e: MouseEvent) => {
+      handleResize(e.clientX, e.clientY);
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      e.preventDefault(); // Prevent scrolling
+      if (e.touches.length > 0) {
+        handleResize(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    };
+
+    const handleEnd = () => {
       setResizingItemId(null);
       setResizeDirection(null);
       saveHistory(); // Save state after resize
     };
 
     document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('mouseup', handleEnd);
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchend', handleEnd);
 
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('mouseup', handleEnd);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleEnd);
     };
-  }, [resizingItemId, resizeDirection, resizeStart, updateTextOverlay, updateImageOverlay, updateShapeOverlay]);
+  }, [resizingItemId, resizeDirection, resizeStart, updateTextOverlay, updateImageOverlay, updateShapeOverlay, overlays, zoom]);
 
   // Handle signature save
   const handleSignatureSave = (dataUrl: string) => {
@@ -615,6 +741,7 @@ export default function AdvancedOverlayLayer({ pageId, pageWidth, pageHeight, zo
         height,
         dataUrl,
         rotation: 0,
+        isSignature: true, // Mark as signature for transparent background
       });
       saveHistory();
       
@@ -704,6 +831,7 @@ export default function AdvancedOverlayLayer({ pageId, pageWidth, pageHeight, zo
                 height: `${boxHeight}%`,
               }}
               onMouseDown={(e) => handleItemMouseDown(e, overlay.id, overlay.x, overlay.y)}
+              onTouchStart={(e) => handleItemTouchStart(e, overlay.id, overlay.x, overlay.y)}
               onClick={(e) => {
                 e.stopPropagation();
                 const target = e.target as HTMLElement;
@@ -767,58 +895,66 @@ export default function AdvancedOverlayLayer({ pageId, pageWidth, pageHeight, zo
               {/* Resize Handles - 4 сторони + 4 кути */}
               {/* Top */}
               <div
-                className="resize-handle absolute -top-0.5 left-0 right-0 h-1 cursor-n-resize bg-blue-600 hover:bg-blue-700 opacity-20 hover:opacity-60 transition-opacity z-10"
+                className="resize-handle absolute -top-0.5 left-0 right-0 h-2 md:h-1 cursor-n-resize bg-blue-600 hover:bg-blue-700 opacity-60 md:opacity-20 md:hover:opacity-60 active:opacity-100 transition-opacity z-10 touch-none"
                 onMouseDown={(e) => handleResizeMouseDown(e, overlay, 'top')}
+                onTouchStart={(e) => handleResizeTouchStart(e, overlay, 'top')}
                 title="Drag up to expand from top"
               />
               
               {/* Bottom */}
               <div
-                className="resize-handle absolute -bottom-0.5 left-0 right-0 h-1 cursor-s-resize bg-blue-600 hover:bg-blue-700 opacity-20 hover:opacity-60 transition-opacity z-10"
+                className="resize-handle absolute -bottom-0.5 left-0 right-0 h-2 md:h-1 cursor-s-resize bg-blue-600 hover:bg-blue-700 opacity-60 md:opacity-20 md:hover:opacity-60 active:opacity-100 transition-opacity z-10 touch-none"
                 onMouseDown={(e) => handleResizeMouseDown(e, overlay, 'bottom')}
+                onTouchStart={(e) => handleResizeTouchStart(e, overlay, 'bottom')}
                 title="Drag down to expand from bottom"
               />
               
               {/* Left */}
               <div
-                className="resize-handle absolute -left-0.5 top-0 bottom-0 w-1 cursor-w-resize bg-blue-600 hover:bg-blue-700 opacity-20 hover:opacity-60 transition-opacity z-10"
+                className="resize-handle absolute -left-0.5 top-0 bottom-0 w-2 md:w-1 cursor-w-resize bg-blue-600 hover:bg-blue-700 opacity-60 md:opacity-20 md:hover:opacity-60 active:opacity-100 transition-opacity z-10 touch-none"
                 onMouseDown={(e) => handleResizeMouseDown(e, overlay, 'left')}
+                onTouchStart={(e) => handleResizeTouchStart(e, overlay, 'left')}
                 title="Drag left to expand from left"
               />
               
               {/* Right */}
               <div
-                className="resize-handle absolute -right-0.5 top-0 bottom-0 w-1 cursor-e-resize bg-blue-600 hover:bg-blue-700 opacity-20 hover:opacity-60 transition-opacity z-10"
+                className="resize-handle absolute -right-0.5 top-0 bottom-0 w-2 md:w-1 cursor-e-resize bg-blue-600 hover:bg-blue-700 opacity-60 md:opacity-20 md:hover:opacity-60 active:opacity-100 transition-opacity z-10 touch-none"
                 onMouseDown={(e) => handleResizeMouseDown(e, overlay, 'right')}
+                onTouchStart={(e) => handleResizeTouchStart(e, overlay, 'right')}
                 title="Drag right to expand from right"
               />
               
               {/* Corners */}
               {/* Top Left */}
               <div
-                className="resize-handle absolute -top-1.5 -left-1.5 w-3 h-3 cursor-nw-resize bg-blue-600 hover:bg-blue-700 rounded-full opacity-0 hover:opacity-100 transition-opacity z-10 shadow-lg"
+                className="resize-handle absolute -top-1.5 -left-1.5 w-6 h-6 md:w-3 md:h-3 cursor-nw-resize bg-blue-600 hover:bg-blue-700 rounded-full opacity-60 md:opacity-0 md:hover:opacity-100 active:opacity-100 transition-opacity z-10 shadow-lg touch-none"
                 onMouseDown={(e) => handleResizeMouseDown(e, overlay, 'top-left')}
+                onTouchStart={(e) => handleResizeTouchStart(e, overlay, 'top-left')}
                 title="Drag to resize from top-left"
               />
               
               {/* Top Right */}
               <div
-                className="resize-handle absolute -top-1.5 -right-1.5 w-3 h-3 cursor-ne-resize bg-blue-600 hover:bg-blue-700 rounded-full opacity-0 hover:opacity-100 transition-opacity z-10 shadow-lg"
+                className="resize-handle absolute -top-1.5 -right-1.5 w-6 h-6 md:w-3 md:h-3 cursor-ne-resize bg-blue-600 hover:bg-blue-700 rounded-full opacity-60 md:opacity-0 md:hover:opacity-100 active:opacity-100 transition-opacity z-10 shadow-lg touch-none"
                 onMouseDown={(e) => handleResizeMouseDown(e, overlay, 'top-right')}
+                onTouchStart={(e) => handleResizeTouchStart(e, overlay, 'top-right')}
                 title="Drag to resize from top-right"
               />
               
               {/* Bottom Left */}
               <div
-                className="resize-handle absolute -bottom-1.5 -left-1.5 w-3 h-3 cursor-sw-resize bg-blue-600 hover:bg-blue-700 rounded-full opacity-0 hover:opacity-100 transition-opacity z-10 shadow-lg"
+                className="resize-handle absolute -bottom-1.5 -left-1.5 w-6 h-6 md:w-3 md:h-3 cursor-sw-resize bg-blue-600 hover:bg-blue-700 rounded-full opacity-60 md:opacity-0 md:hover:opacity-100 active:opacity-100 transition-opacity z-10 shadow-lg touch-none"
                 onMouseDown={(e) => handleResizeMouseDown(e, overlay, 'bottom-left')}
+                onTouchStart={(e) => handleResizeTouchStart(e, overlay, 'bottom-left')}
                 title="Drag to resize from bottom-left"
               />
               
               {/* Bottom Right */}
               <div
-                className="resize-handle absolute -bottom-1.5 -right-1.5 w-3 h-3 cursor-se-resize bg-blue-600 hover:bg-blue-700 rounded-full opacity-0 hover:opacity-100 transition-opacity z-10 shadow-lg"
+                className="resize-handle absolute -bottom-1.5 -right-1.5 w-6 h-6 md:w-3 md:h-3 cursor-se-resize bg-blue-600 hover:bg-blue-700 rounded-full opacity-60 md:opacity-0 md:hover:opacity-100 active:opacity-100 transition-opacity z-10 shadow-lg touch-none"
                 onMouseDown={(e) => handleResizeMouseDown(e, overlay, 'bottom-right')}
+                onTouchStart={(e) => handleResizeTouchStart(e, overlay, 'bottom-right')}
                 title="Drag to resize from bottom-right"
               />
 
@@ -999,6 +1135,11 @@ export default function AdvancedOverlayLayer({ pageId, pageWidth, pageHeight, zo
                 if (target.closest('.resize-handle') || target.closest('.settings-button') || target.closest('.delete-button') || target.closest('.edit-panel')) return;
                 handleItemMouseDown(e, image.id, image.x, image.y);
               }}
+              onTouchStart={(e) => {
+                const target = e.target as HTMLElement;
+                if (target.closest('.resize-handle') || target.closest('.settings-button') || target.closest('.delete-button') || target.closest('.edit-panel')) return;
+                handleItemTouchStart(e, image.id, image.x, image.y);
+              }}
               onClick={(e) => {
                 e.stopPropagation();
                 const target = e.target as HTMLElement;
@@ -1026,69 +1167,82 @@ export default function AdvancedOverlayLayer({ pageId, pageWidth, pageHeight, zo
               <img
                 src={image.dataUrl}
                 alt="Overlay"
-                className="w-full h-full object-contain border-2 border-blue-400 rounded pointer-events-none"
+                className={`w-full h-full object-contain rounded pointer-events-none ${
+                  image.isSignature 
+                    ? '' // No border for signatures (transparent background)
+                    : 'border-2 border-blue-400'
+                }`}
                 draggable={false}
                 style={{
                   transform: `rotate(${image.rotation || 0}deg)`,
                   transformOrigin: 'center center',
+                  backgroundColor: image.isSignature ? 'transparent' : undefined,
                 }}
               />
               
               {/* Resize Handles - 4 сторони + 4 кути */}
               {/* Top */}
               <div
-                className="resize-handle absolute -top-0.5 left-0 right-0 h-1 cursor-n-resize bg-blue-600 hover:bg-blue-700 opacity-20 hover:opacity-60 transition-opacity z-10"
+                className="resize-handle absolute -top-0.5 left-0 right-0 h-2 md:h-1 cursor-n-resize bg-blue-600 hover:bg-blue-700 opacity-60 md:opacity-20 md:hover:opacity-60 active:opacity-100 transition-opacity z-10 touch-none"
                 onMouseDown={(e) => handleImageResizeMouseDown(e, image, 'top')}
+                onTouchStart={(e) => handleImageResizeTouchStart(e, image, 'top')}
                 title="Drag up to resize from top"
               />
               
               {/* Bottom */}
               <div
-                className="resize-handle absolute -bottom-0.5 left-0 right-0 h-1 cursor-s-resize bg-blue-600 hover:bg-blue-700 opacity-20 hover:opacity-60 transition-opacity z-10"
+                className="resize-handle absolute -bottom-0.5 left-0 right-0 h-2 md:h-1 cursor-s-resize bg-blue-600 hover:bg-blue-700 opacity-60 md:opacity-20 md:hover:opacity-60 active:opacity-100 transition-opacity z-10 touch-none"
                 onMouseDown={(e) => handleImageResizeMouseDown(e, image, 'bottom')}
+                onTouchStart={(e) => handleImageResizeTouchStart(e, image, 'bottom')}
                 title="Drag down to resize from bottom"
               />
               
               {/* Left */}
               <div
-                className="resize-handle absolute -left-0.5 top-0 bottom-0 w-1 cursor-w-resize bg-blue-600 hover:bg-blue-700 opacity-20 hover:opacity-60 transition-opacity z-10"
+                className="resize-handle absolute -left-0.5 top-0 bottom-0 w-2 md:w-1 cursor-w-resize bg-blue-600 hover:bg-blue-700 opacity-60 md:opacity-20 md:hover:opacity-60 active:opacity-100 transition-opacity z-10 touch-none"
                 onMouseDown={(e) => handleImageResizeMouseDown(e, image, 'left')}
+                onTouchStart={(e) => handleImageResizeTouchStart(e, image, 'left')}
                 title="Drag left to resize from left"
               />
               
               {/* Right */}
               <div
-                className="resize-handle absolute -right-0.5 top-0 bottom-0 w-1 cursor-e-resize bg-blue-600 hover:bg-blue-700 opacity-20 hover:opacity-60 transition-opacity z-10"
+                className="resize-handle absolute -right-0.5 top-0 bottom-0 w-2 md:w-1 cursor-e-resize bg-blue-600 hover:bg-blue-700 opacity-60 md:opacity-20 md:hover:opacity-60 active:opacity-100 transition-opacity z-10 touch-none"
                 onMouseDown={(e) => handleImageResizeMouseDown(e, image, 'right')}
+                onTouchStart={(e) => handleImageResizeTouchStart(e, image, 'right')}
                 title="Drag right to resize from right"
               />
               
               {/* Corners */}
               {/* Top Left */}
               <div
-                className="resize-handle absolute -top-1.5 -left-1.5 w-3 h-3 cursor-nw-resize bg-blue-600 hover:bg-blue-700 rounded-full opacity-0 hover:opacity-100 transition-opacity z-10 shadow-lg"
+                className="resize-handle absolute -top-1.5 -left-1.5 w-6 h-6 md:w-3 md:h-3 cursor-nw-resize bg-blue-600 hover:bg-blue-700 rounded-full opacity-60 md:opacity-0 md:hover:opacity-100 active:opacity-100 transition-opacity z-10 shadow-lg touch-none"
                 onMouseDown={(e) => handleImageResizeMouseDown(e, image, 'top-left')}
+                onTouchStart={(e) => handleImageResizeTouchStart(e, image, 'top-left')}
                 title="Drag to resize from top-left"
               />
               
               {/* Top Right */}
               <div
-                className="resize-handle absolute -top-1.5 -right-1.5 w-3 h-3 cursor-ne-resize bg-blue-600 hover:bg-blue-700 rounded-full opacity-0 hover:opacity-100 transition-opacity z-10 shadow-lg"
+                className="resize-handle absolute -top-1.5 -right-1.5 w-6 h-6 md:w-3 md:h-3 cursor-ne-resize bg-blue-600 hover:bg-blue-700 rounded-full opacity-60 md:opacity-0 md:hover:opacity-100 active:opacity-100 transition-opacity z-10 shadow-lg touch-none"
                 onMouseDown={(e) => handleImageResizeMouseDown(e, image, 'top-right')}
+                onTouchStart={(e) => handleImageResizeTouchStart(e, image, 'top-right')}
                 title="Drag to resize from top-right"
               />
               
               {/* Bottom Left */}
               <div
-                className="resize-handle absolute -bottom-1.5 -left-1.5 w-3 h-3 cursor-sw-resize bg-blue-600 hover:bg-blue-700 rounded-full opacity-0 hover:opacity-100 transition-opacity z-10 shadow-lg"
+                className="resize-handle absolute -bottom-1.5 -left-1.5 w-6 h-6 md:w-3 md:h-3 cursor-sw-resize bg-blue-600 hover:bg-blue-700 rounded-full opacity-60 md:opacity-0 md:hover:opacity-100 active:opacity-100 transition-opacity z-10 shadow-lg touch-none"
                 onMouseDown={(e) => handleImageResizeMouseDown(e, image, 'bottom-left')}
+                onTouchStart={(e) => handleImageResizeTouchStart(e, image, 'bottom-left')}
                 title="Drag to resize from bottom-left"
               />
               
               {/* Bottom Right */}
               <div
-                className="resize-handle absolute -bottom-1.5 -right-1.5 w-3 h-3 cursor-se-resize bg-blue-600 hover:bg-blue-700 rounded-full opacity-0 hover:opacity-100 transition-opacity z-10 shadow-lg"
+                className="resize-handle absolute -bottom-1.5 -right-1.5 w-6 h-6 md:w-3 md:h-3 cursor-se-resize bg-blue-600 hover:bg-blue-700 rounded-full opacity-60 md:opacity-0 md:hover:opacity-100 active:opacity-100 transition-opacity z-10 shadow-lg touch-none"
                 onMouseDown={(e) => handleImageResizeMouseDown(e, image, 'bottom-right')}
+                onTouchStart={(e) => handleImageResizeTouchStart(e, image, 'bottom-right')}
                 title="Drag to resize from bottom-right"
               />
               
@@ -1298,6 +1452,11 @@ export default function AdvancedOverlayLayer({ pageId, pageWidth, pageHeight, zo
                 if (target.closest('.resize-handle') || target.closest('.settings-button') || target.closest('.delete-button') || target.closest('.edit-panel')) return;
                 handleItemMouseDown(e, shape.id, shape.x, shape.y);
               }}
+              onTouchStart={(e) => {
+                const target = e.target as HTMLElement;
+                if (target.closest('.resize-handle') || target.closest('.settings-button') || target.closest('.delete-button') || target.closest('.edit-panel')) return;
+                handleItemTouchStart(e, shape.id, shape.x, shape.y);
+              }}
               onClick={(e) => {
                 e.stopPropagation();
                 const target = e.target as HTMLElement;
@@ -1415,29 +1574,33 @@ export default function AdvancedOverlayLayer({ pageId, pageWidth, pageHeight, zo
               {/* Resize Handles - 4 кути */}
               {/* Top Left */}
               <div
-                className="resize-handle absolute -top-1.5 -left-1.5 w-3 h-3 cursor-nw-resize bg-blue-600 hover:bg-blue-700 rounded-full opacity-0 hover:opacity-100 transition-opacity z-10 shadow-lg"
+                className="resize-handle absolute -top-1.5 -left-1.5 w-6 h-6 md:w-3 md:h-3 cursor-nw-resize bg-blue-600 hover:bg-blue-700 rounded-full opacity-60 md:opacity-0 md:hover:opacity-100 active:opacity-100 transition-opacity z-10 shadow-lg touch-none"
                 onMouseDown={(e) => handleShapeResizeMouseDown(e, shape, 'top-left')}
+                onTouchStart={(e) => handleShapeResizeTouchStart(e, shape, 'top-left')}
                 title="Drag to resize from top-left"
               />
               
               {/* Top Right */}
               <div
-                className="resize-handle absolute -top-1.5 -right-1.5 w-3 h-3 cursor-ne-resize bg-blue-600 hover:bg-blue-700 rounded-full opacity-0 hover:opacity-100 transition-opacity z-10 shadow-lg"
+                className="resize-handle absolute -top-1.5 -right-1.5 w-6 h-6 md:w-3 md:h-3 cursor-ne-resize bg-blue-600 hover:bg-blue-700 rounded-full opacity-60 md:opacity-0 md:hover:opacity-100 active:opacity-100 transition-opacity z-10 shadow-lg touch-none"
                 onMouseDown={(e) => handleShapeResizeMouseDown(e, shape, 'top-right')}
+                onTouchStart={(e) => handleShapeResizeTouchStart(e, shape, 'top-right')}
                 title="Drag to resize from top-right"
               />
               
               {/* Bottom Left */}
               <div
-                className="resize-handle absolute -bottom-1.5 -left-1.5 w-3 h-3 cursor-sw-resize bg-blue-600 hover:bg-blue-700 rounded-full opacity-0 hover:opacity-100 transition-opacity z-10 shadow-lg"
+                className="resize-handle absolute -bottom-1.5 -left-1.5 w-6 h-6 md:w-3 md:h-3 cursor-sw-resize bg-blue-600 hover:bg-blue-700 rounded-full opacity-60 md:opacity-0 md:hover:opacity-100 active:opacity-100 transition-opacity z-10 shadow-lg touch-none"
                 onMouseDown={(e) => handleShapeResizeMouseDown(e, shape, 'bottom-left')}
+                onTouchStart={(e) => handleShapeResizeTouchStart(e, shape, 'bottom-left')}
                 title="Drag to resize from bottom-left"
               />
               
               {/* Bottom Right */}
               <div
-                className="resize-handle absolute -bottom-1.5 -right-1.5 w-3 h-3 cursor-se-resize bg-blue-600 hover:bg-blue-700 rounded-full opacity-0 hover:opacity-100 transition-opacity z-10 shadow-lg"
+                className="resize-handle absolute -bottom-1.5 -right-1.5 w-6 h-6 md:w-3 md:h-3 cursor-se-resize bg-blue-600 hover:bg-blue-700 rounded-full opacity-60 md:opacity-0 md:hover:opacity-100 active:opacity-100 transition-opacity z-10 shadow-lg touch-none"
                 onMouseDown={(e) => handleShapeResizeMouseDown(e, shape, 'bottom-right')}
+                onTouchStart={(e) => handleShapeResizeTouchStart(e, shape, 'bottom-right')}
                 title="Drag to resize from bottom-right"
               />
               
