@@ -62,7 +62,12 @@ export default function ExportButton() {
   };
 
   return (
-    <div className="glass border-t border-surface-700/50 px-2 sm:px-4 py-2 sm:py-3">
+    <div 
+      className="glass border-t border-surface-700/50 px-2 sm:px-4 py-2 sm:py-3"
+      style={{
+        paddingBottom: `max(0.5rem, calc(0.5rem + env(safe-area-inset-bottom, 0px)))`,
+      }}
+    >
       <div className="flex items-center justify-between gap-2">
         {/* Progress Status */}
         <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">

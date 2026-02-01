@@ -159,6 +159,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
+  viewportFit: 'cover', // Enable safe-area-inset support
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#0f172a' },
     { media: '(prefers-color-scheme: dark)', color: '#0f172a' },

@@ -53,7 +53,7 @@ export default function EditPage() {
 
   return (
     <>
-      <main className="h-screen flex flex-col" role="main">
+      <main className="h-screen h-[100dvh] flex flex-col" role="main">
         {/* Header */}
         <header className="sticky top-0 z-50 glass border-b border-surface-700/50" role="banner">
           <div className="px-6 py-3">
