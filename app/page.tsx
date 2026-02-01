@@ -1,34 +1,14 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Script from 'next/script';
-import { usePdfStore } from './store/pdfStore';
 import { generateFAQSchema } from './data/faq';
-import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
-import { useAutosave } from './hooks/useAutosave';
-import UploadArea from './components/UploadArea';
-import Toolbar from './components/Toolbar';
-import EditToolbar from './components/EditToolbar';
-import Thumbnails from './components/Thumbnails';
-import PdfViewer from './components/PdfViewer';
-import ExportButton from './components/ExportButton';
-import ConfirmDialog from './components/ConfirmDialog';
 import FAQ from './components/FAQ';
 
 const siteUrl = 'https://editorapdf.com';
 
 export default function Home() {
-  const { pages, reset } = usePdfStore();
-  const hasPages = pages.length > 0;
-  const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
-  
-  // Enable keyboard shortcuts
-  useKeyboardShortcuts();
-  
-  // Enable autosave
-  useAutosave();
 
   // FAQ Schema for SEO - Generated from reusable data
   const faqSchema = generateFAQSchema(siteUrl);
@@ -266,65 +246,40 @@ export default function Home() {
             </Link>
             
             {/* Navigation */}
-            {!hasPages && (
-              <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
-                <Link href="/" className="nav-link">
-                  Home
-                </Link>
-                <Link href="/how-it-works" className="nav-link">
-                  How It Works
-                </Link>
-                <Link href="/about" className="nav-link">
-                  About
-                </Link>
-                <Link href="/blog" className="nav-link">
-                  Blog
-                </Link>
-                <Link href="/contact" className="nav-link">
-                  Contact
-                </Link>
-              </nav>
-            )}
+            <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
+              <Link href="/" className="nav-link">
+                Home
+              </Link>
+              <Link href="/how-it-works" className="nav-link">
+                How It Works
+              </Link>
+              <Link href="/about" className="nav-link">
+                About
+              </Link>
+              <Link href="/blog" className="nav-link">
+                Blog
+              </Link>
+              <Link href="/contact" className="nav-link">
+                Contact
+              </Link>
+            </nav>
             
-            {/* Close Button when PDF is open */}
-            {hasPages && (
-              <button
-                onClick={() => setConfirmCloseOpen(true)}
-                className="btn-ghost btn-md group"
-                aria-label="Close PDF document"
-              >
-                <svg className="w-5 h-5 text-surface-400 group-hover:text-error-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-                <span className="text-surface-300 group-hover:text-surface-100">Close PDF</span>
-              </button>
-            )}
-
-            {/* CTA Button when no PDF */}
-            {!hasPages && (
-              <button
-                onClick={() => {
-                  const fileInput = document.getElementById('file-input') as HTMLInputElement;
-                  if (fileInput) {
-                    fileInput.click();
-                  }
-                }}
-                className="btn-primary btn-md hidden sm:flex"
-              >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                </svg>
-                Edit PDF
-              </button>
-            )}
+            {/* CTA Button */}
+            <Link
+              href="/edit"
+              className="btn-primary btn-md hidden sm:flex"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+              </svg>
+              Edit PDF
+            </Link>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      {!hasPages ? (
-        /* Empty State - Upload Area */
-        <div className="flex-1 flex items-center justify-center p-6 overflow-auto">
+      <div className="flex-1 flex items-center justify-center p-6 ">
           <div className="max-w-5xl w-full">
             {/* Hero Section */}
             <section className="relative mb-16 animate-fade-in" aria-labelledby="hero-heading">
@@ -403,33 +358,10 @@ export default function Home() {
                   </div>
 
                   {/* CTA Button */}
-                  <div className="animate-fade-in-up delay-500">
-                    <button
-                      onClick={() => {
-                        const fileInput = document.getElementById('file-input') as HTMLInputElement;
-                        if (fileInput) {
-                          fileInput.click();
-                        }
-                      }}
-                      className="group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-primary-600 via-primary-500 to-accent-500 text-white font-bold text-lg md:text-xl rounded-2xl shadow-2xl shadow-primary-500/40 hover:shadow-2xl hover:shadow-primary-500/60 transition-all duration-300 hover:scale-105 active:scale-95 overflow-hidden transform hover:-translate-y-1"
-                    >
-                      <span className="absolute inset-0 bg-gradient-to-r from-primary-400 via-accent-400 to-primary-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></span>
-                      <svg className="w-6 h-6 relative z-10 transform group-hover:rotate-12 group-hover:scale-110 transition-all duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                      </svg>
-                      <span className="relative z-10">Start Editing PDF Now</span>
-                      <span className="absolute inset-0 bg-white/30 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></span>
-                      <div className="absolute -inset-1 bg-gradient-to-r from-primary-400 to-accent-400 rounded-2xl blur opacity-30 group-hover:opacity-50 transition-opacity duration-300 -z-10"></div>
-                    </button>
-                  </div>
+
                 </div>
               </div>
             </section>
-            
-            {/* Upload Area */}
-            <div className="mb-16 animate-fade-in-up delay-100" role="region" aria-label="PDF Upload">
-              <UploadArea />
-            </div>
             
             {/* Features Grid */}
             <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12" aria-labelledby="features-heading">
@@ -515,38 +447,9 @@ export default function Home() {
             </div>
           </div>
         </div>
-      ) : (
-        /* Editor View */
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <Toolbar />
-          <EditToolbar />
-          
-          <div className="flex-1 flex overflow-hidden">
-            <Thumbnails />
-            <PdfViewer />
-          </div>
-          
-          <ExportButton />
-        </div>
-      )}
-
-      <ConfirmDialog
-        isOpen={confirmCloseOpen}
-        title="Close current PDF?"
-        message="All unsaved changes will be lost. Make sure to export your document first."
-        confirmText="Close Document"
-        cancelText="Keep Editing"
-        type="warning"
-        onCancel={() => setConfirmCloseOpen(false)}
-        onConfirm={() => {
-          reset();
-          setConfirmCloseOpen(false);
-        }}
-      />
 
       {/* Footer with Social Links */}
-      {!hasPages && (
-        <footer className="mt-auto py-4 px-6 border-t border-surface-800/50" role="contentinfo">
+      <footer className="mt-auto py-4 px-6 border-t border-surface-800/50" role="contentinfo">
           <div className="max-w-5xl mx-auto space-y-3">
             {/* Disclaimer */}
             <div className="p-3 rounded-lg bg-surface-800/30 border border-surface-700/50">
@@ -621,7 +524,6 @@ export default function Home() {
             </div>
           </div>
         </footer>
-      )}
     </main>
     </>
   );
