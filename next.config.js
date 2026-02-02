@@ -17,6 +17,14 @@ const nextConfig = {
     optimizePackageImports: ['pdfjs-dist', 'pdf-lib'],
   },
   
+  // Compiler optimizations
+  compiler: {
+    // Remove console logs in production for smaller bundle
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn'],
+    } : false,
+  },
+  
   // Image optimization
   images: {
     formats: ['image/avif', 'image/webp'],

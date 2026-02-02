@@ -4,11 +4,12 @@ import './globals.css'
 import Script from 'next/script'
 
 // Primary font - Modern geometric sans
+// Optimized for mobile: reduced weights for better performance
 const outfit = Outfit({
   subsets: ['latin'],
-  display: 'swap',
+  display: 'swap', // Show fallback font immediately, swap when loaded
   variable: '--font-outfit',
-  weight: ['300', '400', '500', '600', '700', '800'],
+  weight: ['400', '600', '700'], // Reduced weights for mobile performance
 })
 
 // Display font - Bold headlines
@@ -16,7 +17,7 @@ const lexend = Lexend({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-cabinet',
-  weight: ['600', '700', '800'],
+  weight: ['600', '700'], // Reduced weights for mobile performance
 })
 
 // Monospace font - Code & technical elements
@@ -24,7 +25,7 @@ const jetbrains = JetBrains_Mono({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-jetbrains',
-  weight: ['400', '500', '600'],
+  weight: ['400', '500'], // Reduced weights for mobile performance
 })
 
 const siteUrl = 'https://editorapdf.com' // Replace with your actual domain
@@ -335,10 +336,10 @@ export default function RootLayout({
   return (
     <html lang="en-US" className={`${outfit.variable} ${lexend.variable} ${jetbrains.variable}`}>
       <head>
-        {/* Google Tag Manager - Initialize dataLayer and load GTM */}
+        {/* Google Tag Manager - Load after page is interactive to improve TBT */}
         <Script
           id="gtm-init"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `
               window.dataLayer = window.dataLayer || [];
@@ -368,8 +369,8 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
         <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossOrigin="anonymous" />
         
-        {/* Preload critical resources */}
-        <link rel="preload" href="/logo.svg" as="image" type="image/svg+xml" />
+        {/* Preload critical resources for faster LCP */}
+        <link rel="preload" href="/logo.svg" as="image" type="image/svg+xml" fetchPriority="high" />
         <link rel="preload" href="/favicon.svg" as="image" type="image/svg+xml" />
         
         {/* Favicon links */}
@@ -452,31 +453,31 @@ export default function RootLayout({
         {/* Content Security Policy hints */}
         <meta httpEquiv="Content-Security-Policy" content="upgrade-insecure-requests" />
         
-        {/* JSON-LD Structured Data */}
+        {/* JSON-LD Structured Data - Load after page is interactive to improve TBT */}
         {/* Note: WebApplication schema is on page.tsx only (actual tool page) */}
         <Script
           id="jsonld-breadcrumb"
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
         <Script
           id="jsonld-organization"
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
         <Script
           id="jsonld-website"
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
         <Script
           id="jsonld-itemlist"
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
         {/* Video schema - uncomment when you have video content */}
         {/* <Script

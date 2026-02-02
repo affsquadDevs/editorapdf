@@ -44,11 +44,10 @@ export default function MobileMenu() {
       {/* Hamburger Button - Visible only on mobile */}
       <button
         onClick={toggleMenu}
-        className="md:hidden !flex p-2.5 rounded-lg hover:bg-surface-700/50 active:bg-surface-700/70 transition-colors flex-shrink-0 relative z-[100] touch-manipulation min-w-[44px] min-h-[44px] items-center justify-center bg-surface-700/40 border border-surface-600/50 shadow-sm"
+        className="flex md:hidden p-2.5 rounded-lg hover:bg-surface-700/50 active:bg-surface-700/70 transition-colors flex-shrink-0 relative z-[100] touch-manipulation min-w-[44px] min-h-[44px] items-center justify-center bg-surface-700/40 border border-surface-600/50 shadow-sm"
         aria-label="Toggle menu"
         aria-expanded={isOpen}
         type="button"
-        style={{ display: 'flex' }}
       >
         <svg
           className="w-6 h-6 text-white"

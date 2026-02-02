@@ -204,30 +204,30 @@ export default function Home() {
 
   return (
     <>
-      {/* Structured Data Scripts */}
+      {/* Structured Data Scripts - Load after page is interactive to improve TBT */}
       <Script
         id="jsonld-webapp"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppSchema) }}
-        strategy="afterInteractive"
+        strategy="lazyOnload"
       />
       <Script
         id="jsonld-faq"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-        strategy="afterInteractive"
+        strategy="lazyOnload"
       />
       <Script
         id="jsonld-howto"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }}
-        strategy="afterInteractive"
+        strategy="lazyOnload"
       />
       <Script
         id="jsonld-review"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(reviewSchema) }}
-        strategy="afterInteractive"
+        strategy="lazyOnload"
       />
       
       <main className="h-screen flex flex-col" role="main">
@@ -307,6 +307,8 @@ export default function Home() {
                         width={180} 
                         height={60} 
                         className="h-14 md:h-16 w-auto mx-auto drop-shadow-lg"
+                        loading="eager"
+                        fetchPriority="high"
                       />
                       <div className="absolute -inset-2 bg-primary-500/20 rounded-xl blur-xl opacity-50 -z-10"></div>
                     </div>
