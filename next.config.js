@@ -15,7 +15,10 @@ const nextConfig = {
   // Experimental features for better performance
   experimental: {
     optimizePackageImports: ['pdfjs-dist', 'pdf-lib'],
-    optimizeCss: true, // Optimize CSS for better performance
+    // NOTE: optimizeCss requires the optional dependency `critters`.
+    // It breaks `next export` if `critters` isn't installed, especially on /404 and /500 prerender.
+    // Keep disabled unless you explicitly add `critters` to dependencies.
+    optimizeCss: false,
   },
   
   // Compiler optimizations

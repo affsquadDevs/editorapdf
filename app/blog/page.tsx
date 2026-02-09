@@ -75,6 +75,31 @@ export default function BlogPage() {
                 </span>
               </div>
             </Link>
+
+            {/* Blog Post: Is It Safe to Edit PDFs Online? */}
+            <Link href="/blog/is-it-safe-to-edit-pdfs-online" className="card overflow-hidden hover:scale-105 transition-transform duration-300 group">
+              <div className="relative w-full h-48 overflow-hidden bg-surface-800">
+                <img
+                  src="/blog2.png"
+                  alt="Is It Safe to Edit PDFs Online."
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-primary-400 transition-colors">
+                  Is It Safe to Edit PDFs Online?
+                </h3>
+                <p className="text-surface-400 mb-4 line-clamp-3">
+                  Learn how online PDF editors handle files, what privacy risks exist, and best practices for secure PDF editing.
+                </p>
+                <span className="text-primary-400 text-sm font-medium inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+                  Read more
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                  </svg>
+                </span>
+              </div>
+            </Link>
           </div>
         </div>
       </div>
