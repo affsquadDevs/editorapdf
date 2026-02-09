@@ -146,13 +146,23 @@
   
   /* Glass Effect */
   .glass {
-    @apply bg-surface-800/95 backdrop-blur-xl;
+    @apply bg-surface-800/95 backdrop-blur-md;
     border: 1px solid rgb(var(--color-border) / 0.5);
   }
   
   .glass-light {
-    @apply bg-white/5 backdrop-blur-xl;
+    @apply bg-white/5 backdrop-blur-md;
     border: 1px solid rgb(255 255 255 / 0.1);
+  }
+
+  /* Heavier blur only on larger screens (mobile GPUs struggle with big backdrop-filter) */
+  @media (min-width: 768px) {
+    .glass {
+      @apply backdrop-blur-xl;
+    }
+    .glass-light {
+      @apply backdrop-blur-xl;
+    }
   }
   
   /* Card Components */

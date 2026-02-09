@@ -1,10 +1,7 @@
-'use client';
-
 import Link from 'next/link';
-import Image from 'next/image';
 import Script from 'next/script';
 import { generateFAQSchema } from './data/faq';
-import FAQ from './components/FAQ';
+import LazyFAQ from './components/LazyFAQ';
 import MobileMenu from './components/MobileMenu';
 
 const siteUrl = 'https://editorapdf.com';
@@ -238,7 +235,7 @@ export default function Home() {
         strategy="lazyOnload"
       />
       
-      <main className="h-screen flex flex-col" role="main">
+      <main className="min-h-screen flex flex-col" role="main">
       {/* Header */}
       <header className="sticky top-0 z-50 glass border-b border-surface-700/50" role="banner">
         <div className="px-6 py-3">
@@ -300,28 +297,12 @@ export default function Home() {
             {/* Hero Section */}
             <section className="relative mb-16 animate-fade-in" aria-labelledby="hero-heading">
               {/* Hero Card Container */}
-              <div className="relative card p-8 md:p-12 lg:p-16 bg-gradient-to-br from-surface-800/80 via-surface-800/60 to-surface-900/80 border-primary-500/20 backdrop-blur-xl overflow-hidden">
+              <div className="relative card p-8 md:p-12 lg:p-16 bg-gradient-to-br from-surface-800/80 via-surface-800/60 to-surface-900/80 border-primary-500/20 backdrop-blur-sm md:backdrop-blur-xl overflow-hidden">
                 {/* Decorative Background Elements */}
                 <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" aria-hidden="true"></div>
                 <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" aria-hidden="true"></div>
                 
                 <div className="relative z-10 text-center">
-                  {/* Logo */}
-                  <div className="flex justify-center mb-8 animate-fade-in-up">
-                    <div className="relative">
-                      <img 
-                        src="/logo.svg" 
-                        alt="EditoraPDF Logo" 
-                        width={180} 
-                        height={60} 
-                        className="h-14 md:h-16 w-auto mx-auto drop-shadow-lg"
-                        loading="eager"
-                        fetchPriority="high"
-                      />
-                      <div className="absolute -inset-2 bg-primary-500/20 rounded-xl blur-xl opacity-50 -z-10"></div>
-                    </div>
-                  </div>
-
                   {/* Badge */}
                   <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary-500/15 border border-primary-500/30 text-primary-300 text-sm font-semibold mb-6 shadow-lg shadow-primary-500/10 animate-fade-in-up delay-100" role="status">
                     <span className="relative flex h-2 w-2" aria-hidden="true">
@@ -459,9 +440,9 @@ export default function Home() {
               </div>
             </aside>
 
-            {/* FAQ Section */}
+            {/* FAQ Section (lazy on scroll to reduce initial JS on mobile) */}
             <div className="mt-20 animate-fade-in delay-600">
-              <FAQ />
+              <LazyFAQ />
             </div>
           </div>
         </div>

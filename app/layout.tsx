@@ -350,15 +350,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         />
         {/* End Google Tag Manager */}
         
-        {/* Performance: Preconnect to external domains */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-        <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+        {/* Performance:
+            - Fonts are self-hosted via next/font, so no need to preconnect to fonts.googleapis.com/fonts.gstatic.com
+            - Avoid eager preconnect to third parties on mobile (can hurt LCP); keep only dns-prefetch */}
         <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
-        <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
-        <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
         
         {/* Preload critical resources for faster LCP */}
         <link rel="preload" href="/logo.svg" as="image" type="image/svg+xml" fetchPriority="high" />
