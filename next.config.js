@@ -15,6 +15,7 @@ const nextConfig = {
   // Experimental features for better performance
   experimental: {
     optimizePackageImports: ['pdfjs-dist', 'pdf-lib'],
+    optimizeCss: true, // Optimize CSS for better performance
   },
   
   // Compiler optimizations

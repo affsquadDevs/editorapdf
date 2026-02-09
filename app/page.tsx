@@ -230,6 +230,14 @@ export default function Home() {
         strategy="lazyOnload"
       />
       
+      {/* Google AdSense - Load only on homepage after page is interactive */}
+      <Script
+        async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2980943706375055"
+        crossOrigin="anonymous"
+        strategy="lazyOnload"
+      />
+      
       <main className="h-screen flex flex-col" role="main">
       {/* Header */}
       <header className="sticky top-0 z-50 glass border-b border-surface-700/50" role="banner">

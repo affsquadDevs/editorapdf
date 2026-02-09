@@ -336,10 +336,10 @@ export default function RootLayout({
   return (
     <html lang="en-US" className={`${outfit.variable} ${lexend.variable} ${jetbrains.variable}`}>
       <head>
-        {/* Google Tag Manager */}
+        {/* Google Tag Manager - Load after page is interactive to improve performance */}
         <Script
           id="gtm-script"
-          strategy="beforeInteractive"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -357,6 +357,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
         <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
         <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        <link rel="preconnect" href="https://www.googletagmanager.com" crossOrigin="anonymous" />
         
         {/* Preload critical resources for faster LCP */}
         <link rel="preload" href="/logo.svg" as="image" type="image/svg+xml" fetchPriority="high" />
@@ -430,14 +432,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         {/* <meta name="google-site-verification" content="your-code" /> */}
         {/* <meta name="msvalidate.01" content="your-code" /> */}
         {/* <meta name="yandex-verification" content="your-code" /> */}
-        
-        {/* Google AdSense - Load after page is interactive */}
-        <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2980943706375055"
-          crossOrigin="anonymous"
-          strategy="lazyOnload"
-        />
         
         {/* Content Security Policy hints */}
         <meta httpEquiv="Content-Security-Policy" content="upgrade-insecure-requests" />
