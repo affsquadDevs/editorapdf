@@ -1,75 +1,43 @@
-# PDF Editor MVP
+# EditoraPDF - Free Open-Source PDF Editor
 
-A client-side PDF editor built with Next.js that runs entirely in your browser. No server-side processing, no data uploads - everything happens locally on your machine.
+<div align="center">
 
-## ⭐ SEO Optimized
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](https://www.typescriptlang.org/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![GitHub Stars](https://img.shields.io/github/stars/affsquadDevs/editorapdf?style=social)](https://github.com/affsquadDevs/editorapdf)
 
-This project includes **comprehensive SEO optimizations** following 2026 best practices:
-- ✅ Complete metadata (Open Graph, Twitter Cards, structured data)
-- ✅ JSON-LD schemas (SoftwareApplication, Organization, Breadcrumb)
-- ✅ Dynamic sitemap & robots.txt
-- ✅ PWA manifest for app stores
-- ✅ Performance headers & caching
-- ✅ Semantic HTML5 & ARIA accessibility
-- ✅ Mobile-first responsive design
+[**Live Demo**](https://editorapdf.com) · [**Report Bug**](https://github.com/affsquadDevs/editorapdf/issues) · [**Request Feature**](https://github.com/affsquadDevs/editorapdf/issues) · [**Contributing**](CONTRIBUTING.md)
 
-📚 **SEO Documentation**: See `SEO_IMPLEMENTATION.md`, `SEO_CHECKLIST.md`, and `IMAGE_REQUIREMENTS.md` for complete setup guide.
+</div>
 
-## Features
+---
 
-### 🎯 Core Functionality
+## 🌟 About
 
-- **Upload PDF**: Drag & drop or file picker with validation (max 25MB)
-- **View Pages**: Canvas-based rendering with zoom controls (50% - 300%)
-- **Thumbnail Navigation**: Visual page overview with drag-to-reorder
-- **Page Operations**:
-  - Rotate pages (90° increments)
-  - Delete pages (with confirmation)
-  - Reorder pages (drag & drop)
-- **Text Editing** (ADVANCED):
-  - **Extract & Edit Original Text**: Automatically extracts all text from PDF
-  - Click any existing text to edit content, size, and color
-  - Hide original text when replacing
-  - Add new text overlays anywhere on the page
-  - Multi-line text support
-  - Drag to reposition any text
-- **Image Editing**:
-  - Upload and place images anywhere on pages
-  - Resize and reposition images
-  - Delete images
-  - Support for PNG, JPEG, and other common formats
-- **Shape Drawing**:
-  - Rectangle: Draw boxes for emphasis
-  - Circle/Ellipse: Highlight circular areas
-  - Line: Draw simple lines
-  - Arrow: Point to specific content
-  - Highlight: Semi-transparent overlays
-  - Customize colors and line widths
-- **Export**: Download edited PDF with ALL changes applied:
-  - Modified text (original + new)
-  - Embedded images
-  - Drawn shapes
-  - All transformations
+**EditoraPDF** is a **100% free and open-source** online PDF editor that runs entirely in your browser. Built with modern web technologies (Next.js, TypeScript, React, PDF.js, pdf-lib), it provides professional PDF editing capabilities without requiring installation, signup, or data uploads.
 
-## Tech Stack
+### 🔒 Privacy-First Design
 
-- **Framework**: Next.js 14 (App Router) + TypeScript
-- **Styling**: Tailwind CSS
-- **State Management**: Zustand
-- **PDF Rendering**: pdfjs-dist (Mozilla's PDF.js)
-- **PDF Manipulation**: pdf-lib
-- **SEO**: Complete implementation with structured data, OG tags, PWA manifest
-- **Hosting Ready**: Static export compatible (Vercel, Netlify, etc.)
+All processing happens **locally on your device**. Your PDF files never leave your browser, ensuring complete privacy and security.
 
-## Getting Started
+### 🎯 Perfect For
 
-### Prerequisites
+- Quick PDF edits without software installation
+- Privacy-conscious users who don't want to upload sensitive documents
+- Developers looking for an open-source PDF editor to study or fork
+- Organizations needing a self-hosted PDF editing solution
 
-- Node.js 18+ and npm/yarn/pnpm
+---
 
-### Installation
+## 🚀 Quick Start
 
 ```bash
+# Clone the repository
+git clone https://github.com/affsquadDevs/editorapdf.git
+cd editorapdf
+
 # Install dependencies
 npm install
 
@@ -77,14 +45,119 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000) to see the app.
 
-### Build for Production
+---
+
+## ✨ Key Features
+
+### 📄 PDF Viewing & Navigation
+- **High-Quality Rendering**: Crystal-clear PDF rendering using Mozilla's PDF.js
+- **Zoom Controls**: Smooth zoom from 50% to 300%
+- **Thumbnail Sidebar**: Visual page overview with drag-to-reorder
+- **Responsive Design**: Works on desktop, tablet, and mobile
+
+### ✏️ Advanced Editing Capabilities
+
+#### Text Editing
+- **Extract & Edit Original Text**: Automatically extracts all text from PDF
+- **Edit Content**: Click any text to modify content, size, and color
+- **Add New Text**: Place text overlays anywhere on pages
+- **Multi-line Support**: Create paragraphs with line breaks
+- **Hide Original Text**: Replace existing text seamlessly
+
+#### Image Management
+- **Upload Images**: Add PNG, JPEG, and other image formats
+- **Resize & Position**: Drag and resize images freely
+- **Delete Images**: Remove unwanted images
+
+#### Shape Drawing
+- **Rectangles**: Draw boxes for emphasis
+- **Circles/Ellipses**: Highlight circular areas
+- **Lines & Arrows**: Point to specific content
+- **Highlights**: Semi-transparent overlays
+- **Customization**: Adjust colors and line widths
+
+### 📄 Page Operations
+- **Rotate Pages**: 90° increments with live preview
+- **Delete Pages**: Remove unwanted pages (with confirmation)
+- **Reorder Pages**: Drag thumbnails to rearrange
+- **Export PDF**: Download with all changes applied
+
+---
+
+## 🛠️ Tech Stack
+
+| Technology | Purpose | Version |
+|------------|---------|---------|
+| [Next.js](https://nextjs.org/) | React framework with App Router | 14.x |
+| [TypeScript](https://www.typescriptlang.org/) | Type-safe JavaScript | 5.x |
+| [React](https://react.dev/) | UI library | 18.x |
+| [Tailwind CSS](https://tailwindcss.com/) | Utility-first CSS framework | 3.x |
+| [Zustand](https://github.com/pmndrs/zustand) | Lightweight state management | 4.x |
+| [PDF.js](https://mozilla.github.io/pdf.js/) | PDF rendering engine (Mozilla) | 3.x |
+| [pdf-lib](https://pdf-lib.js.org/) | PDF manipulation library | 1.x |
+
+---
+
+## 📦 Installation & Setup
+
+### Prerequisites
+
+- **Node.js** 18+ and npm/yarn/pnpm
+- **Modern browser**: Chrome, Firefox, Edge, or Safari (latest versions)
+
+### Development Setup
 
 ```bash
+# Clone the repo
+git clone https://github.com/affsquadDevs/editorapdf.git
+cd editorapdf
+
+# Install dependencies
+npm install
+
+# Start development server (with hot reload)
+npm run dev
+```
+
+### Production Build
+
+```bash
+# Build optimized production bundle
 npm run build
+
+# Start production server
 npm run start
 ```
+
+### Static Export (for Vercel, Netlify, etc.)
+
+```bash
+# Generate static export
+npm run build
+
+# Deploy the 'out' directory to your hosting provider
+```
+
+---
+
+## ⭐ SEO Optimized
+
+This project includes **comprehensive SEO optimizations** following 2026 best practices:
+- ✅ Complete metadata (Open Graph, Twitter Cards, structured data)
+- ✅ JSON-LD schemas (WebApplication, SoftwareSourceCode, Organization, Breadcrumb)
+- ✅ Dynamic sitemap & robots.txt
+- ✅ PWA manifest for app stores
+- ✅ Performance headers & caching
+- ✅ Semantic HTML5 & ARIA accessibility
+- ✅ Mobile-first responsive design
+- ✅ Open-source schema with GitHub integration
+
+📚 **SEO Documentation**: See [`SEO_IMPLEMENTATION.md`](SEO_IMPLEMENTATION.md), [`SEO_CHECKLIST.md`](SEO_CHECKLIST.md), and [`IMAGE_REQUIREMENTS.md`](IMAGE_REQUIREMENTS.md) for complete setup guide.
+
+
+
 
 ## Project Structure
 
@@ -249,13 +322,77 @@ The app maintains:
 3. Add helper functions in `app/lib/pdf/` if manipulating PDFs
 4. Update export logic in `exportPdf.ts` to persist changes
 
-## License
+---
 
-MIT License - feel free to use this as a starting point for your own projects.
+## 🤝 Contributing
 
-## Credits
+We welcome contributions from the community! Whether you're fixing bugs, adding features, improving documentation, or spreading the word, your help is appreciated.
 
-- Built with [Next.js](https://nextjs.org/)
-- PDF rendering by [PDF.js](https://mozilla.github.io/pdf.js/)
-- PDF manipulation by [pdf-lib](https://pdf-lib.js.org/)
-- State management by [Zustand](https://github.com/pmndrs/zustand)
+Please read our [**Contributing Guide**](CONTRIBUTING.md) to get started.
+
+### Ways to Contribute
+
+- 🐛 **Report bugs** and suggest features via [GitHub Issues](https://github.com/affsquadDevs/editorapdf/issues)
+- 💻 **Submit pull requests** with bug fixes or new features
+- 📖 **Improve documentation** and add examples
+- ⭐ **Star the repo** to show your support
+- 🔗 **Share the project** with others who might find it useful
+
+---
+
+## 📄 License
+
+**MIT License** - This project is completely free and open source. You can use, modify, and distribute it for any purpose, including commercial projects.
+
+See the [LICENSE](LICENSE) file for full details.
+
+---
+
+## 🙏 Credits & Acknowledgments
+
+EditoraPDF is built on the shoulders of giants:
+
+- **[Next.js](https://nextjs.org/)** - The React framework for production
+- **[PDF.js](https://mozilla.github.io/pdf.js/)** - PDF rendering by Mozilla
+- **[pdf-lib](https://pdf-lib.js.org/)** - PDF manipulation library
+- **[Zustand](https://github.com/pmndrs/zustand)** - Lightweight state management
+- **[Tailwind CSS](https://tailwindcss.com/)** - Utility-first CSS framework
+
+---
+
+## 🌐 Community & Support
+
+- **Website**: [editorapdf.com](https://editorapdf.com)
+- **GitHub**: [github.com/affsquadDevs/editorapdf](https://github.com/affsquadDevs/editorapdf)
+- **Issues**: [Report bugs or request features](https://github.com/affsquadDevs/editorapdf/issues)
+- **Email**: hello@affsquad.com
+
+### Follow Us
+
+- [Instagram](https://www.instagram.com/editora_pdf)
+- [Facebook](https://www.facebook.com/people/Editorapdf/61587362633003/)
+- [YouTube](https://www.youtube.com/@EditoraPDF)
+- [Threads](https://www.threads.com/@editora_pdf)
+
+---
+
+## ⭐ Show Your Support
+
+If you find EditoraPDF useful, please consider:
+
+- ⭐ **Starring the repo** on GitHub
+- 🐦 **Sharing on social media**
+- 📝 **Writing a blog post** about the project
+- 💬 **Recommending it** to friends and colleagues
+
+Every bit of support helps the project grow and improve!
+
+---
+
+<div align="center">
+
+**Made with ❤️ by the EditoraPDF Team**
+
+[Website](https://editorapdf.com) · [GitHub](https://github.com/affsquadDevs/editorapdf) · [Contributing](CONTRIBUTING.md)
+
+</div>

@@ -67,6 +67,31 @@ export const faqData: FAQItem[] = [
     answer: 'Yes, EditoraPDF is completely free to use. There are no hidden fees, no premium tiers, no subscriptions, and no feature limitations. All editing tools are available to everyone at no cost.',
     keywords: ['free pdf editor', 'no cost pdf editor', 'free pdf tools'],
   },
+  {
+    question: 'Is EditoraPDF really free and open source?',
+    answer: 'Yes! EditoraPDF is 100% free and open source under MIT License. The complete source code is available on GitHub at https://github.com/affsquadDevs/editorapdf. You can view, modify, and contribute to the code.',
+    keywords: ['open source pdf editor', 'free open source pdf tool', 'github pdf editor', 'MIT license pdf editor'],
+  },
+  {
+    question: 'What is the best free open-source PDF editor?',
+    answer: 'EditoraPDF is a leading free open-source PDF editor that works entirely in your browser. It offers text editing, image insertion, shape tools, page management, and more - all without requiring installation or signup. View the source code on GitHub to verify its open-source nature.',
+    keywords: ['best open source pdf editor', 'free open source pdf tool', 'open source alternative'],
+  },
+  {
+    question: 'How to edit PDF without uploading to cloud?',
+    answer: 'EditoraPDF processes all PDFs locally in your browser. Your files never leave your device and are never uploaded to any server. All editing happens client-side using PDF.js and pdf-lib libraries. This ensures complete privacy and security.',
+    keywords: ['edit pdf without upload', 'client-side pdf editor', 'no cloud pdf editor', 'private pdf editing'],
+  },
+  {
+    question: 'What is the most private PDF editor?',
+    answer: 'EditoraPDF is one of the most private PDF editors available. All processing happens locally in your browser - no server uploads, no data storage, no tracking. Your PDFs never leave your device. The open-source code allows you to verify the privacy claims yourself.',
+    keywords: ['private pdf editor', 'secure pdf editor', 'privacy-first pdf tool', 'no data collection pdf editor'],
+  },
+  {
+    question: 'Is there an open source alternative to Adobe Acrobat?',
+    answer: 'Yes! EditoraPDF is a free open-source alternative to Adobe Acrobat. While it may not have all enterprise features, it offers core PDF editing capabilities including text editing, image insertion, annotations, page management, and more - all for free with full source code available on GitHub.',
+    keywords: ['adobe acrobat alternative', 'open source acrobat alternative', 'free acrobat alternative', 'open source pdf editor'],
+  },
 ];
 
 // Generate FAQ Schema for structured data (SEO)

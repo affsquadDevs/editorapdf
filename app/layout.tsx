@@ -44,6 +44,16 @@ export const metadata: Metadata = {
   },
   description: siteDescription,
   keywords: [
+    // Open Source & Free Software
+    'open source PDF editor',
+    'free open source PDF tool',
+    'GitHub PDF editor',
+    'MIT license PDF editor',
+    'FOSS PDF editor',
+    'open source document editor',
+    'free software PDF editing',
+    'community-driven PDF editor',
+    // Core Functionality
     'edit PDF online',
     'PDF editor no installation',
     'PDF editor no signup',
@@ -63,10 +73,20 @@ export const metadata: Metadata = {
     'PDF annotation online',
     'modify PDF online',
     'update PDF documents',
+    // Privacy & Security
     'client-side PDF editor',
     'private PDF editor',
     'secure PDF editing',
     'no upload PDF editor',
+    'offline PDF editor',
+    'privacy-first PDF tool',
+    // Technology Stack
+    'Next.js PDF editor',
+    'TypeScript PDF editor',
+    'React PDF editor',
+    'PDF.js online editor',
+    'pdf-lib editor',
+    'modern PDF tool',
   ],
   authors: [{ name: 'EditoraPDF Team', url: siteUrl }],
   creator: 'EditoraPDF',
@@ -333,6 +353,75 @@ export default function RootLayout({
     ],
   }
 
+  // SoftwareSourceCode schema - Open Source Project
+  const softwareSourceCodeJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareSourceCode',
+    '@id': `${siteUrl}/#sourcecode`,
+    name: 'EditoraPDF - Open Source PDF Editor',
+    description: 'Free and open-source online PDF editor built with Next.js, TypeScript, and PDF.js. Edit PDFs entirely in your browser with complete privacy - no uploads, no signup required.',
+    text: 'A client-side PDF editor that runs entirely in your browser. Built with Next.js 14, TypeScript, PDF.js, and pdf-lib. Features text editing, image insertion, shape drawing, page management, and instant export.',
+    codeRepository: 'https://github.com/affsquadDevs/editorapdf',
+    codeSampleType: 'full solution',
+    programmingLanguage: {
+      '@type': 'ComputerLanguage',
+      name: 'TypeScript',
+      url: 'https://www.typescriptlang.org/',
+    },
+    runtimePlatform: [
+      'Next.js 14',
+      'React 18',
+      'Node.js 18+',
+      'Modern browsers (Chrome, Firefox, Edge, Safari)',
+    ],
+    targetProduct: {
+      '@type': 'SoftwareApplication',
+      name: 'EditoraPDF',
+      applicationCategory: 'BusinessApplication',
+      operatingSystem: 'Any',
+    },
+    author: {
+      '@type': 'Organization',
+      name: 'EditoraPDF Team',
+      url: siteUrl,
+    },
+    license: 'https://opensource.org/licenses/MIT',
+    softwareVersion: '1.0.0',
+    dateCreated: '2024-01-01',
+    dateModified: new Date().toISOString().split('T')[0],
+    keywords: [
+      'open source',
+      'PDF editor',
+      'Next.js',
+      'TypeScript',
+      'React',
+      'PDF.js',
+      'pdf-lib',
+      'client-side',
+      'browser-based',
+      'privacy-first',
+      'no backend',
+      'static site',
+      'Zustand',
+      'Tailwind CSS',
+      'free software',
+      'FOSS',
+    ],
+    contributor: [
+      {
+        '@type': 'Organization',
+        name: 'GitHub Community',
+        url: 'https://github.com/affsquadDevs/editorapdf/graphs/contributors',
+      },
+    ],
+    sponsor: {
+      '@type': 'Organization',
+      name: 'AffSquad',
+      url: 'https://affsquad.com',
+      email: 'hello@affsquad.com',
+    },
+  }
+
   return (
     <html lang="en-US" className={`${outfit.variable} ${lexend.variable} ${jetbrains.variable}`}>
       <head>
@@ -412,6 +501,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <meta name="twitter:image" content={`${siteUrl}/og/og-image.png`} />
         <meta name="twitter:image:alt" content="EditoraPDF - Professional PDF Editor" />
         
+        {/* Article Tags for AI Crawlers & Social Media */}
+        <meta property="article:tag" content="open-source" />
+        <meta property="article:tag" content="free-software" />
+        <meta property="article:tag" content="pdf-editor" />
+        <meta property="article:tag" content="privacy-first" />
+        <meta property="article:tag" content="client-side" />
+        
         {/* Social Media Profile Links */}
         <meta property="og:see_also" content="https://www.facebook.com/people/Editorapdf/61587362633003/" />
         <meta property="og:see_also" content="https://www.instagram.com/editora_pdf" />
@@ -456,6 +552,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           id="jsonld-itemlist"
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
+          strategy="lazyOnload"
+        />
+        <Script
+          id="jsonld-sourcecode"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSourceCodeJsonLd) }}
           strategy="lazyOnload"
         />
         {/* Video schema - uncomment when you have video content */}
