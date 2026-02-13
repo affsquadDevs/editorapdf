@@ -33,6 +33,7 @@ export default function MobileMenu() {
 
   const navLinks = [
     { href: '/', label: 'Home' },
+    { href: '/edit?tab=tools', label: 'PDF Tools', isNew: true },
     { href: '/how-it-works', label: 'How It Works' },
     { href: '/about', label: 'About' },
     { href: '/blog', label: 'Blog' },
@@ -139,9 +140,14 @@ export default function MobileMenu() {
                   <Link
                     href={link.href}
                     onClick={closeMenu}
-                    className="block px-4 py-3 rounded-lg text-surface-300 hover:text-white hover:bg-surface-800/50 transition-colors font-medium"
+                    className="flex items-center gap-2 px-4 py-3 rounded-lg text-surface-300 hover:text-white hover:bg-surface-800/50 transition-colors font-medium"
                   >
                     {link.label}
+                    {(link as any).isNew && (
+                      <span className="px-1.5 py-0.5 rounded-full bg-primary-500/15 text-primary-400 text-[10px] font-bold uppercase tracking-wider">
+                        New
+                      </span>
+                    )}
                   </Link>
                 </li>
               ))}

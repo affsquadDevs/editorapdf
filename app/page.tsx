@@ -3,6 +3,14 @@ import Script from 'next/script';
 import { generateFAQSchema } from './data/faq';
 import LazyFAQ from './components/LazyFAQ';
 import MobileMenu from './components/MobileMenu';
+import {
+  FilePlus2, Scissors, GripVertical, RotateCw, Trash2,
+  Lock, LockOpen, PenTool, EyeOff, SlidersHorizontal,
+  Image, FileText, Table, Code, AlignLeft,
+  Minimize2, Droplets, PenLine, QrCode, Info,
+  ArrowRight, Shield, Zap, Globe, Sparkles,
+  AlertCircle, PenSquare,
+} from 'lucide-react';
 
 const siteUrl = 'https://editorapdf.com';
 
@@ -263,6 +271,12 @@ export default function Home() {
               <Link href="/" className="nav-link">
                 Home
               </Link>
+              <Link href="/edit?tab=tools" className="nav-link flex items-center gap-1.5">
+                PDF Tools
+                <span className="px-1.5 py-0.5 rounded-full bg-primary-500/15 text-primary-400 text-[10px] font-bold uppercase tracking-wider">
+                  New
+                </span>
+              </Link>
               <Link href="/how-it-works" className="nav-link">
                 How It Works
               </Link>
@@ -294,9 +308,7 @@ export default function Home() {
               href="/edit"
               className="btn-primary btn-md hidden sm:flex"
             >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-              </svg>
+              <PenSquare size={20} strokeWidth={2} />
               Edit PDF
             </Link>
           </div>
@@ -343,27 +355,19 @@ export default function Home() {
                   {/* Trust Indicators */}
                   <div className="flex flex-wrap items-center justify-center gap-6 md:gap-8 mb-8 text-sm text-surface-400 animate-fade-in-up delay-400">
                     <div className="flex items-center gap-2">
-                      <svg className="w-5 h-5 text-success-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-                      </svg>
+                      <Shield size={20} strokeWidth={2} className="text-success-400" />
                       <span className="font-medium text-surface-300">100% Free</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <svg className="w-5 h-5 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
+                      <Lock size={20} strokeWidth={2} className="text-primary-400" />
                       <span className="font-medium text-surface-300">100% Private</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <svg className="w-5 h-5 text-accent-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
-                      </svg>
+                      <Zap size={20} strokeWidth={2} className="text-accent-400" />
                       <span className="font-medium text-surface-300">Instant Processing</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <svg className="w-5 h-5 text-success-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
-                      </svg>
+                      <Globe size={20} strokeWidth={2} className="text-success-400" />
                       <span className="font-medium text-surface-300">No Data Upload</span>
                     </div>
                   </div>
@@ -374,34 +378,189 @@ export default function Home() {
               </div>
             </section>
             
+            {/* PDF Tools Section */}
+            <section className="mb-16 animate-fade-in delay-300" aria-labelledby="pdftools-heading">
+              <div className="relative card p-8 md:p-10 bg-gradient-to-br from-accent-500/5 via-surface-800/60 to-primary-500/5 border-accent-500/15 overflow-hidden">
+                {/* Decorative blurs */}
+                <div className="absolute top-0 left-1/4 w-72 h-72 bg-accent-500/8 rounded-full blur-3xl -translate-y-1/2" aria-hidden="true"></div>
+                <div className="absolute bottom-0 right-1/4 w-56 h-56 bg-primary-500/8 rounded-full blur-3xl translate-y-1/2" aria-hidden="true"></div>
+                <div className="absolute top-1/2 right-0 w-64 h-64 bg-success-500/5 rounded-full blur-3xl" aria-hidden="true"></div>
+
+                <div className="relative z-10">
+                  {/* Header */}
+                  <div className="text-center mb-8">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent-500/10 border border-accent-500/25 text-accent-300 text-xs font-bold uppercase tracking-wider mb-4">
+                      <span className="relative flex h-1.5 w-1.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-accent-500"></span>
+                      </span>
+                      55+ Tools
+                    </div>
+                    <h2 id="pdftools-heading" className="text-2xl md:text-3xl font-bold text-white mb-3">
+                      Complete PDF Toolkit
+                    </h2>
+                    <p className="text-surface-400 text-base max-w-2xl mx-auto">
+                      Everything you need to work with PDFs — organize, protect, encrypt, convert, sign, analyze, and more. All in your browser, 100% private.
+                    </p>
+                  </div>
+
+                  {/* Category rows */}
+                  <div className="space-y-6 mb-8">
+
+                    {/* Row 1: Organize & Pages */}
+                    {(() => {
+                      const tools = [
+                        { title: 'Merge PDF', desc: 'Combine files', color: 'primary', icon: <FilePlus2 size={20} strokeWidth={1.5} /> },
+                        { title: 'Split PDF', desc: 'Separate pages', color: 'accent', icon: <Scissors size={20} strokeWidth={1.5} /> },
+                        { title: 'Reorder', desc: 'Drag & drop', color: 'warning', icon: <GripVertical size={20} strokeWidth={1.5} /> },
+                        { title: 'Rotate', desc: 'Rotate pages', color: 'info', icon: <RotateCw size={20} strokeWidth={1.5} /> },
+                        { title: 'Delete Pages', desc: 'Remove pages', color: 'error', icon: <Trash2 size={20} strokeWidth={1.5} /> },
+                      ];
+                      const colorClasses: Record<string, { bg: string; border: string; text: string; iconBg: string }> = { primary: { bg: 'bg-primary-500/5', border: 'border-primary-500/20 hover:border-primary-500/40', text: 'text-primary-400', iconBg: 'bg-primary-500/15' }, accent: { bg: 'bg-accent-500/5', border: 'border-accent-500/20 hover:border-accent-500/40', text: 'text-accent-400', iconBg: 'bg-accent-500/15' }, success: { bg: 'bg-success-500/5', border: 'border-success-500/20 hover:border-success-500/40', text: 'text-success-400', iconBg: 'bg-success-500/15' }, error: { bg: 'bg-error-500/5', border: 'border-error-500/20 hover:border-error-500/40', text: 'text-error-400', iconBg: 'bg-error-500/15' }, warning: { bg: 'bg-warning-500/5', border: 'border-warning-500/20 hover:border-warning-500/40', text: 'text-warning-400', iconBg: 'bg-warning-500/15' }, info: { bg: 'bg-info-500/5', border: 'border-info-500/20 hover:border-info-500/40', text: 'text-info-400', iconBg: 'bg-info-500/15' } };
+                      return (
+                        <div>
+                          <div className="flex items-center gap-2 mb-3">
+                            <GripVertical size={16} strokeWidth={1.5} className="text-primary-400" />
+                            <span className="text-xs font-semibold uppercase tracking-wider text-surface-400">Organize & Pages</span>
+                            <span className="text-[10px] text-surface-600 ml-auto">11 tools</span>
+                          </div>
+                          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                            {tools.map((tool, i) => { const c = colorClasses[tool.color] || colorClasses.primary; return (
+                              <Link key={tool.title} href="/edit?tab=tools" className={`group flex flex-col items-center text-center p-3 rounded-xl border transition-all duration-200 hover:scale-[1.04] hover:shadow-lg active:scale-[0.97] ${c.bg} ${c.border} animate-fade-in-up`} style={{ animationDelay: `${300 + i * 50}ms` }}>
+                                <div className={`w-9 h-9 rounded-lg ${c.iconBg} flex items-center justify-center mb-2 ${c.text} transition-transform duration-200 group-hover:scale-110`}>{tool.icon}</div>
+                                <h3 className="text-xs font-semibold text-white mb-0.5">{tool.title}</h3>
+                                <p className="text-[10px] text-surface-500 hidden sm:block">{tool.desc}</p>
+                              </Link>
+                            ); })}
+                          </div>
+                        </div>
+                      );
+                    })()}
+
+                    {/* Row 2: Security & Protection */}
+                    {(() => {
+                      const tools = [
+                        { title: 'Encrypt PDF', desc: 'AES-256 protection', color: 'success', icon: <Lock size={20} strokeWidth={1.5} /> },
+                        { title: 'Unlock PDF', desc: 'Remove password', color: 'warning', icon: <LockOpen size={20} strokeWidth={1.5} /> },
+                        { title: 'Sign PDF', desc: 'Digital signature', color: 'primary', icon: <PenTool size={20} strokeWidth={1.5} /> },
+                        { title: 'Redact', desc: 'Black out data', color: 'error', icon: <EyeOff size={20} strokeWidth={1.5} /> },
+                        { title: 'Permissions', desc: 'Control access', color: 'info', icon: <SlidersHorizontal size={20} strokeWidth={1.5} /> },
+                      ];
+                      const colorClasses: Record<string, { bg: string; border: string; text: string; iconBg: string }> = { primary: { bg: 'bg-primary-500/5', border: 'border-primary-500/20 hover:border-primary-500/40', text: 'text-primary-400', iconBg: 'bg-primary-500/15' }, accent: { bg: 'bg-accent-500/5', border: 'border-accent-500/20 hover:border-accent-500/40', text: 'text-accent-400', iconBg: 'bg-accent-500/15' }, success: { bg: 'bg-success-500/5', border: 'border-success-500/20 hover:border-success-500/40', text: 'text-success-400', iconBg: 'bg-success-500/15' }, error: { bg: 'bg-error-500/5', border: 'border-error-500/20 hover:border-error-500/40', text: 'text-error-400', iconBg: 'bg-error-500/15' }, warning: { bg: 'bg-warning-500/5', border: 'border-warning-500/20 hover:border-warning-500/40', text: 'text-warning-400', iconBg: 'bg-warning-500/15' }, info: { bg: 'bg-info-500/5', border: 'border-info-500/20 hover:border-info-500/40', text: 'text-info-400', iconBg: 'bg-info-500/15' } };
+                      return (
+                        <div>
+                          <div className="flex items-center gap-2 mb-3">
+                            <Shield size={16} strokeWidth={1.5} className="text-success-400" />
+                            <span className="text-xs font-semibold uppercase tracking-wider text-surface-400">Security & Protection</span>
+                            <span className="text-[10px] text-surface-600 ml-auto">7 tools</span>
+                          </div>
+                          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                            {tools.map((tool, i) => { const c = colorClasses[tool.color] || colorClasses.primary; return (
+                              <Link key={tool.title} href="/edit?tab=tools" className={`group flex flex-col items-center text-center p-3 rounded-xl border transition-all duration-200 hover:scale-[1.04] hover:shadow-lg active:scale-[0.97] ${c.bg} ${c.border} animate-fade-in-up`} style={{ animationDelay: `${500 + i * 50}ms` }}>
+                                <div className={`w-9 h-9 rounded-lg ${c.iconBg} flex items-center justify-center mb-2 ${c.text} transition-transform duration-200 group-hover:scale-110`}>{tool.icon}</div>
+                                <h3 className="text-xs font-semibold text-white mb-0.5">{tool.title}</h3>
+                                <p className="text-[10px] text-surface-500 hidden sm:block">{tool.desc}</p>
+                              </Link>
+                            ); })}
+                          </div>
+                        </div>
+                      );
+                    })()}
+
+                    {/* Row 3: Convert */}
+                    {(() => {
+                      const tools = [
+                        { title: 'PDF → Images', desc: 'PNG, JPEG, WebP', color: 'accent', icon: <Image size={20} strokeWidth={1.5} /> },
+                        { title: 'PDF → Word', desc: 'Editable DOCX', color: 'info', icon: <FileText size={20} strokeWidth={1.5} /> },
+                        { title: 'PDF → Excel', desc: 'Extract tables', color: 'success', icon: <Table size={20} strokeWidth={1.5} /> },
+                        { title: 'PDF → HTML', desc: 'Web format', color: 'error', icon: <Code size={20} strokeWidth={1.5} /> },
+                        { title: 'PDF → Text', desc: 'Plain text', color: 'warning', icon: <AlignLeft size={20} strokeWidth={1.5} /> },
+                      ];
+                      const colorClasses: Record<string, { bg: string; border: string; text: string; iconBg: string }> = { primary: { bg: 'bg-primary-500/5', border: 'border-primary-500/20 hover:border-primary-500/40', text: 'text-primary-400', iconBg: 'bg-primary-500/15' }, accent: { bg: 'bg-accent-500/5', border: 'border-accent-500/20 hover:border-accent-500/40', text: 'text-accent-400', iconBg: 'bg-accent-500/15' }, success: { bg: 'bg-success-500/5', border: 'border-success-500/20 hover:border-success-500/40', text: 'text-success-400', iconBg: 'bg-success-500/15' }, error: { bg: 'bg-error-500/5', border: 'border-error-500/20 hover:border-error-500/40', text: 'text-error-400', iconBg: 'bg-error-500/15' }, warning: { bg: 'bg-warning-500/5', border: 'border-warning-500/20 hover:border-warning-500/40', text: 'text-warning-400', iconBg: 'bg-warning-500/15' }, info: { bg: 'bg-info-500/5', border: 'border-info-500/20 hover:border-info-500/40', text: 'text-info-400', iconBg: 'bg-info-500/15' } };
+                      return (
+                        <div>
+                          <div className="flex items-center gap-2 mb-3">
+                            <ArrowRight size={16} strokeWidth={1.5} className="text-accent-400" />
+                            <span className="text-xs font-semibold uppercase tracking-wider text-surface-400">Convert</span>
+                            <span className="text-[10px] text-surface-600 ml-auto">12 formats</span>
+                          </div>
+                          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                            {tools.map((tool, i) => { const c = colorClasses[tool.color] || colorClasses.primary; return (
+                              <Link key={tool.title} href="/edit?tab=tools" className={`group flex flex-col items-center text-center p-3 rounded-xl border transition-all duration-200 hover:scale-[1.04] hover:shadow-lg active:scale-[0.97] ${c.bg} ${c.border} animate-fade-in-up`} style={{ animationDelay: `${650 + i * 50}ms` }}>
+                                <div className={`w-9 h-9 rounded-lg ${c.iconBg} flex items-center justify-center mb-2 ${c.text} transition-transform duration-200 group-hover:scale-110`}>{tool.icon}</div>
+                                <h3 className="text-xs font-semibold text-white mb-0.5">{tool.title}</h3>
+                                <p className="text-[10px] text-surface-500 hidden sm:block">{tool.desc}</p>
+                              </Link>
+                            ); })}
+                          </div>
+                        </div>
+                      );
+                    })()}
+
+                    {/* Row 4: Edit & Content */}
+                    {(() => {
+                      const tools = [
+                        { title: 'Compress', desc: 'Reduce file size', color: 'success', icon: <Minimize2 size={20} strokeWidth={1.5} /> },
+                        { title: 'Watermark', desc: 'Text or image', color: 'info', icon: <Droplets size={20} strokeWidth={1.5} /> },
+                        { title: 'Fill & Sign', desc: 'Forms & signing', color: 'primary', icon: <PenLine size={20} strokeWidth={1.5} /> },
+                        { title: 'Add QR Code', desc: 'Insert QR codes', color: 'accent', icon: <QrCode size={20} strokeWidth={1.5} /> },
+                        { title: 'Metadata', desc: 'Edit properties', color: 'warning', icon: <Info size={20} strokeWidth={1.5} /> },
+                      ];
+                      const colorClasses: Record<string, { bg: string; border: string; text: string; iconBg: string }> = { primary: { bg: 'bg-primary-500/5', border: 'border-primary-500/20 hover:border-primary-500/40', text: 'text-primary-400', iconBg: 'bg-primary-500/15' }, accent: { bg: 'bg-accent-500/5', border: 'border-accent-500/20 hover:border-accent-500/40', text: 'text-accent-400', iconBg: 'bg-accent-500/15' }, success: { bg: 'bg-success-500/5', border: 'border-success-500/20 hover:border-success-500/40', text: 'text-success-400', iconBg: 'bg-success-500/15' }, error: { bg: 'bg-error-500/5', border: 'border-error-500/20 hover:border-error-500/40', text: 'text-error-400', iconBg: 'bg-error-500/15' }, warning: { bg: 'bg-warning-500/5', border: 'border-warning-500/20 hover:border-warning-500/40', text: 'text-warning-400', iconBg: 'bg-warning-500/15' }, info: { bg: 'bg-info-500/5', border: 'border-info-500/20 hover:border-info-500/40', text: 'text-info-400', iconBg: 'bg-info-500/15' } };
+                      return (
+                        <div>
+                          <div className="flex items-center gap-2 mb-3">
+                            <Sparkles size={16} strokeWidth={1.5} className="text-info-400" />
+                            <span className="text-xs font-semibold uppercase tracking-wider text-surface-400">Edit, Content & Analyze</span>
+                            <span className="text-[10px] text-surface-600 ml-auto">25+ tools</span>
+                          </div>
+                          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                            {tools.map((tool, i) => { const c = colorClasses[tool.color] || colorClasses.primary; return (
+                              <Link key={tool.title} href="/edit?tab=tools" className={`group flex flex-col items-center text-center p-3 rounded-xl border transition-all duration-200 hover:scale-[1.04] hover:shadow-lg active:scale-[0.97] ${c.bg} ${c.border} animate-fade-in-up`} style={{ animationDelay: `${800 + i * 50}ms` }}>
+                                <div className={`w-9 h-9 rounded-lg ${c.iconBg} flex items-center justify-center mb-2 ${c.text} transition-transform duration-200 group-hover:scale-110`}>{tool.icon}</div>
+                                <h3 className="text-xs font-semibold text-white mb-0.5">{tool.title}</h3>
+                                <p className="text-[10px] text-surface-500 hidden sm:block">{tool.desc}</p>
+                              </Link>
+                            ); })}
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+
+                  {/* CTA */}
+                  <div className="text-center">
+                    <Link
+                      href="/edit?tab=tools"
+                      className="btn-primary btn-md inline-flex"
+                    >
+                      Explore All 55+ PDF Tools
+                      <ArrowRight size={16} strokeWidth={2} className="transition-transform group-hover:translate-x-1" />
+                    </Link>
+                    <p className="text-xs text-surface-500 mt-3">
+                      100% free &bull; No signup &bull; Processed on your device
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
             {/* Features Grid */}
             <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12" aria-labelledby="features-heading">
               <h2 id="features-heading" className="text-2xl font-bold text-white mb-6 col-span-full text-center">Why Choose EditoraPDF?</h2>
               {[
                 {
-                  icon: (
-                    <svg className="w-7 h-7 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
-                    </svg>
-                  ),
+                  icon: <Zap size={28} strokeWidth={1.5} className="text-primary-400" />,
                   title: 'Instant Start',
                   description: 'No installation, no signup, no waiting. Drop your PDF and start editing immediately in your browser',
                 },
                 {
-                  icon: (
-                    <svg className="w-7 h-7 text-accent-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                    </svg>
-                  ),
+                  icon: <PenSquare size={28} strokeWidth={1.5} className="text-accent-400" />,
                   title: 'Full-Featured Editor',
                   description: 'Edit text, add images, annotate, reorder pages, rotate, and more — all the tools you need online',
                 },
                 {
-                  icon: (
-                    <svg className="w-7 h-7 text-success-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5} aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-                    </svg>
-                  ),
+                  icon: <Shield size={28} strokeWidth={1.5} className="text-success-400" />,
                   title: '100% Private & Secure',
                   description: 'All processing happens on your device. No uploads, no accounts, no data collection — total privacy',
                 },
@@ -424,9 +583,7 @@ export default function Home() {
             <aside className="card p-5 border-warning-500/20 bg-warning-500/5 animate-fade-in delay-500" aria-labelledby="limitations-heading">
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-warning-500/20 flex items-center justify-center" aria-hidden="true">
-                  <svg className="w-5 h-5 text-warning-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-                  </svg>
+                  <AlertCircle size={20} strokeWidth={2} className="text-warning-400" />
                 </div>
                 <div>
                   <h4 id="limitations-heading" className="font-semibold text-warning-300 mb-2">Current Limitations</h4>

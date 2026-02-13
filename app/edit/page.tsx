@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { usePdfStore } from '../store/pdfStore';
@@ -8,9 +8,11 @@ import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
 import { useAutosave } from '../hooks/useAutosave';
 import UploadArea from '../components/UploadArea';
 import Toolbar from '../components/Toolbar';
+import { FileText, X, PenSquare, Wrench } from 'lucide-react';
 import EditToolbar from '../components/EditToolbar';
 import ConfirmDialog from '../components/ConfirmDialog';
 import MobileMenu from '../components/MobileMenu';
+import ToolsPanel from '../components/ToolsPanel';
 
 // Dynamic imports for PDF components - only load when needed
 const Thumbnails = dynamic(() => import('../components/Thumbnails'), {
@@ -24,9 +26,7 @@ const PdfViewer = dynamic(() => import('../components/PdfViewer'), {
     <div className="flex-1 flex items-center justify-center bg-surface-900/30">
       <div className="text-center">
         <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-surface-800 flex items-center justify-center animate-pulse">
-          <svg className="w-8 h-8 text-surface-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-          </svg>
+          <FileText size={32} strokeWidth={1.5} className="text-surface-500" />
         </div>
         <p className="text-surface-400">Loading PDF viewer...</p>
       </div>
@@ -40,10 +40,24 @@ const ExportButton = dynamic(() => import('../components/ExportButton'), {
 
 const siteUrl = 'https://editorapdf.com';
 
+type ActiveTab = 'editor' | 'tools';
+
 export default function EditPage() {
   const { pages, reset } = usePdfStore();
   const hasPages = pages.length > 0;
   const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<ActiveTab>('editor');
+
+  // Handle ?tab=tools URL parameter
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get('tab');
+      if (tab === 'tools') {
+        setActiveTab('tools');
+      }
+    }
+  }, []);
   
   // Enable keyboard shortcuts
   useKeyboardShortcuts();
@@ -81,6 +95,15 @@ export default function EditPage() {
                 <Link href="/" className="nav-link">
                   Home
                 </Link>
+                <button
+                  onClick={() => { setActiveTab('tools'); }}
+                  className="nav-link flex items-center gap-1.5"
+                >
+                  PDF Tools
+                  <span className="px-1.5 py-0.5 rounded-full bg-primary-500/15 text-primary-400 text-[10px] font-bold uppercase tracking-wider">
+                    New
+                  </span>
+                </button>
                 <Link href="/how-it-works" className="nav-link">
                   How It Works
                 </Link>
@@ -102,9 +125,7 @@ export default function EditPage() {
                   className="btn-ghost btn-md group"
                   aria-label="Close PDF document"
                 >
-                  <svg className="w-5 h-5 text-surface-400 group-hover:text-error-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  <X size={20} strokeWidth={2} className="text-surface-400 group-hover:text-error-400 transition-colors" />
                   <span className="text-surface-300 group-hover:text-surface-100">Close PDF</span>
                 </button>
               )}
@@ -114,12 +135,69 @@ export default function EditPage() {
 
         {/* Main Content */}
         {!hasPages ? (
-          /* Empty State - Upload Area */
-          <div className="flex-1 flex items-center justify-center p-6">
-            <div className="max-w-5xl w-full">
-              {/* Upload Area */}
-              <div className="mb-16 animate-fade-in-up delay-100" role="region" aria-label="PDF Upload">
-                <UploadArea />
+          /* Empty State - Upload Area with Tabs */
+          <div className="flex-1 flex flex-col overflow-auto">
+            {/* Tab Switcher */}
+            <div className="sticky top-0 z-10 border-b border-surface-700/50 bg-surface-900/80 backdrop-blur-sm">
+              <div className="max-w-5xl mx-auto px-6">
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => setActiveTab('editor')}
+                    className={`
+                      relative px-5 py-3.5 text-sm font-semibold transition-all duration-200
+                      ${activeTab === 'editor'
+                        ? 'text-primary-400'
+                        : 'text-surface-400 hover:text-surface-200'
+                      }
+                    `}
+                  >
+                    <div className="flex items-center gap-2">
+                      <PenSquare size={16} strokeWidth={2} />
+                      Edit PDF
+                    </div>
+                    {activeTab === 'editor' && (
+                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500 rounded-full" />
+                    )}
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('tools')}
+                    className={`
+                      relative px-5 py-3.5 text-sm font-semibold transition-all duration-200
+                      ${activeTab === 'tools'
+                        ? 'text-primary-400'
+                        : 'text-surface-400 hover:text-surface-200'
+                      }
+                    `}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Wrench size={16} strokeWidth={2} />
+                      PDF Tools
+                      <span className="px-1.5 py-0.5 rounded-full bg-primary-500/15 text-primary-400 text-[10px] font-bold uppercase tracking-wider">
+                        New
+                      </span>
+                    </div>
+                    {activeTab === 'tools' && (
+                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500 rounded-full" />
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Tab Content */}
+            <div className="flex-1 flex items-center justify-center p-6">
+              <div className="max-w-5xl w-full">
+                {activeTab === 'editor' ? (
+                  /* Upload Area */
+                  <div className="mb-16 animate-fade-in-up delay-100" role="region" aria-label="PDF Upload">
+                    <UploadArea />
+                  </div>
+                ) : (
+                  /* PDF Tools Panel */
+                  <div className="mb-16" role="region" aria-label="PDF Tools">
+                    <ToolsPanel />
+                  </div>
+                )}
               </div>
             </div>
           </div>
