@@ -8,7 +8,10 @@ import {
 } from 'lucide-react';
 import { mergePdf, downloadMergedPdf } from '../lib/pdf/mergePdf';
 import { splitPdf, parsePageRange, downloadSplitPdfs } from '../lib/pdf/splitPdf';
+import { deletePages, downloadPdf as downloadDeletePdf } from '../lib/pdf/deletePages';
+import { extractPages, downloadPdf as downloadExtractPdf } from '../lib/pdf/extractPages';
 import PageRangeSelector from './PageRangeSelector';
+import PageSelector from './PageSelector';
 
 interface ToolViewProps {
   tool: PdfTool;
@@ -114,6 +117,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
   const [isComplete, setIsComplete] = useState(false);
   const [mergedPdfBytes, setMergedPdfBytes] = useState<Uint8Array | null>(null);
   const [splitPdfResults, setSplitPdfResults] = useState<Array<{ bytes: Uint8Array; filename: string }> | null>(null);
+  const [processedPdfBytes, setProcessedPdfBytes] = useState<Uint8Array | null>(null);
   const [pageRange, setPageRange] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState<number | null>(null);
@@ -133,8 +137,9 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
     } else {
       setFiles([validFiles[0]]);
       
-      // Load total pages for split tool
-      if (tool.id === 'split' && validFiles[0].type === 'application/pdf') {
+      // Load total pages for tools that need it
+      if ((tool.id === 'split' || tool.id === 'extract-pages' || tool.id === 'delete-pages') 
+          && validFiles[0].type === 'application/pdf') {
         try {
           const { PDFDocument } = await import('pdf-lib');
           const arrayBuffer = await validFiles[0].arrayBuffer();
@@ -166,9 +171,10 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
 
   const handleRemoveFile = (index: number) => {
     setFiles(prev => prev.filter((_, i) => i !== index));
-    if (tool.id === 'split' && index === 0) {
+    if ((tool.id === 'split' || tool.id === 'extract-pages' || tool.id === 'delete-pages') && index === 0) {
       setTotalPages(null);
       setPageRangeWarning(null);
+      setPageRange('');
     }
   };
 
@@ -341,6 +347,68 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       } finally {
         setIsProcessing(false);
       }
+    } else if (tool.id === 'delete-pages') {
+      // Real delete pages implementation
+      if (files.length === 0) {
+        setError('Please upload a PDF file to delete pages from');
+        return;
+      }
+
+      if (!pageRange.trim()) {
+        setError('Please select pages to delete');
+        return;
+      }
+
+      setIsProcessing(true);
+      setError(null);
+
+      try {
+        const file = files[0];
+        const pdfBytes = await deletePages(file, pageRange);
+        
+        console.log('Delete pages successful, bytes:', pdfBytes.length);
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        console.error('Error deleting pages:', err);
+        setError(err instanceof Error ? err.message : 'Failed to delete pages. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'extract-pages') {
+      // Real extract pages implementation
+      if (files.length === 0) {
+        setError('Please upload a PDF file to extract pages from');
+        return;
+      }
+
+      if (!pageRange.trim()) {
+        setError('Please select pages to extract');
+        return;
+      }
+
+      setIsProcessing(true);
+      setError(null);
+
+      try {
+        const file = files[0];
+        const pdfBytes = await extractPages(file, pageRange);
+        
+        console.log('Extract pages successful, bytes:', pdfBytes.length);
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        console.error('Error extracting pages:', err);
+        setError(err instanceof Error ? err.message : 'Failed to extract pages. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
     } else {
       // Stub for other tools
       setIsProcessing(true);
@@ -357,6 +425,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
     setIsProcessing(false);
     setMergedPdfBytes(null);
     setSplitPdfResults(null);
+    setProcessedPdfBytes(null);
     setPageRange('');
     setError(null);
     setTotalPages(null);
@@ -397,6 +466,31 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       } catch (err) {
         console.error('Error downloading split PDFs:', err);
         setError('Failed to download PDFs. Please try again.');
+      }
+    } else if (tool.id === 'delete-pages' || tool.id === 'extract-pages') {
+      if (!processedPdfBytes) {
+        console.error('Processed PDF bytes not available');
+        setError(`${tool.id === 'delete-pages' ? 'Updated' : 'Extracted'} PDF is not ready. Please try again.`);
+        return;
+      }
+      
+      // Generate filename from input file
+      const baseName = files.length > 0 
+        ? files[0].name.replace(/\.pdf$/i, '') 
+        : tool.id === 'delete-pages' ? 'updated' : 'extracted';
+      const filename = tool.id === 'delete-pages'
+        ? `${baseName}_updated.pdf`
+        : `${baseName}_extracted.pdf`;
+      
+      try {
+        if (tool.id === 'delete-pages') {
+          downloadDeletePdf(processedPdfBytes, filename);
+        } else {
+          downloadExtractPdf(processedPdfBytes, filename);
+        }
+      } catch (err) {
+        console.error('Error downloading PDF:', err);
+        setError('Failed to download PDF. Please try again.');
       }
     } else {
       // Stub for other tools
@@ -490,14 +584,16 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               <button
                 className={`btn-primary btn-lg ${
                   (tool.id === 'merge' && !mergedPdfBytes) || 
-                  (tool.id === 'split' && (!splitPdfResults || splitPdfResults.length === 0))
+                  (tool.id === 'split' && (!splitPdfResults || splitPdfResults.length === 0)) ||
+                  ((tool.id === 'delete-pages' || tool.id === 'extract-pages') && !processedPdfBytes)
                     ? 'opacity-50 cursor-not-allowed' 
                     : ''
                 }`}
                 onClick={handleDownload}
                 disabled={
                   (tool.id === 'merge' && !mergedPdfBytes) ||
-                  (tool.id === 'split' && (!splitPdfResults || splitPdfResults.length === 0))
+                  (tool.id === 'split' && (!splitPdfResults || splitPdfResults.length === 0)) ||
+                  ((tool.id === 'delete-pages' || tool.id === 'extract-pages') && !processedPdfBytes)
                 }
               >
                 <FileText size={20} strokeWidth={2} />
@@ -521,6 +617,11 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
             {tool.id === 'split' && (!splitPdfResults || splitPdfResults.length === 0) && (
               <p className="text-xs text-warning-400 text-center mt-2">
                 Split PDFs are not ready. Please try splitting again.
+              </p>
+            )}
+            {(tool.id === 'delete-pages' || tool.id === 'extract-pages') && !processedPdfBytes && (
+              <p className="text-xs text-warning-400 text-center mt-2">
+                {tool.id === 'delete-pages' ? 'Updated' : 'Extracted'} PDF is not ready. Please try again.
               </p>
             )}
           </div>
@@ -698,6 +799,13 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                         Select which pages should be split into separate PDF files. Each range will create a new file.
                       </p>
                     )}
+                    {(tool.id === 'extract-pages' || tool.id === 'delete-pages') && (
+                      <p className="text-xs text-surface-400 mb-3">
+                        {tool.id === 'extract-pages' 
+                          ? 'Click on pages to select which ones to extract into a new PDF file.'
+                          : 'Click on pages to select which ones to delete from the PDF.'}
+                      </p>
+                    )}
                     
                     {tool.id === 'split' ? (
                       <PageRangeSelector
@@ -707,12 +815,10 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                         onWarningChange={setPageRangeWarning}
                       />
                     ) : (
-                      <input
-                        type="text"
-                        value=""
-                        onChange={(e) => {}}
-                        placeholder="e.g. 1-3, 5, 8-10"
-                        className="w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:ring-1 focus:border-primary-500/50 focus:ring-primary-500/25 transition-all"
+                      <PageSelector
+                        totalPages={totalPages}
+                        value={pageRange}
+                        onChange={handlePageRangeChange}
                       />
                     )}
                     
@@ -740,11 +846,18 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                     </div>
                   )}
                   
-                  <p className="text-xs text-surface-500">
-                    {tool.id === 'split' 
-                      ? '⚠️ Note: You cannot select all pages - split requires selecting only some pages to create separate files.'
-                      : 'Enter page numbers or ranges separated by commas'}
-                  </p>
+                  {tool.id === 'split' && (
+                    <p className="text-xs text-surface-500">
+                      ⚠️ Note: You cannot select all pages - split requires selecting only some pages to create separate files.
+                    </p>
+                  )}
+                  {(tool.id === 'extract-pages' || tool.id === 'delete-pages') && (
+                    <p className="text-xs text-surface-500">
+                      {tool.id === 'delete-pages' 
+                        ? '⚠️ Note: You cannot delete all pages - at least one page must remain.'
+                        : 'Select one or more pages to extract into a new PDF file.'}
+                    </p>
+                  )}
                 </div>
               )}
 
@@ -1421,12 +1534,13 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                 disabled={
                   isProcessing || 
                   (config.acceptMultiple && files.length < 2) ||
-                  (tool.id === 'split' && !pageRange.trim())
+                  (tool.id === 'split' && !pageRange.trim()) ||
+                  ((tool.id === 'delete-pages' || tool.id === 'extract-pages') && !pageRange.trim())
                 }
                 className={`
                   w-full btn-primary btn-lg font-semibold justify-center
                   ${isProcessing ? 'opacity-75 cursor-wait' : ''}
-                  ${(config.acceptMultiple && files.length < 2) || (tool.id === 'split' && !pageRange.trim()) ? 'opacity-50 cursor-not-allowed' : ''}
+                  ${(config.acceptMultiple && files.length < 2) || (tool.id === 'split' && !pageRange.trim()) || ((tool.id === 'delete-pages' || tool.id === 'extract-pages') && !pageRange.trim()) ? 'opacity-50 cursor-not-allowed' : ''}
                 `}
               >
                 {isProcessing ? (
@@ -1449,6 +1563,11 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {tool.id === 'split' && !pageRange.trim() && (
                 <p className="text-xs text-surface-500 text-center mt-2">
                   Please enter page ranges (e.g., "1-3, 5, 8-10")
+                </p>
+              )}
+              {(tool.id === 'delete-pages' || tool.id === 'extract-pages') && !pageRange.trim() && (
+                <p className="text-xs text-surface-500 text-center mt-2">
+                  Please select pages to {tool.id === 'delete-pages' ? 'delete' : 'extract'}
                 </p>
               )}
             </div>
