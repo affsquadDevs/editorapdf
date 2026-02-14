@@ -1,11 +1,13 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import type { PdfTool } from './ToolsPanel';
 import {
   ArrowLeft, CheckCircle, Upload, X, FileText, Plus,
   CircleCheck, GripVertical, Zap
 } from 'lucide-react';
+import { mergePdf, downloadMergedPdf } from '../lib/pdf/mergePdf';
+import { splitPdf, parsePageRange, downloadSplitPdfs } from '../lib/pdf/splitPdf';
 
 interface ToolViewProps {
   tool: PdfTool;
@@ -109,6 +111,13 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
+  const [mergedPdfBytes, setMergedPdfBytes] = useState<Uint8Array | null>(null);
+  const [splitPdfResults, setSplitPdfResults] = useState<Array<{ bytes: Uint8Array; filename: string }> | null>(null);
+  const [pageRange, setPageRange] = useState<string>('');
+  const [error, setError] = useState<string | null>(null);
+  const [totalPages, setTotalPages] = useState<number | null>(null);
+  const [pageRangeWarning, setPageRangeWarning] = useState<string | null>(null);
+  const validationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const config = toolConfigs[tool.id] || toolConfigs.merge;
 
@@ -143,21 +152,242 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
 
   const handleRemoveFile = (index: number) => {
     setFiles(prev => prev.filter((_, i) => i !== index));
+    if (tool.id === 'split' && index === 0) {
+      setTotalPages(null);
+      setPageRangeWarning(null);
+    }
   };
 
-  const handleProcess = () => {
-    // Stub: simulate processing
-    setIsProcessing(true);
-    setTimeout(() => {
-      setIsProcessing(false);
-      setIsComplete(true);
-    }, 2000);
+  // Validate page range in real-time for split tool (with debounce)
+  const validatePageRange = useCallback(async (range: string) => {
+    if (tool.id !== 'split' || !range.trim() || files.length === 0) {
+      setPageRangeWarning(null);
+      return;
+    }
+
+    try {
+      // Load PDF to get total pages (only once)
+      if (!totalPages) {
+        const { PDFDocument } = await import('pdf-lib');
+        const file = files[0];
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await PDFDocument.load(arrayBuffer);
+        const total = pdf.getPageCount();
+        setTotalPages(total);
+      }
+
+      if (!totalPages) return;
+
+      // Parse and validate
+      const rangeParts = range.split(',').map(p => p.trim()).filter(p => p.length > 0);
+      const allSelectedPages = new Set<number>();
+
+      for (const part of rangeParts) {
+        try {
+          const pageIndices = parsePageRange(part, totalPages);
+          pageIndices.forEach(idx => allSelectedPages.add(idx));
+        } catch (err) {
+          // Ignore parsing errors during typing
+        }
+      }
+
+      // Check if all pages are selected
+      if (allSelectedPages.size === totalPages) {
+        setPageRangeWarning(`⚠️ You selected all ${totalPages} pages. Split requires selecting only some pages to create separate files. Please specify fewer pages.`);
+      } else if (allSelectedPages.size > totalPages * 0.9) {
+        setPageRangeWarning(`⚠️ You selected ${allSelectedPages.size} out of ${totalPages} pages. Consider selecting fewer pages for a meaningful split.`);
+      } else {
+        setPageRangeWarning(null);
+      }
+    } catch (err) {
+      // Ignore parsing errors during typing
+      setPageRangeWarning(null);
+    }
+  }, [tool.id, files, totalPages]);
+
+  const handlePageRangeChange = (value: string) => {
+    setPageRange(value);
+    if (tool.id === 'split') {
+      // Clear previous timeout
+      if (validationTimeoutRef.current) {
+        clearTimeout(validationTimeoutRef.current);
+      }
+      // Debounce validation
+      validationTimeoutRef.current = setTimeout(() => {
+        validatePageRange(value);
+      }, 500);
+    }
+  };
+
+  const handleProcess = async () => {
+    if (tool.id === 'merge') {
+      // Real merge PDF implementation
+      if (files.length < 2) {
+        setError('Please add at least 2 PDF files to merge');
+        return;
+      }
+
+      setIsProcessing(true);
+      setError(null);
+
+      try {
+        const mergedBytes = await mergePdf(files);
+        console.log('Merge successful, bytes:', mergedBytes.length);
+        setMergedPdfBytes(mergedBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        console.error('Error merging PDFs:', err);
+        setError(err instanceof Error ? err.message : 'Failed to merge PDF files. Please try again.');
+        setIsComplete(false);
+        setMergedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'split') {
+      // Real split PDF implementation
+      if (files.length === 0) {
+        setError('Please upload a PDF file to split');
+        return;
+      }
+
+      if (!pageRange.trim()) {
+        setError('Please enter page ranges (e.g., "1-3, 5, 8-10")');
+        return;
+      }
+
+      setIsProcessing(true);
+      setError(null);
+
+      try {
+        const file = files[0];
+        
+        // Load PDF to get total pages
+        const { PDFDocument } = await import('pdf-lib');
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await PDFDocument.load(arrayBuffer);
+        const totalPages = pdf.getPageCount();
+
+        // Parse page ranges - split by commas to get separate ranges
+        const rangeParts = pageRange.split(',').map(p => p.trim()).filter(p => p.length > 0);
+        const ranges: number[][] = [];
+        const allSelectedPages = new Set<number>();
+
+        for (const part of rangeParts) {
+          const pageIndices = parsePageRange(part, totalPages);
+          if (pageIndices.length > 0) {
+            ranges.push(pageIndices);
+            pageIndices.forEach(idx => allSelectedPages.add(idx));
+          }
+        }
+        
+        if (ranges.length === 0) {
+          throw new Error('No valid pages found in the specified range');
+        }
+
+        // Validation: Check if user selected all pages (which would just be the same file)
+        if (allSelectedPages.size === totalPages && ranges.length === 1) {
+          throw new Error(`You selected all ${totalPages} pages. To split a PDF, you need to select only some pages, not all of them. For example, use "1-5" to split pages 1-5 into one file, and the rest will remain.`);
+        }
+
+        // Validation: Check if only one range that covers all pages
+        if (ranges.length === 1 && ranges[0].length === totalPages) {
+          throw new Error(`You selected all ${totalPages} pages in one range. To split a PDF, specify multiple ranges separated by commas. For example: "1-3, 5-7" will create 2 separate files.`);
+        }
+
+        // Split PDF
+        const splitResults = await splitPdf(file, ranges);
+
+        // Generate filenames
+        const baseName = file.name.replace(/\.pdf$/i, '');
+        const results = splitResults.map((bytes, index) => {
+          const range = ranges[index];
+          const startPage = range[0] + 1;
+          const endPage = range[range.length - 1] + 1;
+          const filename = range.length === 1
+            ? `${baseName}_page_${startPage}.pdf`
+            : `${baseName}_pages_${startPage}-${endPage}.pdf`;
+          
+          return { bytes, filename };
+        });
+
+        console.log(`Split successful: ${results.length} files created`);
+        results.forEach((r, i) => {
+          console.log(`  File ${i + 1}: ${r.filename} (${r.bytes.length} bytes)`);
+        });
+        
+        setSplitPdfResults(results);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        console.error('Error splitting PDF:', err);
+        setError(err instanceof Error ? err.message : 'Failed to split PDF. Please check your page ranges and try again.');
+        setIsComplete(false);
+        setSplitPdfResults(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else {
+      // Stub for other tools
+      setIsProcessing(true);
+      setTimeout(() => {
+        setIsProcessing(false);
+        setIsComplete(true);
+      }, 2000);
+    }
   };
 
   const handleReset = () => {
     setFiles([]);
     setIsComplete(false);
     setIsProcessing(false);
+    setMergedPdfBytes(null);
+    setSplitPdfResults(null);
+    setPageRange('');
+    setError(null);
+    setTotalPages(null);
+    setPageRangeWarning(null);
+  };
+
+  const handleDownload = async () => {
+    if (tool.id === 'merge') {
+      if (!mergedPdfBytes) {
+        console.error('Merged PDF bytes not available');
+        setError('Merged PDF is not ready. Please try merging again.');
+        return;
+      }
+      
+      // Generate filename from input files
+      const baseName = files.length > 0 
+        ? files[0].name.replace(/\.pdf$/i, '') 
+        : 'merged';
+      const filename = files.length > 1 
+        ? `${baseName}_merged.pdf`
+        : `${baseName}.pdf`;
+      
+      try {
+        downloadMergedPdf(mergedPdfBytes, filename);
+      } catch (err) {
+        console.error('Error downloading PDF:', err);
+        setError('Failed to download PDF. Please try again.');
+      }
+    } else if (tool.id === 'split') {
+      if (!splitPdfResults || splitPdfResults.length === 0) {
+        console.error('Split PDF results not available');
+        setError('Split PDFs are not ready. Please try splitting again.');
+        return;
+      }
+      
+      try {
+        await downloadSplitPdfs(splitPdfResults);
+      } catch (err) {
+        console.error('Error downloading split PDFs:', err);
+        setError('Failed to download PDFs. Please try again.');
+      }
+    } else {
+      // Stub for other tools
+      alert('This is a stub — download functionality will be implemented soon!');
+    }
   };
 
   const formatFileSize = (bytes: number) => {
@@ -241,14 +471,26 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               Your {config.resultLabel.toLowerCase()} is ready to download.
             </p>
 
-            {/* Stub download button */}
+            {/* Download button */}
             <div className="flex items-center justify-center gap-3">
               <button
-                className="btn-primary btn-lg"
-                onClick={() => alert('This is a stub — download functionality will be implemented soon!')}
+                className={`btn-primary btn-lg ${
+                  (tool.id === 'merge' && !mergedPdfBytes) || 
+                  (tool.id === 'split' && (!splitPdfResults || splitPdfResults.length === 0))
+                    ? 'opacity-50 cursor-not-allowed' 
+                    : ''
+                }`}
+                onClick={handleDownload}
+                disabled={
+                  (tool.id === 'merge' && !mergedPdfBytes) ||
+                  (tool.id === 'split' && (!splitPdfResults || splitPdfResults.length === 0))
+                }
               >
                 <FileText size={20} strokeWidth={2} />
                 Download {config.resultLabel}
+                {tool.id === 'split' && splitPdfResults && splitPdfResults.length > 0 && (
+                  <span className="ml-2 text-xs">({splitPdfResults.length} files)</span>
+                )}
               </button>
               <button
                 onClick={handleReset}
@@ -257,6 +499,16 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                 Start Over
               </button>
             </div>
+            {tool.id === 'merge' && !mergedPdfBytes && (
+              <p className="text-xs text-warning-400 text-center mt-2">
+                Merged PDF is not ready. Please try merging again.
+              </p>
+            )}
+            {tool.id === 'split' && (!splitPdfResults || splitPdfResults.length === 0) && (
+              <p className="text-xs text-warning-400 text-center mt-2">
+                Split PDFs are not ready. Please try splitting again.
+              </p>
+            )}
           </div>
         </div>
       ) : (
@@ -422,17 +674,66 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
 
               {/* Page range for split/extract/delete */}
               {(tool.id === 'split' || tool.id === 'extract-pages' || tool.id === 'delete-pages') && (
-                <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50">
-                  <p className="text-sm font-medium text-surface-200 mb-3">
-                    {tool.id === 'split' ? 'Split Range' : tool.id === 'extract-pages' ? 'Pages to Extract' : 'Pages to Delete'}
-                  </p>
-                  <input
-                    type="text"
-                    placeholder="e.g. 1-3, 5, 8-10"
-                    className="w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all"
-                  />
-                  <p className="text-xs text-surface-500 mt-2">
-                    Enter page numbers or ranges separated by commas
+                <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-3">
+                  <div>
+                    <p className="text-sm font-medium text-surface-200 mb-2">
+                      {tool.id === 'split' ? 'Pages to Split Into Separate Files' : tool.id === 'extract-pages' ? 'Pages to Extract' : 'Pages to Delete'}
+                    </p>
+                    {tool.id === 'split' && (
+                      <p className="text-xs text-surface-400 mb-3">
+                        Specify which pages should be split into separate PDF files. Each range separated by comma will create a new file.
+                      </p>
+                    )}
+                    <input
+                      type="text"
+                      value={tool.id === 'split' ? pageRange : ''}
+                      onChange={(e) => tool.id === 'split' && handlePageRangeChange(e.target.value)}
+                      placeholder="e.g. 1-3, 5, 8-10"
+                      className={`w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:ring-1 transition-all ${
+                        pageRangeWarning 
+                          ? 'border-warning-500/50 focus:border-warning-500/70 focus:ring-warning-500/25' 
+                          : 'border-surface-600/50 focus:border-primary-500/50 focus:ring-primary-500/25'
+                      }`}
+                    />
+                    {pageRangeWarning && (
+                      <div className="mt-2 p-2 rounded-lg bg-warning-500/10 border border-warning-500/20">
+                        <p className="text-xs text-warning-300">{pageRangeWarning}</p>
+                      </div>
+                    )}
+                    {totalPages && !pageRangeWarning && pageRange.trim() && (
+                      <p className="text-xs text-success-400 mt-2">
+                        ✓ PDF has {totalPages} page{totalPages !== 1 ? 's' : ''}. Your selection looks good!
+                      </p>
+                    )}
+                  </div>
+                  
+                  {tool.id === 'split' && (
+                    <div className="p-3 rounded-lg bg-primary-500/10 border border-primary-500/20">
+                      <p className="text-xs font-semibold text-primary-300 mb-2">📋 How it works:</p>
+                      <ul className="text-xs text-surface-400 space-y-1.5 list-disc list-inside">
+                        <li>Each range separated by comma creates a separate PDF file</li>
+                        <li><strong>Example:</strong> "1-3, 5, 8-10" creates 3 files: pages 1-3, page 5, and pages 8-10</li>
+                        <li>Use <strong>dashes</strong> for ranges: "1-5" means pages 1 through 5</li>
+                        <li>Use <strong>commas</strong> to separate different ranges: "1-3, 7-9"</li>
+                        <li>You can mix single pages and ranges: "1, 3-5, 8"</li>
+                      </ul>
+                    </div>
+                  )}
+                  
+                  <div className="p-3 rounded-lg bg-info-500/10 border border-info-500/20">
+                    <p className="text-xs font-semibold text-info-300 mb-1.5">💡 Examples:</p>
+                    <div className="space-y-1 text-xs text-surface-400">
+                      <div><strong className="text-surface-300">"1-3"</strong> → Creates 1 file with pages 1-3</div>
+                      <div><strong className="text-surface-300">"1-3, 5-7"</strong> → Creates 2 files: pages 1-3 and pages 5-7</div>
+                      <div><strong className="text-surface-300">"1, 3, 5"</strong> → Creates 3 files: page 1, page 3, and page 5</div>
+                      <div><strong className="text-surface-300">"1-5, 10-15"</strong> → Creates 2 files: pages 1-5 and pages 10-15</div>
+                    </div>
+                  </div>
+                  
+                  <p className="text-xs text-surface-500">
+                    {tool.id === 'split' 
+                      ? '⚠️ Note: You cannot select all pages - split requires selecting only some pages to create separate files.'
+                      : 'Enter page numbers or ranges separated by commas'}
                   </p>
                 </div>
               )}
@@ -1082,16 +1383,40 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
             </div>
           )}
 
+          {/* Error message */}
+          {error && (
+            <div className="mb-6 p-4 rounded-xl border border-error-500/30 bg-error-500/5 animate-fade-in">
+              <div className="flex items-start gap-3">
+                <X size={20} strokeWidth={2} className="text-error-400 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-error-300 mb-1">Error</p>
+                  <p className="text-sm text-error-400/80">{error}</p>
+                </div>
+                <button
+                  onClick={() => setError(null)}
+                  className="text-error-400 hover:text-error-300 transition-colors"
+                  aria-label="Dismiss error"
+                >
+                  <X size={16} strokeWidth={2} />
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Action Button */}
           {files.length > 0 && (
             <div className="animate-fade-in">
               <button
                 onClick={handleProcess}
-                disabled={isProcessing || (config.acceptMultiple && files.length < 2)}
+                disabled={
+                  isProcessing || 
+                  (config.acceptMultiple && files.length < 2) ||
+                  (tool.id === 'split' && !pageRange.trim())
+                }
                 className={`
                   w-full btn-primary btn-lg font-semibold justify-center
                   ${isProcessing ? 'opacity-75 cursor-wait' : ''}
-                  ${config.acceptMultiple && files.length < 2 ? 'opacity-50 cursor-not-allowed' : ''}
+                  ${(config.acceptMultiple && files.length < 2) || (tool.id === 'split' && !pageRange.trim()) ? 'opacity-50 cursor-not-allowed' : ''}
                 `}
               >
                 {isProcessing ? (
@@ -1109,6 +1434,11 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {config.acceptMultiple && files.length < 2 && (
                 <p className="text-xs text-surface-500 text-center mt-2">
                   Please add at least 2 files
+                </p>
+              )}
+              {tool.id === 'split' && !pageRange.trim() && (
+                <p className="text-xs text-surface-500 text-center mt-2">
+                  Please enter page ranges (e.g., "1-3, 5, 8-10")
                 </p>
               )}
             </div>

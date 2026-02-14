@@ -68,7 +68,10 @@ function getPdfFont(fonts: Record<string, any>, overlay: TextOverlay): any {
   const style = overlay.fontStyle || 'normal';
   
   let baseName = 'Helvetica';
-  if (family.toLowerCase().includes('times') || family.toLowerCase().includes('georgia')) {
+  if (family.toLowerCase().includes('san francisco') || family.toLowerCase().includes('sf pro')) {
+    // San Francisco maps to Helvetica for PDF export (pdf-lib only supports standard fonts)
+    baseName = 'Helvetica';
+  } else if (family.toLowerCase().includes('times') || family.toLowerCase().includes('georgia')) {
     baseName = 'Times';
   } else if (family.toLowerCase().includes('courier')) {
     baseName = 'Courier';

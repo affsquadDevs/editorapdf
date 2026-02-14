@@ -16,6 +16,7 @@ interface Props {
 // Available fonts
 const FONT_OPTIONS = [
   { value: 'Helvetica', label: 'Helvetica (Sans)' },
+  { value: 'San Francisco', label: 'San Francisco (System)' },
   { value: 'Arial', label: 'Arial (Sans)' },
   { value: 'Times', label: 'Times (Serif)' },
   { value: 'Georgia', label: 'Georgia (Serif)' },
@@ -75,6 +76,36 @@ export default function AdvancedOverlayLayer({ pageId, pageWidth, pageHeight, zo
   const [signaturePadOpen, setSignaturePadOpen] = useState(false);
   const [signaturePadPosition, setSignaturePadPosition] = useState({ x: 0, y: 0 });
   
+  // Convert font family name to CSS font-family with proper fallbacks
+  const getFontFamilyCSS = (fontFamily: string): string => {
+    switch (fontFamily) {
+      case 'San Francisco':
+        return '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Helvetica, Arial, sans-serif';
+      case 'Helvetica':
+        return 'Helvetica, Arial, sans-serif';
+      case 'Arial':
+        return 'Arial, Helvetica, sans-serif';
+      case 'Times':
+        return 'Times, "Times New Roman", serif';
+      case 'Georgia':
+        return 'Georgia, "Times New Roman", serif';
+      case 'Courier':
+        return 'Courier, "Courier New", monospace';
+      case 'Verdana':
+        return 'Verdana, Geneva, sans-serif';
+      case 'Tahoma':
+        return 'Tahoma, Geneva, sans-serif';
+      case 'Trebuchet MS':
+        return '"Trebuchet MS", Helvetica, sans-serif';
+      case 'Comic Sans MS':
+        return '"Comic Sans MS", cursive, sans-serif';
+      case 'Impact':
+        return 'Impact, Charcoal, sans-serif';
+      default:
+        return fontFamily;
+    }
+  };
+
   const measureTextBox = (
     text: string,
     fontSizePx: number,
@@ -98,7 +129,8 @@ export default function AdvancedOverlayLayer({ pageId, pageWidth, pageHeight, zo
         heightPx: Math.ceil(fontSizePx * lineHeight) + paddingTop + paddingBottom,
       };
     }
-    ctx.font = `${fontStyle} ${fontWeight} ${fontSizePx}px ${fontFamily}`;
+    const fontFamilyCSS = getFontFamilyCSS(fontFamily);
+    ctx.font = `${fontStyle} ${fontWeight} ${fontSizePx}px ${fontFamilyCSS}`;
     const lines = (text || '').split('\n');
     const metrics = lines.map((line) => ctx.measureText(line));
     const textWidth = roundPx(Math.max(0, ...metrics.map((m) => m.width)));
@@ -881,7 +913,7 @@ export default function AdvancedOverlayLayer({ pageId, pageWidth, pageHeight, zo
                   fontSize: `${overlay.fontSize * zoom}px`,
                   lineHeight: '1',
                   color: overlay.color,
-                  fontFamily: overlay.fontFamily || 'Helvetica',
+                  fontFamily: getFontFamilyCSS(overlay.fontFamily || 'Helvetica'),
                   fontWeight: overlay.fontWeight || 'normal',
                   fontStyle: overlay.fontStyle || 'normal',
                   textAlign: overlay.textAlign || 'left',
