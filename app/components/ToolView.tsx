@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { mergePdf, downloadMergedPdf } from '../lib/pdf/mergePdf';
 import { splitPdf, parsePageRange, downloadSplitPdfs } from '../lib/pdf/splitPdf';
+import PageRangeSelector from './PageRangeSelector';
 
 interface ToolViewProps {
   tool: PdfTool;
@@ -121,7 +122,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
 
   const config = toolConfigs[tool.id] || toolConfigs.merge;
 
-  const handleFiles = useCallback((newFiles: FileList | null) => {
+  const handleFiles = useCallback(async (newFiles: FileList | null) => {
     if (!newFiles) return;
 
     const validFiles = Array.from(newFiles);
@@ -131,8 +132,21 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       setFiles(prev => [...prev, ...validFiles]);
     } else {
       setFiles([validFiles[0]]);
+      
+      // Load total pages for split tool
+      if (tool.id === 'split' && validFiles[0].type === 'application/pdf') {
+        try {
+          const { PDFDocument } = await import('pdf-lib');
+          const arrayBuffer = await validFiles[0].arrayBuffer();
+          const pdf = await PDFDocument.load(arrayBuffer);
+          const total = pdf.getPageCount();
+          setTotalPages(total);
+        } catch (err) {
+          console.error('Error loading PDF:', err);
+        }
+      }
     }
-  }, [config.acceptMultiple]);
+  }, [config.acceptMultiple, tool.id]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -681,20 +695,27 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                     </p>
                     {tool.id === 'split' && (
                       <p className="text-xs text-surface-400 mb-3">
-                        Specify which pages should be split into separate PDF files. Each range separated by comma will create a new file.
+                        Select which pages should be split into separate PDF files. Each range will create a new file.
                       </p>
                     )}
-                    <input
-                      type="text"
-                      value={tool.id === 'split' ? pageRange : ''}
-                      onChange={(e) => tool.id === 'split' && handlePageRangeChange(e.target.value)}
-                      placeholder="e.g. 1-3, 5, 8-10"
-                      className={`w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:ring-1 transition-all ${
-                        pageRangeWarning 
-                          ? 'border-warning-500/50 focus:border-warning-500/70 focus:ring-warning-500/25' 
-                          : 'border-surface-600/50 focus:border-primary-500/50 focus:ring-primary-500/25'
-                      }`}
-                    />
+                    
+                    {tool.id === 'split' ? (
+                      <PageRangeSelector
+                        totalPages={totalPages}
+                        value={pageRange}
+                        onChange={handlePageRangeChange}
+                        onWarningChange={setPageRangeWarning}
+                      />
+                    ) : (
+                      <input
+                        type="text"
+                        value=""
+                        onChange={(e) => {}}
+                        placeholder="e.g. 1-3, 5, 8-10"
+                        className="w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:ring-1 focus:border-primary-500/50 focus:ring-primary-500/25 transition-all"
+                      />
+                    )}
+                    
                     {pageRangeWarning && (
                       <div className="mt-2 p-2 rounded-lg bg-warning-500/10 border border-warning-500/20">
                         <p className="text-xs text-warning-300">{pageRangeWarning}</p>
@@ -711,24 +732,13 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                     <div className="p-3 rounded-lg bg-primary-500/10 border border-primary-500/20">
                       <p className="text-xs font-semibold text-primary-300 mb-2">📋 How it works:</p>
                       <ul className="text-xs text-surface-400 space-y-1.5 list-disc list-inside">
-                        <li>Each range separated by comma creates a separate PDF file</li>
-                        <li><strong>Example:</strong> "1-3, 5, 8-10" creates 3 files: pages 1-3, page 5, and pages 8-10</li>
-                        <li>Use <strong>dashes</strong> for ranges: "1-5" means pages 1 through 5</li>
-                        <li>Use <strong>commas</strong> to separate different ranges: "1-3, 7-9"</li>
-                        <li>You can mix single pages and ranges: "1, 3-5, 8"</li>
+                        <li>Each range you add creates a separate PDF file</li>
+                        <li>Use "From page" and "To page" to select a range (e.g., pages 1-5)</li>
+                        <li>If "From" and "To" are the same, it creates a file with a single page</li>
+                        <li>You can add multiple ranges to split the PDF into multiple files</li>
                       </ul>
                     </div>
                   )}
-                  
-                  <div className="p-3 rounded-lg bg-info-500/10 border border-info-500/20">
-                    <p className="text-xs font-semibold text-info-300 mb-1.5">💡 Examples:</p>
-                    <div className="space-y-1 text-xs text-surface-400">
-                      <div><strong className="text-surface-300">"1-3"</strong> → Creates 1 file with pages 1-3</div>
-                      <div><strong className="text-surface-300">"1-3, 5-7"</strong> → Creates 2 files: pages 1-3 and pages 5-7</div>
-                      <div><strong className="text-surface-300">"1, 3, 5"</strong> → Creates 3 files: page 1, page 3, and page 5</div>
-                      <div><strong className="text-surface-300">"1-5, 10-15"</strong> → Creates 2 files: pages 1-5 and pages 10-15</div>
-                    </div>
-                  </div>
                   
                   <p className="text-xs text-surface-500">
                     {tool.id === 'split' 
