@@ -11,6 +11,7 @@ import { splitPdf, parsePageRange, downloadSplitPdfs } from '../lib/pdf/splitPdf
 import { deletePages, downloadPdf as downloadDeletePdf } from '../lib/pdf/deletePages';
 import { extractPages, downloadPdf as downloadExtractPdf } from '../lib/pdf/extractPages';
 import { rotatePages, downloadPdf as downloadRotatePdf } from '../lib/pdf/rotatePages';
+import { insertBlankPages, downloadPdf as downloadInsertBlankPdf } from '../lib/pdf/insertBlankPages';
 import { loadPdfDocument, getPdfPagesInfo } from '../lib/pdf/pdfRender';
 import { exportPdf } from '../lib/pdf/exportPdf';
 import { usePdfStore } from '../store/pdfStore';
@@ -130,6 +131,9 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
   const [pageRangeWarning, setPageRangeWarning] = useState<string | null>(null);
   const [pageOrder, setPageOrder] = useState<number[]>([]); // For reorder: array of original indices in new order
   const [pageRotations, setPageRotations] = useState<{ [pageNumber: number]: number }>({}); // For rotate: map of page number to rotation
+  const [insertPosition, setInsertPosition] = useState<'beginning' | 'end' | 'after'>('end'); // For insert-blank: position to insert
+  const [numberOfBlankPages, setNumberOfBlankPages] = useState<number>(1); // For insert-blank: number of blank pages
+  const [afterPageNumber, setAfterPageNumber] = useState<number>(1); // For insert-blank: page number when position is 'after'
   const validationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { setOriginalFile, setPages, setSelectedPageId, pages: storePages, originalFile: storeOriginalFile } = usePdfStore();
 
@@ -187,6 +191,21 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
           console.error('Error loading PDF:', err);
         }
       }
+      
+      // Load total pages for insert-blank tool
+      if (tool.id === 'insert-blank' && validFiles[0].type === 'application/pdf') {
+        try {
+          const { PDFDocument } = await import('pdf-lib');
+          const arrayBuffer = await validFiles[0].arrayBuffer();
+          const pdf = await PDFDocument.load(arrayBuffer);
+          const total = pdf.getPageCount();
+          setTotalPages(total);
+          // Set default after page number to last page
+          setAfterPageNumber(total);
+        } catch (err) {
+          console.error('Error loading PDF:', err);
+        }
+      }
     }
   }, [config.acceptMultiple, tool.id]);
 
@@ -208,12 +227,15 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
 
   const handleRemoveFile = (index: number) => {
     setFiles(prev => prev.filter((_, i) => i !== index));
-    if ((tool.id === 'split' || tool.id === 'extract-pages' || tool.id === 'delete-pages' || tool.id === 'reorder' || tool.id === 'rotate') && index === 0) {
+    if ((tool.id === 'split' || tool.id === 'extract-pages' || tool.id === 'delete-pages' || tool.id === 'reorder' || tool.id === 'rotate' || tool.id === 'insert-blank') && index === 0) {
       setTotalPages(null);
       setPageRangeWarning(null);
       setPageRange('');
       setPageOrder([]);
       setPageRotations({});
+      setInsertPosition('end');
+      setNumberOfBlankPages(1);
+      setAfterPageNumber(1);
     }
   };
 
@@ -523,6 +545,47 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       } finally {
         setIsProcessing(false);
       }
+    } else if (tool.id === 'insert-blank') {
+      // Real insert blank pages implementation
+      if (files.length === 0) {
+        setError('Please upload a PDF file to insert blank pages');
+        return;
+      }
+
+      if (numberOfBlankPages < 1 || numberOfBlankPages > 100) {
+        setError('Number of blank pages must be between 1 and 100');
+        return;
+      }
+
+      if (insertPosition === 'after' && (!totalPages || afterPageNumber < 1 || afterPageNumber > totalPages)) {
+        setError(`Page number must be between 1 and ${totalPages || 'N/A'}`);
+        return;
+      }
+
+      setIsProcessing(true);
+      setError(null);
+
+      try {
+        const file = files[0];
+        const pdfBytes = await insertBlankPages(
+          file,
+          insertPosition,
+          numberOfBlankPages,
+          insertPosition === 'after' ? afterPageNumber : undefined
+        );
+        
+        console.log('Insert blank pages successful, bytes:', pdfBytes.length);
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        console.error('Error inserting blank pages:', err);
+        setError(err instanceof Error ? err.message : 'Failed to insert blank pages. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
     } else {
       // Stub for other tools
       setIsProcessing(true);
@@ -546,6 +609,9 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
     setPageRangeWarning(null);
     setPageOrder([]);
     setPageRotations({});
+    setInsertPosition('end');
+    setNumberOfBlankPages(1);
+    setAfterPageNumber(1);
   };
 
   const handleDownload = async () => {
@@ -642,6 +708,25 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       
       try {
         downloadRotatePdf(processedPdfBytes, filename);
+      } catch (err) {
+        console.error('Error downloading PDF:', err);
+        setError('Failed to download PDF. Please try again.');
+      }
+    } else if (tool.id === 'insert-blank') {
+      if (!processedPdfBytes) {
+        console.error('Updated PDF bytes not available');
+        setError('Updated PDF is not ready. Please try again.');
+        return;
+      }
+      
+      // Generate filename from input file
+      const baseName = files.length > 0 
+        ? files[0].name.replace(/\.pdf$/i, '') 
+        : 'updated';
+      const filename = `${baseName}_updated.pdf`;
+      
+      try {
+        downloadInsertBlankPdf(processedPdfBytes, filename);
       } catch (err) {
         console.error('Error downloading PDF:', err);
         setError('Failed to download PDF. Please try again.');
@@ -1269,14 +1354,120 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                   <div>
                     <p className="text-sm font-medium text-surface-200 mb-2">Insert Position</p>
                     <div className="flex gap-2">
-                      {['Beginning', 'End', 'After Page...'].map((pos) => (
-                        <button key={pos} className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${pos === 'End' ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300' : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'}`}>{pos}</button>
+                      {[
+                        { label: 'Beginning', value: 'beginning' as const },
+                        { label: 'End', value: 'end' as const },
+                        { label: 'After Page...', value: 'after' as const }
+                      ].map((pos) => (
+                        <button
+                          key={pos.value}
+                          onClick={() => setInsertPosition(pos.value)}
+                          className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                            insertPosition === pos.value
+                              ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300'
+                              : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'
+                          }`}
+                        >
+                          {pos.label}
+                        </button>
                       ))}
                     </div>
+                    {insertPosition === 'after' && totalPages && (
+                      <div className="mt-3">
+                        <p className="text-xs text-surface-400 mb-1.5">After which page?</p>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            value={afterPageNumber}
+                            onChange={(e) => {
+                              const val = parseInt(e.target.value);
+                              if (!isNaN(val)) {
+                                // Allow typing, but clamp to valid range
+                                const clamped = Math.max(1, Math.min(totalPages, val));
+                                setAfterPageNumber(clamped);
+                              } else if (e.target.value === '') {
+                                // Allow empty input while typing
+                                setAfterPageNumber(1);
+                              }
+                            }}
+                            onBlur={(e) => {
+                              // Ensure valid value on blur
+                              const val = parseInt(e.target.value);
+                              if (isNaN(val) || val < 1) {
+                                setAfterPageNumber(1);
+                              } else if (val > totalPages) {
+                                setAfterPageNumber(totalPages);
+                              }
+                            }}
+                            min={1}
+                            max={totalPages}
+                            className="w-24 px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all"
+                          />
+                          <span className="text-xs text-surface-500">of {totalPages}</span>
+                        </div>
+                        <p className="text-xs text-surface-500 mt-1.5">
+                          Blank pages will be inserted after page {afterPageNumber}
+                        </p>
+                      </div>
+                    )}
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">Number of Blank Pages</p>
-                    <input type="number" defaultValue={1} min={1} max={100} className="w-24 px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all" />
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm font-medium text-surface-200">Number of Blank Pages</p>
+                      <span className="text-xs text-surface-500">
+                        {numberOfBlankPages} {numberOfBlankPages === 1 ? 'page' : 'pages'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="number"
+                        value={numberOfBlankPages}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value);
+                          if (!isNaN(val)) {
+                            // Allow typing, but clamp to valid range
+                            const clamped = Math.max(1, Math.min(100, val));
+                            setNumberOfBlankPages(clamped);
+                          } else if (e.target.value === '') {
+                            // Allow empty input while typing
+                            setNumberOfBlankPages(1);
+                          }
+                        }}
+                        onBlur={(e) => {
+                          // Ensure valid value on blur
+                          const val = parseInt(e.target.value);
+                          if (isNaN(val) || val < 1) {
+                            setNumberOfBlankPages(1);
+                          } else if (val > 100) {
+                            setNumberOfBlankPages(100);
+                          }
+                        }}
+                        min={1}
+                        max={100}
+                        className="w-24 px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all"
+                      />
+                      <div className="flex gap-1">
+                        <button
+                          onClick={() => setNumberOfBlankPages(Math.max(1, numberOfBlankPages - 1))}
+                          className="px-3 py-1.5 rounded-lg bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-sm font-medium"
+                          disabled={numberOfBlankPages <= 1}
+                        >
+                          −
+                        </button>
+                        <button
+                          onClick={() => setNumberOfBlankPages(Math.min(100, numberOfBlankPages + 1))}
+                          className="px-3 py-1.5 rounded-lg bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-sm font-medium"
+                          disabled={numberOfBlankPages >= 100}
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                    <p className="text-xs text-surface-500 mt-2">
+                      {insertPosition === 'beginning' && `Will add ${numberOfBlankPages} blank ${numberOfBlankPages === 1 ? 'page' : 'pages'} at the beginning of your PDF`}
+                      {insertPosition === 'end' && `Will add ${numberOfBlankPages} blank ${numberOfBlankPages === 1 ? 'page' : 'pages'} at the end of your PDF`}
+                      {insertPosition === 'after' && totalPages && `Will add ${numberOfBlankPages} blank ${numberOfBlankPages === 1 ? 'page' : 'pages'} after page ${afterPageNumber}`}
+                    </p>
                   </div>
                 </div>
               )}
