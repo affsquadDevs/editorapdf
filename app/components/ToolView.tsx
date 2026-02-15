@@ -13,6 +13,9 @@ import { extractPages, downloadPdf as downloadExtractPdf } from '../lib/pdf/extr
 import { rotatePages, downloadPdf as downloadRotatePdf } from '../lib/pdf/rotatePages';
 import { insertBlankPages, downloadPdf as downloadInsertBlankPdf } from '../lib/pdf/insertBlankPages';
 import { duplicatePages, downloadPdf as downloadDuplicatePdf } from '../lib/pdf/duplicatePages';
+import { reversePageOrder, downloadPdf as downloadReversePdf } from '../lib/pdf/reversePageOrder';
+import { splitBySizeString, downloadSplitPdfs as downloadSplitBySizePdfs, formatBytes, parseSizeToBytes } from '../lib/pdf/splitBySize';
+import { splitByBookmarksSimple, downloadSplitPdfs as downloadSplitByBookmarksPdfs, getBookmarkInfo } from '../lib/pdf/splitByBookmarks';
 import { loadPdfDocument, getPdfPagesInfo } from '../lib/pdf/pdfRender';
 import { exportPdf } from '../lib/pdf/exportPdf';
 import { usePdfStore } from '../store/pdfStore';
@@ -137,6 +140,13 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
   const [afterPageNumber, setAfterPageNumber] = useState<number>(1); // For insert-blank: page number when position is 'after'
   const [duplicatePageRange, setDuplicatePageRange] = useState<string>(''); // For duplicate-pages: page range to duplicate
   const [numberOfCopies, setNumberOfCopies] = useState<number>(1); // For duplicate-pages: number of copies
+  const [maxFileSize, setMaxFileSize] = useState<string>('10 MB'); // For split-by-size: maximum file size (preset)
+  const [customSizeValue, setCustomSizeValue] = useState<string>('10'); // For split-by-size: custom size number
+  const [customSizeUnit, setCustomSizeUnit] = useState<string>('MB'); // For split-by-size: custom size unit (KB, MB, GB)
+  const [useCustomSize, setUseCustomSize] = useState<boolean>(false); // For split-by-size: whether to use custom size
+  const [minSizeBytes, setMinSizeBytes] = useState<number | null>(null); // For split-by-size: minimum size (size of largest page)
+  const [bookmarkLevel, setBookmarkLevel] = useState<number>(1); // For split-by-bookmarks: bookmark level to split at
+  const [bookmarkInfo, setBookmarkInfo] = useState<{ hasBookmarks: boolean; levels: number[]; count: number; bookmarks: Array<{ title: string; pageIndex: number; level: number }> } | null>(null); // For split-by-bookmarks: bookmark info
   const validationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { setOriginalFile, setPages, setSelectedPageId, pages: storePages, originalFile: storeOriginalFile } = usePdfStore();
 
@@ -222,6 +232,24 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
           console.error('Error loading PDF:', err);
         }
       }
+      
+      // Load bookmark info for split-by-bookmarks tool
+      if (tool.id === 'split-by-bookmarks' && validFiles[0].type === 'application/pdf') {
+        setBookmarkInfo(null); // Reset first to show loading
+        (async () => {
+          try {
+            const info = await getBookmarkInfo(validFiles[0]);
+            setBookmarkInfo(info);
+            if (info.hasBookmarks && info.levels.length > 0) {
+              // Set default level to first available level
+              setBookmarkLevel(info.levels[0]);
+            }
+          } catch (err) {
+            console.error('Error loading bookmark info:', err);
+            setBookmarkInfo({ hasBookmarks: false, levels: [], count: 0, bookmarks: [] });
+          }
+        })();
+      }
     }
   }, [config.acceptMultiple, tool.id]);
 
@@ -243,7 +271,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
 
   const handleRemoveFile = (index: number) => {
     setFiles(prev => prev.filter((_, i) => i !== index));
-    if ((tool.id === 'split' || tool.id === 'extract-pages' || tool.id === 'delete-pages' || tool.id === 'reorder' || tool.id === 'rotate' || tool.id === 'insert-blank' || tool.id === 'duplicate-pages') && index === 0) {
+    if ((tool.id === 'split' || tool.id === 'extract-pages' || tool.id === 'delete-pages' || tool.id === 'reorder' || tool.id === 'rotate' || tool.id === 'insert-blank' || tool.id === 'duplicate-pages' || tool.id === 'split-by-size') && index === 0) {
       setTotalPages(null);
       setPageRangeWarning(null);
       setPageRange('');
@@ -254,6 +282,13 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       setAfterPageNumber(1);
       setDuplicatePageRange('');
       setNumberOfCopies(1);
+      setMaxFileSize('10 MB');
+      setCustomSizeValue('10');
+      setCustomSizeUnit('MB');
+      setUseCustomSize(false);
+      setMinSizeBytes(null);
+      setBookmarkLevel(1);
+      setBookmarkInfo(null);
     }
   };
 
@@ -640,6 +675,148 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       } finally {
         setIsProcessing(false);
       }
+    } else if (tool.id === 'split-by-size') {
+      // Real split by size implementation
+      if (files.length === 0) {
+        setError('Please upload a PDF file to split by size');
+        return;
+      }
+
+      // Determine which size to use (custom or preset)
+      const sizeToUse = useCustomSize 
+        ? `${customSizeValue} ${customSizeUnit}`
+        : maxFileSize;
+      
+      if (useCustomSize) {
+        // Validate custom size
+        const sizeNum = parseFloat(customSizeValue);
+        if (isNaN(sizeNum) || sizeNum <= 0) {
+          setError('Please enter a valid size number');
+          return;
+        }
+        
+        try {
+          const customSizeBytes = parseSizeToBytes(sizeToUse);
+          
+          if (minSizeBytes && customSizeBytes < minSizeBytes) {
+            const minSizeStr = formatBytes(minSizeBytes);
+            setError(`Size must be at least ${minSizeStr} (size of largest page). Please enter a larger value.`);
+            return;
+          }
+        } catch (err) {
+          setError('Invalid size. Please check your input.');
+          return;
+        }
+      }
+
+      setIsProcessing(true);
+      setError(null);
+
+      try {
+        const file = files[0];
+        const splitResults = await splitBySizeString(file, sizeToUse);
+        
+        // Generate filenames
+        const baseName = file.name.replace(/\.pdf$/i, '');
+        const results = splitResults.map((bytes, index) => {
+          const filename = `${baseName}_part_${index + 1}_of_${splitResults.length}.pdf`;
+          return { bytes, filename };
+        });
+
+        console.log(`Split by size successful: ${results.length} files created`);
+        results.forEach((r, i) => {
+          console.log(`  File ${i + 1}: ${r.filename} (${formatBytes(r.bytes.length)})`);
+        });
+        
+        setSplitPdfResults(results);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        console.error('Error splitting PDF by size:', err);
+        setError(err instanceof Error ? err.message : 'Failed to split PDF by size. Please try again.');
+        setIsComplete(false);
+        setSplitPdfResults(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'reverse-order') {
+      // Real reverse page order implementation
+      if (files.length === 0) {
+        setError('Please upload a PDF file to reverse page order');
+        return;
+      }
+
+      setIsProcessing(true);
+      setError(null);
+
+      try {
+        const file = files[0];
+        const pdfBytes = await reversePageOrder(file);
+        
+        console.log('Reverse page order successful, bytes:', pdfBytes.length);
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        console.error('Error reversing page order:', err);
+        setError(err instanceof Error ? err.message : 'Failed to reverse page order. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'split-by-bookmarks') {
+      // Real split by bookmarks implementation
+      if (files.length === 0) {
+        setError('Please upload a PDF file to split by bookmarks');
+        return;
+      }
+
+      if (!bookmarkInfo || !bookmarkInfo.hasBookmarks) {
+        setError('No bookmarks found in PDF. Please ensure your PDF has bookmarks/outline structure.');
+        return;
+      }
+
+      if (!bookmarkInfo.levels.includes(bookmarkLevel)) {
+        setError(`No bookmarks found at level ${bookmarkLevel}. Available levels: ${bookmarkInfo.levels.join(', ')}`);
+        return;
+      }
+
+      setIsProcessing(true);
+      setError(null);
+
+      try {
+        const file = files[0];
+        const result = await splitByBookmarksSimple(file, bookmarkLevel);
+        
+        // Generate filenames based on bookmark titles
+        const baseName = file.name.replace(/\.pdf$/i, '');
+        const results = result.map((bytes, index) => {
+          // Use sanitized bookmark title or default name
+          const sanitizedTitle = bookmarkInfo.bookmarks?.[index]?.title
+            ?.replace(/[^a-zA-Z0-9\s-_]/g, '')
+            .trim()
+            .substring(0, 50) || `bookmark_${index + 1}`;
+          const filename = `${baseName}_${sanitizedTitle}.pdf`;
+          return { bytes, filename };
+        });
+
+        console.log(`Split by bookmarks successful: ${results.length} files created`);
+        results.forEach((r, i) => {
+          console.log(`  File ${i + 1}: ${r.filename} (${formatBytes(r.bytes.length)})`);
+        });
+        
+        setSplitPdfResults(results);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        console.error('Error splitting PDF by bookmarks:', err);
+        setError(err instanceof Error ? err.message : 'Failed to split PDF by bookmarks. Please try again.');
+        setIsComplete(false);
+        setSplitPdfResults(null);
+      } finally {
+        setIsProcessing(false);
+      }
     } else {
       // Stub for other tools
       setIsProcessing(true);
@@ -668,6 +845,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
     setAfterPageNumber(1);
     setDuplicatePageRange('');
     setNumberOfCopies(1);
+    setMaxFileSize('10 MB');
   };
 
   const handleDownload = async () => {
@@ -692,7 +870,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
         console.error('Error downloading PDF:', err);
         setError('Failed to download PDF. Please try again.');
       }
-    } else if (tool.id === 'split') {
+    } else if (tool.id === 'split' || tool.id === 'split-by-size' || tool.id === 'split-by-bookmarks') {
       if (!splitPdfResults || splitPdfResults.length === 0) {
         console.error('Split PDF results not available');
         setError('Split PDFs are not ready. Please try splitting again.');
@@ -700,7 +878,13 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       }
       
       try {
-        await downloadSplitPdfs(splitPdfResults);
+        if (tool.id === 'split') {
+          await downloadSplitPdfs(splitPdfResults);
+        } else if (tool.id === 'split-by-size') {
+          await downloadSplitBySizePdfs(splitPdfResults);
+        } else {
+          await downloadSplitByBookmarksPdfs(splitPdfResults);
+        }
       } catch (err) {
         console.error('Error downloading split PDFs:', err);
         setError('Failed to download PDFs. Please try again.');
@@ -806,6 +990,25 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
         console.error('Error downloading PDF:', err);
         setError('Failed to download PDF. Please try again.');
       }
+    } else if (tool.id === 'reverse-order') {
+      if (!processedPdfBytes) {
+        console.error('Reversed PDF bytes not available');
+        setError('Reversed PDF is not ready. Please try again.');
+        return;
+      }
+      
+      // Generate filename from input file
+      const baseName = files.length > 0 
+        ? files[0].name.replace(/\.pdf$/i, '') 
+        : 'reversed';
+      const filename = `${baseName}_reversed.pdf`;
+      
+      try {
+        downloadReversePdf(processedPdfBytes, filename);
+      } catch (err) {
+        console.error('Error downloading PDF:', err);
+        setError('Failed to download PDF. Please try again.');
+      }
     } else {
       // Stub for other tools
       alert('This is a stub — download functionality will be implemented soon!');
@@ -898,7 +1101,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               <button
                 className={`btn-primary btn-lg ${
                   (tool.id === 'merge' && !mergedPdfBytes) || 
-                  (tool.id === 'split' && (!splitPdfResults || splitPdfResults.length === 0)) ||
+                  ((tool.id === 'split' || tool.id === 'split-by-size' || tool.id === 'split-by-bookmarks') && (!splitPdfResults || splitPdfResults.length === 0)) ||
                   ((tool.id === 'delete-pages' || tool.id === 'extract-pages') && !processedPdfBytes) ||
                   (tool.id === 'reorder' && !processedPdfBytes) ||
                   (tool.id === 'rotate' && !processedPdfBytes)
@@ -908,7 +1111,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                 onClick={handleDownload}
                 disabled={
                   (tool.id === 'merge' && !mergedPdfBytes) ||
-                  (tool.id === 'split' && (!splitPdfResults || splitPdfResults.length === 0)) ||
+                  ((tool.id === 'split' || tool.id === 'split-by-size' || tool.id === 'split-by-bookmarks') && (!splitPdfResults || splitPdfResults.length === 0)) ||
                   ((tool.id === 'delete-pages' || tool.id === 'extract-pages') && !processedPdfBytes) ||
                   (tool.id === 'reorder' && !processedPdfBytes) ||
                   (tool.id === 'rotate' && !processedPdfBytes)
@@ -916,7 +1119,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               >
                 <FileText size={20} strokeWidth={2} />
                 Download {config.resultLabel}
-                {tool.id === 'split' && splitPdfResults && splitPdfResults.length > 0 && (
+                {(tool.id === 'split' || tool.id === 'split-by-size' || tool.id === 'split-by-bookmarks') && splitPdfResults && splitPdfResults.length > 0 && (
                   <span className="ml-2 text-xs">({splitPdfResults.length} files)</span>
                 )}
               </button>
@@ -932,7 +1135,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                 Merged PDF is not ready. Please try merging again.
               </p>
             )}
-            {tool.id === 'split' && (!splitPdfResults || splitPdfResults.length === 0) && (
+            {(tool.id === 'split' || tool.id === 'split-by-size' || tool.id === 'split-by-bookmarks') && (!splitPdfResults || splitPdfResults.length === 0) && (
               <p className="text-xs text-warning-400 text-center mt-2">
                 Split PDFs are not ready. Please try splitting again.
               </p>
@@ -1639,11 +1842,169 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {/* Split by size */}
               {tool.id === 'split-by-size' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
-                  <p className="text-sm font-medium text-surface-200 mb-2">Max File Size Per Part</p>
-                  <div className="flex gap-2">
-                    {['5 MB', '10 MB', '25 MB', '50 MB'].map((s) => (
-                      <button key={s} className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${s === '10 MB' ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300' : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'}`}>{s}</button>
-                    ))}
+                  <div>
+                    <p className="text-sm font-medium text-surface-200 mb-3">Max File Size Per Part</p>
+                    
+                    {/* Quick presets */}
+                    <div className="mb-4">
+                      <p className="text-xs text-surface-400 mb-2">Quick presets:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {['5 MB', '10 MB', '25 MB', '50 MB', '100 MB'].map((s) => (
+                          <button
+                            key={s}
+                            onClick={() => {
+                              setMaxFileSize(s);
+                              setUseCustomSize(false);
+                            }}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                              !useCustomSize && maxFileSize === s
+                                ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300'
+                                : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'
+                            }`}
+                          >
+                            {s}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* Custom size input */}
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-xs font-medium text-surface-300">Or set custom size:</p>
+                        <button
+                          onClick={() => setUseCustomSize(!useCustomSize)}
+                          className={`text-xs px-3 py-1 rounded-lg transition-all ${
+                            useCustomSize
+                              ? 'bg-primary-500/20 text-primary-300 border border-primary-500/40'
+                              : 'bg-surface-700/30 text-surface-400 border border-surface-600/30 hover:bg-surface-700/50'
+                          }`}
+                        >
+                          {useCustomSize ? 'Using Custom' : 'Use Custom'}
+                        </button>
+                      </div>
+                      
+                      {useCustomSize && (
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="number"
+                              value={customSizeValue}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                if (val === '' || (!isNaN(parseFloat(val)) && parseFloat(val) > 0)) {
+                                  setCustomSizeValue(val);
+                                }
+                              }}
+                              min="0.1"
+                              step="0.1"
+                              placeholder="10"
+                              className="flex-1 px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all"
+                            />
+                            <select
+                              value={customSizeUnit}
+                              onChange={(e) => setCustomSizeUnit(e.target.value)}
+                              className="px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all"
+                            >
+                              <option value="KB">KB</option>
+                              <option value="MB">MB</option>
+                              <option value="GB">GB</option>
+                            </select>
+                          </div>
+                          
+                          {/* Validation feedback */}
+                          {customSizeValue && (() => {
+                            try {
+                              const sizeNum = parseFloat(customSizeValue);
+                              if (isNaN(sizeNum) || sizeNum <= 0) {
+                                return (
+                                  <p className="text-xs text-error-400">
+                                    ⚠ Please enter a valid number
+                                  </p>
+                                );
+                              }
+                              
+                              const customSizeStr = `${customSizeValue} ${customSizeUnit}`;
+                              const customSizeBytes = parseSizeToBytes(customSizeStr);
+                              const isValid = !minSizeBytes || customSizeBytes >= minSizeBytes;
+                              
+                              if (!isValid && minSizeBytes) {
+                                return (
+                                  <p className="text-xs text-error-400">
+                                    ⚠ Size must be at least {formatBytes(minSizeBytes)} (largest page size)
+                                  </p>
+                                );
+                              }
+                              
+                              return (
+                                <p className="text-xs text-primary-400">
+                                  ✓ Valid size: {customSizeStr}
+                                </p>
+                              );
+                            } catch {
+                              return (
+                                <p className="text-xs text-error-400">
+                                  ⚠ Invalid size
+                                </p>
+                              );
+                            }
+                          })()}
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* File info and preview */}
+                    {files.length > 0 && (
+                      <div className="p-3 rounded-lg bg-surface-900/50 border border-surface-700/50 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-surface-400">Original file size:</span>
+                          <span className="text-xs font-medium text-surface-200">{formatBytes(files[0].size)}</span>
+                        </div>
+                        
+                        {minSizeBytes && (
+                          <div className="flex items-center justify-between pt-2 border-t border-surface-700/50">
+                            <span className="text-xs text-surface-400">Minimum size (largest page):</span>
+                            <span className="text-xs font-medium text-warning-400">{formatBytes(minSizeBytes)}</span>
+                          </div>
+                        )}
+                        
+                        {files[0].size > 0 && (() => {
+                          try {
+                            const sizeToUse = useCustomSize 
+                              ? `${customSizeValue} ${customSizeUnit}`
+                              : maxFileSize;
+                            const maxBytes = parseSizeToBytes(sizeToUse);
+                            const estimatedParts = Math.ceil(files[0].size / maxBytes);
+                            
+                            if (estimatedParts === 1) {
+                              return (
+                                <div className="flex items-center justify-between pt-2 border-t border-surface-700/50">
+                                  <span className="text-xs text-surface-400">Result:</span>
+                                  <span className="text-xs font-medium text-success-400">
+                                    ✓ File fits in one part ({sizeToUse})
+                                  </span>
+                                </div>
+                              );
+                            }
+                            
+                            return (
+                              <div className="flex items-center justify-between pt-2 border-t border-surface-700/50">
+                                <span className="text-xs text-surface-400">Estimated parts:</span>
+                                <span className="text-xs font-medium text-primary-400">
+                                  {estimatedParts} {estimatedParts === 1 ? 'file' : 'files'} (max {sizeToUse} each)
+                                </span>
+                              </div>
+                            );
+                          } catch {
+                            return null;
+                          }
+                        })()}
+                      </div>
+                    )}
+                    
+                    <p className="text-xs text-surface-500 mt-3">
+                      PDF will be split into multiple files, each not exceeding the selected size. Useful for email attachments or file size limits.
+                    </p>
                   </div>
                 </div>
               )}
@@ -1651,11 +2012,91 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {/* Split by bookmarks */}
               {tool.id === 'split-by-bookmarks' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
-                  <p className="text-sm font-medium text-surface-200 mb-2">Split at Bookmark Level</p>
-                  <div className="flex gap-2">
-                    {['Level 1 (Chapters)', 'Level 2 (Sections)', 'Level 3 (Sub-sections)'].map((l) => (
-                      <button key={l} className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-all ${l.startsWith('Level 1') ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300' : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'}`}>{l}</button>
-                    ))}
+                  <div>
+                    <p className="text-sm font-medium text-surface-200 mb-3">Split at Bookmark Level</p>
+                    
+                    {!bookmarkInfo && files.length > 0 && (
+                      <p className="text-xs text-surface-400 mb-3">Loading bookmark information...</p>
+                    )}
+                    
+                    {bookmarkInfo && !bookmarkInfo.hasBookmarks && (
+                      <div className="p-3 rounded-lg bg-error-500/10 border border-error-500/20">
+                        <p className="text-xs text-error-400 font-medium mb-1">⚠ No bookmarks found</p>
+                        <p className="text-xs text-surface-400">
+                          This PDF does not have bookmarks/outline structure. Please use a PDF with bookmarks or try a different tool.
+                        </p>
+                      </div>
+                    )}
+                    
+                    {bookmarkInfo && bookmarkInfo.hasBookmarks && (
+                      <>
+                        <div className="mb-3">
+                          <div className="flex items-center justify-between mb-2">
+                            <p className="text-xs text-surface-400">Available levels:</p>
+                            <span className="text-xs font-medium text-primary-400">
+                              {bookmarkInfo.count} {bookmarkInfo.count === 1 ? 'bookmark' : 'bookmarks'} found
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            {bookmarkInfo.levels.map((level) => {
+                              const levelNames: { [key: number]: string } = {
+                                1: 'Level 1 (Chapters)',
+                                2: 'Level 2 (Sections)',
+                                3: 'Level 3 (Sub-sections)',
+                                4: 'Level 4',
+                                5: 'Level 5',
+                              };
+                              const levelName = levelNames[level] || `Level ${level}`;
+                              const countAtLevel = bookmarkInfo.bookmarks?.filter(b => b.level === level).length || 0;
+                              
+                              return (
+                                <button
+                                  key={level}
+                                  onClick={() => setBookmarkLevel(level)}
+                                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                                    bookmarkLevel === level
+                                      ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300'
+                                      : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'
+                                  }`}
+                                >
+                                  {levelName}
+                                  {countAtLevel > 0 && (
+                                    <span className="ml-2 text-xs opacity-75">({countAtLevel})</span>
+                                  )}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                        
+                        {bookmarkInfo.bookmarks && bookmarkInfo.bookmarks.length > 0 && (
+                          <div className="p-3 rounded-lg bg-surface-900/50 border border-surface-700/50 max-h-48 overflow-y-auto">
+                            <p className="text-xs text-surface-400 mb-2">Bookmarks at level {bookmarkLevel}:</p>
+                            <div className="space-y-1">
+                              {bookmarkInfo.bookmarks
+                                .filter(b => b.level === bookmarkLevel)
+                                .slice(0, 10)
+                                .map((bookmark, idx) => (
+                                  <div key={idx} className="text-xs text-surface-300 flex items-center gap-2">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-primary-400"></span>
+                                    <span className="truncate">{bookmark.title}</span>
+                                    <span className="text-surface-500">(page {bookmark.pageIndex + 1})</span>
+                                  </div>
+                                ))}
+                              {bookmarkInfo.bookmarks.filter(b => b.level === bookmarkLevel).length > 10 && (
+                                <p className="text-xs text-surface-500 mt-1">
+                                  ... and {bookmarkInfo.bookmarks.filter(b => b.level === bookmarkLevel).length - 10} more
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                        
+                        <p className="text-xs text-surface-500 mt-3">
+                          PDF will be split at each bookmark of level {bookmarkLevel}. Each bookmark will create a separate PDF file.
+                        </p>
+                      </>
+                    )}
                   </div>
                 </div>
               )}
@@ -2057,9 +2498,11 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               <button
                 onClick={handleProcess}
                 disabled={
-                  isProcessing || 
+                  isProcessing ||
                   (config.acceptMultiple && files.length < 2) ||
                   (tool.id === 'split' && !pageRange.trim()) ||
+                  (tool.id === 'split-by-size' && files.length === 0) ||
+                  (tool.id === 'split-by-bookmarks' && (!bookmarkInfo || !bookmarkInfo.hasBookmarks)) ||
                   ((tool.id === 'delete-pages' || tool.id === 'extract-pages') && !pageRange.trim()) ||
                   (tool.id === 'reorder' && (!totalPages || pageOrder.length === 0)) ||
                   (tool.id === 'rotate' && (!totalPages || Object.keys(pageRotations).length === 0))
@@ -2067,7 +2510,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                 className={`
                   w-full btn-primary btn-lg font-semibold justify-center
                   ${isProcessing ? 'opacity-75 cursor-wait' : ''}
-                  ${(config.acceptMultiple && files.length < 2) || (tool.id === 'split' && !pageRange.trim()) || ((tool.id === 'delete-pages' || tool.id === 'extract-pages') && !pageRange.trim()) || (tool.id === 'reorder' && (!totalPages || pageOrder.length === 0)) || (tool.id === 'rotate' && (!totalPages || Object.keys(pageRotations).length === 0)) ? 'opacity-50 cursor-not-allowed' : ''}
+                  ${(config.acceptMultiple && files.length < 2) || (tool.id === 'split' && !pageRange.trim()) || (tool.id === 'split-by-size' && files.length === 0) || ((tool.id === 'delete-pages' || tool.id === 'extract-pages') && !pageRange.trim()) || (tool.id === 'reorder' && (!totalPages || pageOrder.length === 0)) || (tool.id === 'rotate' && (!totalPages || Object.keys(pageRotations).length === 0)) ? 'opacity-50 cursor-not-allowed' : ''}
                 `}
               >
                 {isProcessing ? (
