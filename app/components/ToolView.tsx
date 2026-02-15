@@ -12,6 +12,7 @@ import { deletePages, downloadPdf as downloadDeletePdf } from '../lib/pdf/delete
 import { extractPages, downloadPdf as downloadExtractPdf } from '../lib/pdf/extractPages';
 import { rotatePages, downloadPdf as downloadRotatePdf } from '../lib/pdf/rotatePages';
 import { insertBlankPages, downloadPdf as downloadInsertBlankPdf } from '../lib/pdf/insertBlankPages';
+import { duplicatePages, downloadPdf as downloadDuplicatePdf } from '../lib/pdf/duplicatePages';
 import { loadPdfDocument, getPdfPagesInfo } from '../lib/pdf/pdfRender';
 import { exportPdf } from '../lib/pdf/exportPdf';
 import { usePdfStore } from '../store/pdfStore';
@@ -134,6 +135,8 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
   const [insertPosition, setInsertPosition] = useState<'beginning' | 'end' | 'after'>('end'); // For insert-blank: position to insert
   const [numberOfBlankPages, setNumberOfBlankPages] = useState<number>(1); // For insert-blank: number of blank pages
   const [afterPageNumber, setAfterPageNumber] = useState<number>(1); // For insert-blank: page number when position is 'after'
+  const [duplicatePageRange, setDuplicatePageRange] = useState<string>(''); // For duplicate-pages: page range to duplicate
+  const [numberOfCopies, setNumberOfCopies] = useState<number>(1); // For duplicate-pages: number of copies
   const validationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { setOriginalFile, setPages, setSelectedPageId, pages: storePages, originalFile: storeOriginalFile } = usePdfStore();
 
@@ -206,6 +209,19 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
           console.error('Error loading PDF:', err);
         }
       }
+      
+      // Load total pages for duplicate-pages tool
+      if (tool.id === 'duplicate-pages' && validFiles[0].type === 'application/pdf') {
+        try {
+          const { PDFDocument } = await import('pdf-lib');
+          const arrayBuffer = await validFiles[0].arrayBuffer();
+          const pdf = await PDFDocument.load(arrayBuffer);
+          const total = pdf.getPageCount();
+          setTotalPages(total);
+        } catch (err) {
+          console.error('Error loading PDF:', err);
+        }
+      }
     }
   }, [config.acceptMultiple, tool.id]);
 
@@ -227,7 +243,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
 
   const handleRemoveFile = (index: number) => {
     setFiles(prev => prev.filter((_, i) => i !== index));
-    if ((tool.id === 'split' || tool.id === 'extract-pages' || tool.id === 'delete-pages' || tool.id === 'reorder' || tool.id === 'rotate' || tool.id === 'insert-blank') && index === 0) {
+    if ((tool.id === 'split' || tool.id === 'extract-pages' || tool.id === 'delete-pages' || tool.id === 'reorder' || tool.id === 'rotate' || tool.id === 'insert-blank' || tool.id === 'duplicate-pages') && index === 0) {
       setTotalPages(null);
       setPageRangeWarning(null);
       setPageRange('');
@@ -236,6 +252,8 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       setInsertPosition('end');
       setNumberOfBlankPages(1);
       setAfterPageNumber(1);
+      setDuplicatePageRange('');
+      setNumberOfCopies(1);
     }
   };
 
@@ -545,6 +563,42 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       } finally {
         setIsProcessing(false);
       }
+    } else if (tool.id === 'duplicate-pages') {
+      // Real duplicate pages implementation
+      if (files.length === 0) {
+        setError('Please upload a PDF file to duplicate pages');
+        return;
+      }
+
+      if (!duplicatePageRange.trim()) {
+        setError('Please specify which pages to duplicate');
+        return;
+      }
+
+      if (numberOfCopies < 1 || numberOfCopies > 10) {
+        setError('Number of copies must be between 1 and 10');
+        return;
+      }
+
+      setIsProcessing(true);
+      setError(null);
+
+      try {
+        const file = files[0];
+        const pdfBytes = await duplicatePages(file, duplicatePageRange, numberOfCopies);
+        
+        console.log('Duplicate pages successful, bytes:', pdfBytes.length);
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        console.error('Error duplicating pages:', err);
+        setError(err instanceof Error ? err.message : 'Failed to duplicate pages. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
     } else if (tool.id === 'insert-blank') {
       // Real insert blank pages implementation
       if (files.length === 0) {
@@ -612,6 +666,8 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
     setInsertPosition('end');
     setNumberOfBlankPages(1);
     setAfterPageNumber(1);
+    setDuplicatePageRange('');
+    setNumberOfCopies(1);
   };
 
   const handleDownload = async () => {
@@ -727,6 +783,25 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       
       try {
         downloadInsertBlankPdf(processedPdfBytes, filename);
+      } catch (err) {
+        console.error('Error downloading PDF:', err);
+        setError('Failed to download PDF. Please try again.');
+      }
+    } else if (tool.id === 'duplicate-pages') {
+      if (!processedPdfBytes) {
+        console.error('Updated PDF bytes not available');
+        setError('Updated PDF is not ready. Please try again.');
+        return;
+      }
+      
+      // Generate filename from input file
+      const baseName = files.length > 0 
+        ? files[0].name.replace(/\.pdf$/i, '') 
+        : 'updated';
+      const filename = `${baseName}_updated.pdf`;
+      
+      try {
+        downloadDuplicatePdf(processedPdfBytes, filename);
       } catch (err) {
         console.error('Error downloading PDF:', err);
         setError('Failed to download PDF. Please try again.');
@@ -1476,13 +1551,87 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {tool.id === 'duplicate-pages' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
                   <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">Pages to Duplicate</p>
-                    <input type="text" placeholder="e.g. 1, 3-5, 8" className="w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all" />
-                    <p className="text-xs text-surface-500 mt-2">Enter page numbers or ranges. Each selected page will be duplicated.</p>
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="text-sm font-medium text-surface-200">Select Pages to Duplicate</p>
+                      {totalPages && (
+                        <span className="text-xs text-surface-500">Total: {totalPages} pages</span>
+                      )}
+                    </div>
+                    {totalPages ? (
+                      <PageSelector
+                        totalPages={totalPages}
+                        value={duplicatePageRange}
+                        onChange={setDuplicatePageRange}
+                      />
+                    ) : (
+                      <p className="text-xs text-surface-400">Upload a PDF file to select pages</p>
+                    )}
+                    <p className="text-xs text-surface-500 mt-3">
+                      Each selected page will be duplicated right after its original in the PDF.
+                    </p>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">Number of Copies</p>
-                    <input type="number" defaultValue={1} min={1} max={10} className="w-24 px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all" />
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm font-medium text-surface-200">Number of Copies</p>
+                      <span className="text-xs text-surface-500">
+                        {numberOfCopies} {numberOfCopies === 1 ? 'copy' : 'copies'} per page
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="number"
+                        value={numberOfCopies}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value);
+                          if (!isNaN(val)) {
+                            const clamped = Math.max(1, Math.min(10, val));
+                            setNumberOfCopies(clamped);
+                          } else if (e.target.value === '') {
+                            setNumberOfCopies(1);
+                          }
+                        }}
+                        onBlur={(e) => {
+                          const val = parseInt(e.target.value);
+                          if (isNaN(val) || val < 1) {
+                            setNumberOfCopies(1);
+                          } else if (val > 10) {
+                            setNumberOfCopies(10);
+                          }
+                        }}
+                        min={1}
+                        max={10}
+                        className="w-24 px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all"
+                      />
+                      <div className="flex gap-1">
+                        <button
+                          onClick={() => setNumberOfCopies(Math.max(1, numberOfCopies - 1))}
+                          className="px-3 py-1.5 rounded-lg bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-sm font-medium"
+                          disabled={numberOfCopies <= 1}
+                        >
+                          −
+                        </button>
+                        <button
+                          onClick={() => setNumberOfCopies(Math.min(10, numberOfCopies + 1))}
+                          className="px-3 py-1.5 rounded-lg bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all text-sm font-medium"
+                          disabled={numberOfCopies >= 10}
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                    {duplicatePageRange && totalPages && (() => {
+                      try {
+                        const pages = parsePageRange(duplicatePageRange, totalPages);
+                        const totalNewPages = pages.length * numberOfCopies;
+                        return pages.length > 0 ? (
+                          <p className="text-xs text-primary-400 mt-2 font-medium">
+                            ✓ Will create {totalNewPages} duplicate {totalNewPages === 1 ? 'page' : 'pages'} ({pages.length} original {pages.length === 1 ? 'page' : 'pages'} × {numberOfCopies} {numberOfCopies === 1 ? 'copy' : 'copies'})
+                          </p>
+                        ) : null;
+                      } catch {
+                        return null;
+                      }
+                    })()}
                   </div>
                 </div>
               )}
