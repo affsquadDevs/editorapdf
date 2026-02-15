@@ -10,8 +10,12 @@ import { mergePdf, downloadMergedPdf } from '../lib/pdf/mergePdf';
 import { splitPdf, parsePageRange, downloadSplitPdfs } from '../lib/pdf/splitPdf';
 import { deletePages, downloadPdf as downloadDeletePdf } from '../lib/pdf/deletePages';
 import { extractPages, downloadPdf as downloadExtractPdf } from '../lib/pdf/extractPages';
+import { loadPdfDocument, getPdfPagesInfo } from '../lib/pdf/pdfRender';
+import { exportPdf } from '../lib/pdf/exportPdf';
+import { usePdfStore } from '../store/pdfStore';
 import PageRangeSelector from './PageRangeSelector';
 import PageSelector from './PageSelector';
+import PageReorder from './PageReorder';
 
 interface ToolViewProps {
   tool: PdfTool;
@@ -122,7 +126,9 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
   const [error, setError] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState<number | null>(null);
   const [pageRangeWarning, setPageRangeWarning] = useState<string | null>(null);
+  const [pageOrder, setPageOrder] = useState<number[]>([]); // For reorder: array of original indices in new order
   const validationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const { setOriginalFile, setPages, setSelectedPageId, pages: storePages, originalFile: storeOriginalFile } = usePdfStore();
 
   const config = toolConfigs[tool.id] || toolConfigs.merge;
 
@@ -150,6 +156,21 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
           console.error('Error loading PDF:', err);
         }
       }
+      
+      // Load total pages for reorder tool
+      if (tool.id === 'reorder' && validFiles[0].type === 'application/pdf') {
+        try {
+          const { PDFDocument } = await import('pdf-lib');
+          const arrayBuffer = await validFiles[0].arrayBuffer();
+          const pdf = await PDFDocument.load(arrayBuffer);
+          const total = pdf.getPageCount();
+          setTotalPages(total);
+          // Initialize order as 1, 2, 3, ...
+          setPageOrder(Array.from({ length: total }, (_, i) => i));
+        } catch (err) {
+          console.error('Error loading PDF:', err);
+        }
+      }
     }
   }, [config.acceptMultiple, tool.id]);
 
@@ -171,10 +192,11 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
 
   const handleRemoveFile = (index: number) => {
     setFiles(prev => prev.filter((_, i) => i !== index));
-    if ((tool.id === 'split' || tool.id === 'extract-pages' || tool.id === 'delete-pages') && index === 0) {
+    if ((tool.id === 'split' || tool.id === 'extract-pages' || tool.id === 'delete-pages' || tool.id === 'reorder') && index === 0) {
       setTotalPages(null);
       setPageRangeWarning(null);
       setPageRange('');
+      setPageOrder([]);
     }
   };
 
@@ -409,6 +431,50 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       } finally {
         setIsProcessing(false);
       }
+    } else if (tool.id === 'reorder') {
+      // Real reorder pages implementation
+      if (files.length === 0) {
+        setError('Please upload a PDF file to reorder');
+        return;
+      }
+
+      if (!totalPages || pageOrder.length === 0) {
+        setError('PDF pages are not loaded. Please try uploading again.');
+        return;
+      }
+
+      setIsProcessing(true);
+      setError(null);
+
+      try {
+        const file = files[0];
+        const { PDFDocument } = await import('pdf-lib');
+        const arrayBuffer = await file.arrayBuffer();
+        const sourcePdf = await PDFDocument.load(arrayBuffer);
+        
+        // Create new PDF with reordered pages
+        const newPdf = await PDFDocument.create();
+        
+        // Copy pages in new order
+        for (const originalIndex of pageOrder) {
+          const [copiedPage] = await newPdf.copyPages(sourcePdf, [originalIndex]);
+          newPdf.addPage(copiedPage);
+        }
+        
+        const pdfBytes = await newPdf.save();
+        
+        console.log('Reorder pages successful, bytes:', pdfBytes.length);
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        console.error('Error reordering pages:', err);
+        setError(err instanceof Error ? err.message : 'Failed to reorder pages. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
     } else {
       // Stub for other tools
       setIsProcessing(true);
@@ -430,6 +496,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
     setError(null);
     setTotalPages(null);
     setPageRangeWarning(null);
+    setPageOrder([]);
   };
 
   const handleDownload = async () => {
@@ -488,6 +555,25 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
         } else {
           downloadExtractPdf(processedPdfBytes, filename);
         }
+      } catch (err) {
+        console.error('Error downloading PDF:', err);
+        setError('Failed to download PDF. Please try again.');
+      }
+    } else if (tool.id === 'reorder') {
+      if (!processedPdfBytes) {
+        console.error('Reordered PDF bytes not available');
+        setError('Reordered PDF is not ready. Please try again.');
+        return;
+      }
+      
+      // Generate filename from input file
+      const baseName = files.length > 0 
+        ? files[0].name.replace(/\.pdf$/i, '') 
+        : 'reordered';
+      const filename = `${baseName}_reordered.pdf`;
+      
+      try {
+        downloadDeletePdf(processedPdfBytes, filename);
       } catch (err) {
         console.error('Error downloading PDF:', err);
         setError('Failed to download PDF. Please try again.');
@@ -585,7 +671,8 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                 className={`btn-primary btn-lg ${
                   (tool.id === 'merge' && !mergedPdfBytes) || 
                   (tool.id === 'split' && (!splitPdfResults || splitPdfResults.length === 0)) ||
-                  ((tool.id === 'delete-pages' || tool.id === 'extract-pages') && !processedPdfBytes)
+                  ((tool.id === 'delete-pages' || tool.id === 'extract-pages') && !processedPdfBytes) ||
+                  (tool.id === 'reorder' && !processedPdfBytes)
                     ? 'opacity-50 cursor-not-allowed' 
                     : ''
                 }`}
@@ -593,7 +680,8 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                 disabled={
                   (tool.id === 'merge' && !mergedPdfBytes) ||
                   (tool.id === 'split' && (!splitPdfResults || splitPdfResults.length === 0)) ||
-                  ((tool.id === 'delete-pages' || tool.id === 'extract-pages') && !processedPdfBytes)
+                  ((tool.id === 'delete-pages' || tool.id === 'extract-pages') && !processedPdfBytes) ||
+                  (tool.id === 'reorder' && !processedPdfBytes)
                 }
               >
                 <FileText size={20} strokeWidth={2} />
@@ -622,6 +710,11 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
             {(tool.id === 'delete-pages' || tool.id === 'extract-pages') && !processedPdfBytes && (
               <p className="text-xs text-warning-400 text-center mt-2">
                 {tool.id === 'delete-pages' ? 'Updated' : 'Extracted'} PDF is not ready. Please try again.
+              </p>
+            )}
+            {tool.id === 'reorder' && !processedPdfBytes && (
+              <p className="text-xs text-warning-400 text-center mt-2">
+                Reordered PDF is not ready. Please try again.
               </p>
             )}
           </div>
@@ -736,6 +829,23 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
           {/* Tool-specific options stub */}
           {files.length > 0 && (
             <div className="mb-6 animate-fade-in">
+              {/* Reorder pages */}
+              {tool.id === 'reorder' && totalPages && (
+                <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50">
+                  <p className="text-sm font-medium text-surface-200 mb-2">
+                    Reorder Pages
+                  </p>
+                  <p className="text-xs text-surface-400 mb-3">
+                    Drag pages to reorder or use position selectors to set the order
+                  </p>
+                  <PageReorder
+                    totalPages={totalPages}
+                    pdfFile={files.length > 0 ? files[0] : null}
+                    onChange={setPageOrder}
+                  />
+                </div>
+              )}
+              
               {/* Compression level */}
               {tool.id === 'compress' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50">
@@ -1535,12 +1645,13 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                   isProcessing || 
                   (config.acceptMultiple && files.length < 2) ||
                   (tool.id === 'split' && !pageRange.trim()) ||
-                  ((tool.id === 'delete-pages' || tool.id === 'extract-pages') && !pageRange.trim())
+                  ((tool.id === 'delete-pages' || tool.id === 'extract-pages') && !pageRange.trim()) ||
+                  (tool.id === 'reorder' && (!totalPages || pageOrder.length === 0))
                 }
                 className={`
                   w-full btn-primary btn-lg font-semibold justify-center
                   ${isProcessing ? 'opacity-75 cursor-wait' : ''}
-                  ${(config.acceptMultiple && files.length < 2) || (tool.id === 'split' && !pageRange.trim()) || ((tool.id === 'delete-pages' || tool.id === 'extract-pages') && !pageRange.trim()) ? 'opacity-50 cursor-not-allowed' : ''}
+                  ${(config.acceptMultiple && files.length < 2) || (tool.id === 'split' && !pageRange.trim()) || ((tool.id === 'delete-pages' || tool.id === 'extract-pages') && !pageRange.trim()) || (tool.id === 'reorder' && (!totalPages || pageOrder.length === 0)) ? 'opacity-50 cursor-not-allowed' : ''}
                 `}
               >
                 {isProcessing ? (
