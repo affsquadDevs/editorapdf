@@ -1024,7 +1024,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
   const acceptAttr = config.acceptTypes || '.pdf,application/pdf';
 
   return (
-    <div className="w-full max-w-3xl mx-auto animate-fade-in">
+    <div className="w-full max-w-3xl mx-auto animate-fade-in" >
       {/* Back button & Title */}
       <div className="mb-6">
         <button

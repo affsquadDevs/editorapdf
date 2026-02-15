@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import Header from '../components/Header'
 
 export const metadata: Metadata = {
   title: 'Contact Us',
@@ -9,35 +9,7 @@ export const metadata: Metadata = {
 export default function ContactPage() {
   return (
     <main className="min-h-screen flex flex-col">
-      {/* Header */}
-      <header className="relative z-10 glass border-b border-surface-700/50" role="banner">
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between max-w-5xl mx-auto">
-            {/* Logo & Brand */}
-            <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center shadow-lg shadow-primary-500/25">
-                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-white tracking-tight">
-                  Editora<span className="text-gradient">PDF</span>
-                </h1>
-                <p className="text-xs text-surface-400 -mt-0.5">Professional PDF Editor</p>
-              </div>
-            </Link>
-            
-            {/* Back to Editor */}
-            <Link href="/" className="btn-primary btn-md">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-              <span>Back to Editor</span>
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Main Content */}
       <div className="flex-1 flex items-center justify-center p-6">

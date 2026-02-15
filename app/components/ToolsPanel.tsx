@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import ToolView from './ToolView';
 import {
   // Organize & Pages
@@ -397,7 +398,10 @@ const toolCategories: ToolCategory[] = [
 ];
 
 // Flatten all tools for lookup
-const allTools = toolCategories.flatMap(c => c.tools);
+export const allTools = toolCategories.flatMap(c => c.tools);
+
+// Export toolCategories for use in routes
+export { toolCategories };
 
 const colorMap: Record<string, { bg: string; border: string; text: string; iconBg: string; hoverBorder: string }> = {
   primary: { bg: 'bg-primary-500/5', border: 'border-primary-500/20', text: 'text-primary-400', iconBg: 'bg-primary-500/15', hoverBorder: 'hover:border-primary-500/40' },
@@ -409,12 +413,7 @@ const colorMap: Record<string, { bg: string; border: string; text: string; iconB
 };
 
 export default function ToolsPanel() {
-  const [selectedTool, setSelectedTool] = useState<PdfTool | null>(null);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
-
-  if (selectedTool) {
-    return <ToolView tool={selectedTool} onBack={() => setSelectedTool(null)} />;
-  }
 
   const visibleCategories = activeCategory
     ? toolCategories.filter(c => c.id === activeCategory)
@@ -481,11 +480,15 @@ export default function ToolsPanel() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {category.tools.map((tool, index) => {
                 const colors = colorMap[tool.color] || colorMap.primary;
+                const ToolComponent = tool.comingSoon ? 'div' : Link;
+                const toolProps = tool.comingSoon 
+                  ? {} 
+                  : { href: `/tools/${tool.id}` };
+                
                 return (
-                  <button
+                  <ToolComponent
                     key={tool.id}
-                    onClick={() => !tool.comingSoon && setSelectedTool(tool)}
-                    disabled={tool.comingSoon}
+                    {...toolProps}
                     className={`relative group text-left p-5 rounded-2xl border transition-all duration-200 ${colors.bg} ${colors.border} ${colors.hoverBorder} ${tool.comingSoon ? 'opacity-50 cursor-not-allowed' : 'hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] cursor-pointer'} animate-fade-in-up`}
                     style={{ animationDelay: `${index * 40}ms` }}
                   >
@@ -502,7 +505,7 @@ export default function ToolsPanel() {
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
                       </div>
                     )}
-                  </button>
+                  </ToolComponent>
                 );
               })}
             </div>

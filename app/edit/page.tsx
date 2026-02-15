@@ -11,7 +11,7 @@ import Toolbar from '../components/Toolbar';
 import { FileText, X, PenSquare, Wrench } from 'lucide-react';
 import EditToolbar from '../components/EditToolbar';
 import ConfirmDialog from '../components/ConfirmDialog';
-import MobileMenu from '../components/MobileMenu';
+import Header from '../components/Header';
 import ToolsPanel from '../components/ToolsPanel';
 
 // Dynamic imports for PDF components - only load when needed
@@ -68,70 +68,11 @@ export default function EditPage() {
   return (
     <>
       <main className="h-screen h-[100dvh] flex flex-col" role="main">
-        {/* Header */}
-        <header className="sticky top-0 z-50 glass border-b border-surface-700/50" role="banner">
-          <div className="px-6 py-3">
-            <div className="flex items-center justify-between max-w-7xl mx-auto">
-              <div className="flex items-center gap-3">
-                {/* Mobile Menu Button */}
-                <MobileMenu />
-                
-                {/* Logo & Brand */}
-                <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                  <img 
-                    src="/logo.svg" 
-                    alt="EditoraPDF Logo" 
-                    width={120} 
-                    height={40} 
-                    className="h-10 w-auto"
-                    loading="eager"
-                    fetchPriority="high"
-                  />
-                </Link>
-              </div>
-              
-              {/* Navigation */}
-              <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
-                <Link href="/" className="nav-link">
-                  Home
-                </Link>
-                <button
-                  onClick={() => { setActiveTab('tools'); }}
-                  className="nav-link flex items-center gap-1.5"
-                >
-                  PDF Tools
-                  <span className="px-1.5 py-0.5 rounded-full bg-primary-500/15 text-primary-400 text-[10px] font-bold uppercase tracking-wider">
-                    New
-                  </span>
-                </button>
-                <Link href="/how-it-works" className="nav-link">
-                  How It Works
-                </Link>
-                <Link href="/about" className="nav-link">
-                  About
-                </Link>
-                <Link href="/blog" className="nav-link">
-                  Blog
-                </Link>
-                <Link href="/contact" className="nav-link">
-                  Contact
-                </Link>
-              </nav>
-              
-              {/* Close Button when PDF is open */}
-              {hasPages && (
-                <button
-                  onClick={() => setConfirmCloseOpen(true)}
-                  className="btn-ghost btn-md group"
-                  aria-label="Close PDF document"
-                >
-                  <X size={20} strokeWidth={2} className="text-surface-400 group-hover:text-error-400 transition-colors" />
-                  <span className="text-surface-300 group-hover:text-surface-100">Close PDF</span>
-                </button>
-              )}
-            </div>
-          </div>
-        </header>
+        <Header 
+          showCloseButton={hasPages}
+          onClose={() => setConfirmCloseOpen(true)}
+          closeButtonLabel="Close PDF"
+        />
 
         {/* Main Content */}
         {!hasPages ? (

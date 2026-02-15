@@ -33,7 +33,7 @@ export default function MobileMenu() {
 
   const navLinks = [
     { href: '/', label: 'Home' },
-    { href: '/edit?tab=tools', label: 'PDF Tools', isNew: true },
+    { href: '/tools', label: 'PDF Tools', isNew: true },
     { href: '/how-it-works', label: 'How It Works' },
     { href: '/about', label: 'About' },
     { href: '/blog', label: 'Blog' },
