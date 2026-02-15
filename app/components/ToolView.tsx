@@ -16,6 +16,7 @@ import { duplicatePages, downloadPdf as downloadDuplicatePdf } from '../lib/pdf/
 import { reversePageOrder, downloadPdf as downloadReversePdf } from '../lib/pdf/reversePageOrder';
 import { splitBySizeString, downloadSplitPdfs as downloadSplitBySizePdfs, formatBytes, parseSizeToBytes } from '../lib/pdf/splitBySize';
 import { splitByBookmarksSimple, downloadSplitPdfs as downloadSplitByBookmarksPdfs, getBookmarkInfo } from '../lib/pdf/splitByBookmarks';
+import { signPdf, downloadSignedPdf } from '../lib/pdf/signPdf';
 import { loadPdfDocument, getPdfPagesInfo } from '../lib/pdf/pdfRender';
 import { exportPdf } from '../lib/pdf/exportPdf';
 import { usePdfStore } from '../store/pdfStore';
@@ -23,6 +24,8 @@ import PageRangeSelector from './PageRangeSelector';
 import PageSelector from './PageSelector';
 import PageReorder from './PageReorder';
 import PageRotate from './PageRotate';
+import SignaturePad from './SignaturePad';
+import SignaturePositionSelector from './SignaturePositionSelector';
 
 interface ToolViewProps {
   tool: PdfTool;
@@ -53,8 +56,6 @@ const toolConfigs: Record<string, {
   'split-by-bookmarks': { acceptMultiple: false, uploadLabel: 'Drop a PDF to split by bookmarks',   uploadDescription: 'Upload a PDF with bookmarks/chapters to split',         actionLabel: 'Split by Bookmarks',    resultLabel: 'Split Files',       steps: ['Upload a PDF with bookmarks', 'Choose bookmark level to split at', 'Click "Split by Bookmarks"'] },
 
   // ── Security & Protection ──
-  encrypt:           { acceptMultiple: false, uploadLabel: 'Drop a PDF file to encrypt',             uploadDescription: 'Upload the PDF you want to protect with a password',    actionLabel: 'Encrypt PDF',           resultLabel: 'Encrypted PDF',     steps: ['Upload a PDF file', 'Set owner and user passwords', 'Choose encryption level & click "Encrypt PDF"'] },
-  unlock:            { acceptMultiple: false, uploadLabel: 'Drop a password-protected PDF',          uploadDescription: 'Upload the PDF you want to unlock',                     actionLabel: 'Unlock PDF',            resultLabel: 'Unlocked PDF',      steps: ['Upload a protected PDF file', 'Enter the current password', 'Click "Unlock PDF" to remove protection'] },
   sign:              { acceptMultiple: false, uploadLabel: 'Drop a PDF file to sign',                uploadDescription: 'Upload the PDF you want to add a digital signature to', actionLabel: 'Apply Signature',       resultLabel: 'Signed PDF',        steps: ['Upload a PDF file', 'Draw, type, or upload your signature', 'Place the signature and click "Apply Signature"'] },
   redact:            { acceptMultiple: false, uploadLabel: 'Drop a PDF file to redact',              uploadDescription: 'Upload the PDF with sensitive content to black out',     actionLabel: 'Apply Redaction',       resultLabel: 'Redacted PDF',      steps: ['Upload a PDF file', 'Select areas or text to redact', 'Click "Apply Redaction" — this is permanent'] },
   permissions:       { acceptMultiple: false, uploadLabel: 'Drop a PDF file to set permissions',     uploadDescription: 'Upload the PDF you want to restrict',                   actionLabel: 'Apply Permissions',     resultLabel: 'Restricted PDF',    steps: ['Upload a PDF file', 'Choose what to restrict (print, copy, edit)', 'Click "Apply Permissions" to save'] },
@@ -147,6 +148,15 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
   const [minSizeBytes, setMinSizeBytes] = useState<number | null>(null); // For split-by-size: minimum size (size of largest page)
   const [bookmarkLevel, setBookmarkLevel] = useState<number>(1); // For split-by-bookmarks: bookmark level to split at
   const [bookmarkInfo, setBookmarkInfo] = useState<{ hasBookmarks: boolean; levels: number[]; count: number; bookmarks: Array<{ title: string; pageIndex: number; level: number }> } | null>(null); // For split-by-bookmarks: bookmark info
+  const [signatureType, setSignatureType] = useState<'draw' | 'type' | 'image'>('draw'); // For sign: signature type
+  const [signatureData, setSignatureData] = useState<string>(''); // For sign: signature data (data URL or text)
+  const [signaturePage, setSignaturePage] = useState<number>(1); // For sign: page number (1-based)
+  const [signatureX, setSignatureX] = useState<number>(0.5); // For sign: X position (0-1)
+  const [signatureY, setSignatureY] = useState<number>(0.5); // For sign: Y position (0-1)
+  const [typedSignature, setTypedSignature] = useState<string>(''); // For sign: typed signature text
+  const [signatureFontSize, setSignatureFontSize] = useState<number>(24); // For sign: font size for typed signature
+  const [isSignaturePadOpen, setIsSignaturePadOpen] = useState<boolean>(false);
+  const [isPositionSelectorOpen, setIsPositionSelectorOpen] = useState<boolean>(false);
   const validationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { setOriginalFile, setPages, setSelectedPageId, pages: storePages, originalFile: storeOriginalFile } = usePdfStore();
 
@@ -287,8 +297,16 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       setCustomSizeUnit('MB');
       setUseCustomSize(false);
       setMinSizeBytes(null);
-      setBookmarkLevel(1);
-      setBookmarkInfo(null);
+    setBookmarkLevel(1);
+    setBookmarkInfo(null);
+    setSignatureType('draw');
+    setSignatureData('');
+    setSignaturePage(1);
+    setSignatureX(0.5);
+    setSignatureY(0.5);
+    setTypedSignature('');
+    setSignatureFontSize(24);
+    setIsSignaturePadOpen(false);
     }
   };
 
@@ -739,6 +757,54 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       } finally {
         setIsProcessing(false);
       }
+    } else if (tool.id === 'sign') {
+      // Real sign PDF implementation
+      if (files.length === 0) {
+        setError('Please upload a PDF file to sign');
+        return;
+      }
+
+      if (signatureType === 'type' && !typedSignature.trim()) {
+        setError('Please enter your signature text');
+        return;
+      } else if (signatureType !== 'type' && (!signatureData || signatureData.trim().length === 0)) {
+        setError('Please create or upload a signature');
+        return;
+      }
+
+      if (!signaturePage || signaturePage < 1) {
+        setError('Please select a page for the signature by clicking "Select Position on PDF"');
+        return;
+      }
+
+      setIsProcessing(true);
+      setError(null);
+
+      try {
+        const file = files[0];
+        const signatureToUse = signatureType === 'type' ? typedSignature : signatureData;
+        
+        const pdfBytes = await signPdf(file, {
+          signatureType: signatureType,
+          signatureData: signatureToUse,
+          pageNumber: signaturePage,
+          x: signatureX,
+          y: signatureY,
+          fontSize: signatureType === 'type' ? signatureFontSize : undefined,
+        });
+        
+        console.log('Signing successful, bytes:', pdfBytes.length);
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        console.error('Error signing PDF:', err);
+        setError(err instanceof Error ? err.message : 'Failed to sign PDF. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
     } else if (tool.id === 'reverse-order') {
       // Real reverse page order implementation
       if (files.length === 0) {
@@ -846,6 +912,15 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
     setDuplicatePageRange('');
     setNumberOfCopies(1);
     setMaxFileSize('10 MB');
+    setSignatureType('draw');
+    setSignatureData('');
+    setSignaturePage(1);
+    setSignatureX(0.5);
+    setSignatureY(0.5);
+    setTypedSignature('');
+    setSignatureFontSize(24);
+    setIsSignaturePadOpen(false);
+    setIsPositionSelectorOpen(false);
   };
 
   const handleDownload = async () => {
@@ -989,6 +1064,25 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       } catch (err) {
         console.error('Error downloading PDF:', err);
         setError('Failed to download PDF. Please try again.');
+      }
+    } else if (tool.id === 'sign') {
+      if (!processedPdfBytes) {
+        console.error('Signed PDF bytes not available');
+        setError('Signed PDF is not ready. Please try again.');
+        return;
+      }
+      
+      // Generate filename from input file
+      const baseName = files.length > 0 
+        ? files[0].name.replace(/\.pdf$/i, '') 
+        : 'signed';
+      const filename = `${baseName}_signed.pdf`;
+      
+      try {
+        downloadSignedPdf(processedPdfBytes, filename);
+      } catch (err) {
+        console.error('Error downloading signed PDF:', err);
+        setError('Failed to download signed PDF. Please try again.');
       }
     } else if (tool.id === 'reverse-order') {
       if (!processedPdfBytes) {
@@ -1409,70 +1503,171 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                 </div>
               )}
 
-              {/* Encryption settings */}
-              {tool.id === 'encrypt' && (
+              {/* Signature settings for sign */}
+              {tool.id === 'sign' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
                   <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">Encryption Level</p>
+                    <p className="text-sm font-medium text-surface-200 mb-3">Signature Type</p>
                     <div className="flex gap-2">
-                      {['AES-128', 'AES-256'].map((enc) => (
+                      {(['draw', 'type', 'image'] as const).map((type) => (
                         <button
-                          key={enc}
-                          className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${enc === 'AES-256' ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300' : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'}`}
+                          key={type}
+                          type="button"
+                          onClick={() => {
+                            setSignatureType(type);
+                            setSignatureData('');
+                            setTypedSignature('');
+                            if (type !== 'type') {
+                              setSignatureFontSize(24);
+                            }
+                          }}
+                          className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                            signatureType === type 
+                              ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300' 
+                              : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'
+                          }`}
                         >
-                          {enc}
+                          {type === 'draw' ? 'Draw' : type === 'type' ? 'Type' : 'Upload Image'}
                         </button>
                       ))}
                     </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">User Password (to open)</p>
-                    <input
-                      type="password"
-                      placeholder="Enter password to open the PDF"
-                      className="w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all"
-                    />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">Owner Password (for permissions)</p>
-                    <input
-                      type="password"
-                      placeholder="Enter owner password (optional)"
-                      className="w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all"
-                    />
-                  </div>
-                </div>
-              )}
 
-              {/* Unlock password */}
-              {tool.id === 'unlock' && (
-                <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50">
-                  <p className="text-sm font-medium text-surface-200 mb-2">Current Password</p>
-                  <input
-                    type="password"
-                    placeholder="Enter the password to unlock the PDF"
-                    className="w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all"
-                  />
-                </div>
-              )}
-
-              {/* Signature type for sign */}
-              {tool.id === 'sign' && (
-                <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
-                  <p className="text-sm font-medium text-surface-200 mb-3">Signature Type</p>
-                  <div className="flex gap-2">
-                    {['Draw', 'Type', 'Upload Image'].map((type) => (
+                  {signatureType === 'draw' && (
+                    <div className="space-y-3">
                       <button
-                        key={type}
-                        className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${type === 'Draw' ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300' : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'}`}
+                        type="button"
+                        onClick={() => setIsSignaturePadOpen(true)}
+                        className="w-full px-4 py-3 rounded-lg bg-primary-500/10 border border-primary-500/30 text-primary-300 hover:bg-primary-500/20 transition-all text-sm font-medium"
                       >
-                        {type}
+                        {signatureData ? 'Edit Signature' : 'Draw Signature'}
                       </button>
-                    ))}
-                  </div>
-                  <div className="h-32 rounded-lg border-2 border-dashed border-surface-600/50 flex items-center justify-center text-surface-500 text-sm">
-                    Draw your signature here (stub)
-                  </div>
+                      {signatureData && (
+                        <div className="relative">
+                          <img 
+                            src={signatureData} 
+                            alt="Signature" 
+                            className="w-full h-32 object-contain bg-white rounded-lg border border-surface-600/50"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSignatureData('');
+                              setIsSignaturePadOpen(false);
+                            }}
+                            className="absolute top-2 right-2 p-1 rounded-full bg-error-500/20 hover:bg-error-500/30 text-error-400 transition-colors"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {signatureType === 'type' && (
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-sm font-medium text-surface-200 mb-2">Enter Your Name</p>
+                        <input
+                          type="text"
+                          value={typedSignature}
+                          onChange={(e) => setTypedSignature(e.target.value)}
+                          placeholder="John Doe"
+                          className="w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all"
+                        />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-surface-200 mb-2">Font Size</p>
+                        <input
+                          type="number"
+                          value={signatureFontSize}
+                          onChange={(e) => setSignatureFontSize(Math.max(8, Math.min(72, parseInt(e.target.value) || 24)))}
+                          min="8"
+                          max="72"
+                          className="w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all"
+                        />
+                      </div>
+                      {typedSignature && (
+                        <div className="p-4 rounded-lg border border-surface-600/50 aspect-square flex items-center justify-center" style={{ backgroundColor: 'transparent' }}>
+                          <p className="font-bold text-black text-center" style={{ 
+                            fontFamily: 'Helvetica, Arial, sans-serif',
+                            fontSize: `${signatureFontSize}px`
+                          }}>
+                            {typedSignature}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {signatureType === 'image' && (
+                    <div className="space-y-3">
+                      <label className="block">
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/jpg"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onload = (event) => {
+                                const dataUrl = event.target?.result as string;
+                                setSignatureData(dataUrl);
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                          className="hidden"
+                        />
+                        <div className="w-full px-4 py-3 rounded-lg bg-primary-500/10 border border-primary-500/30 text-primary-300 hover:bg-primary-500/20 transition-all text-sm font-medium text-center cursor-pointer">
+                          {signatureData ? 'Change Image' : 'Upload Signature Image'}
+                        </div>
+                      </label>
+                      {signatureData && (
+                        <div className="relative">
+                          <img 
+                            src={signatureData} 
+                            alt="Signature" 
+                            className="w-full h-32 object-contain bg-white rounded-lg border border-surface-600/50"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setSignatureData('')}
+                            className="absolute top-2 right-2 p-1 rounded-full bg-error-500/20 hover:bg-error-500/30 text-error-400 transition-colors"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Position selector */}
+                  {files.length > 0 && (signatureData || (signatureType === 'type' && typedSignature.trim())) && (
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-sm font-medium text-surface-200 mb-2">Signature Position</p>
+                        <button
+                          type="button"
+                          onClick={() => setIsPositionSelectorOpen(true)}
+                          className="w-full px-4 py-3 rounded-lg bg-primary-500/10 border border-primary-500/30 text-primary-300 hover:bg-primary-500/20 transition-all text-sm font-medium flex items-center justify-center gap-2"
+                        >
+                          <FileText size={18} />
+                          {signaturePage && (signatureX !== 0.5 || signatureY !== 0.5)
+                            ? `Page ${signaturePage} - Position (${signatureX.toFixed(2)}, ${signatureY.toFixed(2)})`
+                            : 'Select Position on PDF'}
+                        </button>
+                        {signaturePage && totalPages && (
+                          <p className="text-xs text-surface-500 mt-1">
+                            Current: Page {signaturePage} of {totalPages} at ({signatureX.toFixed(2)}, {signatureY.toFixed(2)})
+                          </p>
+                        )}
+                        <p className="text-xs text-surface-400 mt-1">
+                          Click to open PDF preview and select where to place your signature
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -2543,6 +2738,66 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
             </div>
           )}
         </>
+      )}
+
+      {/* Signature Pad Modal */}
+      {tool.id === 'sign' && isSignaturePadOpen && (
+        <SignaturePad
+          isOpen={isSignaturePadOpen}
+          onClose={() => setIsSignaturePadOpen(false)}
+          onSave={(dataUrl) => {
+            setSignatureData(dataUrl);
+            setIsSignaturePadOpen(false);
+            // Automatically open position selector after saving signature
+            if (files.length > 0) {
+              setTimeout(() => {
+                setIsPositionSelectorOpen(true);
+              }, 100);
+            }
+          }}
+          position={{ x: signatureX, y: signatureY }}
+          pageWidth={800}
+          pageHeight={1000}
+          zoom={1}
+        />
+      )}
+
+      {/* Signature Position Selector */}
+      {tool.id === 'sign' && isPositionSelectorOpen && files.length > 0 && (
+        <SignaturePositionSelector
+          isOpen={isPositionSelectorOpen}
+          onClose={() => setIsPositionSelectorOpen(false)}
+          pdfFile={files[0]}
+          signatureData={
+            signatureType === 'type' 
+              ? (() => {
+                  // Create a temporary canvas for typed signature preview
+                  const canvas = document.createElement('canvas');
+                  canvas.width = 400;
+                  canvas.height = 150;
+                  const ctx = canvas.getContext('2d');
+                  if (ctx && typedSignature) {
+                    // Transparent background
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = '#000000';
+                    ctx.font = `${signatureFontSize * 2}px Helvetica, Arial, sans-serif`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(typedSignature, canvas.width / 2, canvas.height / 2);
+                    return canvas.toDataURL();
+                  }
+                  return '';
+                })()
+              : signatureData
+          }
+          signatureType={signatureType}
+          onPositionSelected={(pageNumber, x, y) => {
+            setSignaturePage(pageNumber);
+            setSignatureX(x);
+            setSignatureY(y);
+            setIsPositionSelectorOpen(false);
+          }}
+        />
       )}
     </div>
   );

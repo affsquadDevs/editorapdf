@@ -331,7 +331,7 @@ export default function Home() {
                       Complete PDF Toolkit
                     </h2>
                     <p className="text-surface-400 text-base max-w-2xl mx-auto">
-                      Everything you need to work with PDFs — organize, protect, encrypt, convert, sign, analyze, and more. All in your browser, 100% private.
+                      Everything you need to work with PDFs — organize, protect, convert, sign, analyze, and more. All in your browser, 100% private.
                     </p>
                   </div>
 
@@ -371,8 +371,6 @@ export default function Home() {
                     {/* Row 2: Security & Protection */}
                     {(() => {
                       const tools = [
-                        { title: 'Encrypt PDF', desc: 'AES-256 protection', color: 'success', icon: <Lock size={20} strokeWidth={1.5} /> },
-                        { title: 'Unlock PDF', desc: 'Remove password', color: 'warning', icon: <LockOpen size={20} strokeWidth={1.5} /> },
                         { title: 'Sign PDF', desc: 'Digital signature', color: 'primary', icon: <PenTool size={20} strokeWidth={1.5} /> },
                         { title: 'Redact', desc: 'Black out data', color: 'error', icon: <EyeOff size={20} strokeWidth={1.5} /> },
                         { title: 'Permissions', desc: 'Control access', color: 'info', icon: <SlidersHorizontal size={20} strokeWidth={1.5} /> },

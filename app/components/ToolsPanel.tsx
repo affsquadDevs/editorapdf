@@ -112,14 +112,6 @@ const toolCategories: ToolCategory[] = [
     icon: <Lock size={20} strokeWidth={1.5} />,
     tools: [
       {
-        id: 'encrypt', title: 'Encrypt PDF', description: 'Add password & AES-256 encryption to your PDF', color: 'success',
-        icon: <Lock size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
-      },
-      {
-        id: 'unlock', title: 'Unlock PDF', description: 'Remove password protection from a PDF', color: 'warning',
-        icon: <LockOpen size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
-      },
-      {
         id: 'sign', title: 'Digital Signature', description: 'Add a digital signature or e-sign your PDF', color: 'primary',
         icon: <PenTool size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },

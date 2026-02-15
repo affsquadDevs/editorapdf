@@ -37,7 +37,7 @@ export default function ToolPage() {
   return (
     <main className="min-h-screen flex flex-col">
       <Header />
-      <div className="flex-1 flex items-center justify-center px-6 pb-6 ">
+      <div className="flex-1 flex items-center justify-center px-6 pt-6 pb-6">
         <ToolView 
           tool={tool} 
           onBack={() => router.push('/tools')} 
