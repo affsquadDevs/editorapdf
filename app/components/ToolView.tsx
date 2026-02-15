@@ -26,6 +26,8 @@ import PageReorder from './PageReorder';
 import PageRotate from './PageRotate';
 import SignaturePad from './SignaturePad';
 import SignaturePositionSelector from './SignaturePositionSelector';
+import RedactSelector from './RedactSelector';
+import { redactPdf, downloadRedactedPdf, type RedactionArea } from '../lib/pdf/redactPdf';
 
 interface ToolViewProps {
   tool: PdfTool;
@@ -157,6 +159,8 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
   const [signatureFontSize, setSignatureFontSize] = useState<number>(24); // For sign: font size for typed signature
   const [isSignaturePadOpen, setIsSignaturePadOpen] = useState<boolean>(false);
   const [isPositionSelectorOpen, setIsPositionSelectorOpen] = useState<boolean>(false);
+  const [isRedactSelectorOpen, setIsRedactSelectorOpen] = useState<boolean>(false);
+  const [redactions, setRedactions] = useState<RedactionArea[]>([]);
   const validationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { setOriginalFile, setPages, setSelectedPageId, pages: storePages, originalFile: storeOriginalFile } = usePdfStore();
 
@@ -831,6 +835,40 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       } finally {
         setIsProcessing(false);
       }
+    } else if (tool.id === 'redact') {
+      // Real redact PDF implementation
+      if (files.length === 0) {
+        setError('Please upload a PDF file to redact');
+        return;
+      }
+
+      if (redactions.length === 0) {
+        setError('Please select areas to redact by clicking "Select Areas to Redact"');
+        return;
+      }
+
+      setIsProcessing(true);
+      setError(null);
+
+      try {
+        const file = files[0];
+        const pdfBytes = await redactPdf({
+          file,
+          redactions,
+        });
+        
+        console.log('Redaction successful, bytes:', pdfBytes.length);
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        console.error('Error redacting PDF:', err);
+        setError(err instanceof Error ? err.message : 'Failed to redact PDF. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
     } else if (tool.id === 'split-by-bookmarks') {
       // Real split by bookmarks implementation
       if (files.length === 0) {
@@ -921,6 +959,8 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
     setSignatureFontSize(24);
     setIsSignaturePadOpen(false);
     setIsPositionSelectorOpen(false);
+    setIsRedactSelectorOpen(false);
+    setRedactions([]);
   };
 
   const handleDownload = async () => {
@@ -1099,6 +1139,25 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       
       try {
         downloadReversePdf(processedPdfBytes, filename);
+      } catch (err) {
+        console.error('Error downloading PDF:', err);
+        setError('Failed to download PDF. Please try again.');
+      }
+    } else if (tool.id === 'redact') {
+      if (!processedPdfBytes) {
+        console.error('Redacted PDF bytes not available');
+        setError('Redacted PDF is not ready. Please try again.');
+        return;
+      }
+      
+      // Generate filename from input file
+      const baseName = files.length > 0 
+        ? files[0].name.replace(/\.pdf$/i, '') 
+        : 'redacted';
+      const filename = `${baseName}_redacted.pdf`;
+      
+      try {
+        downloadRedactedPdf(processedPdfBytes, filename);
       } catch (err) {
         console.error('Error downloading PDF:', err);
         setError('Failed to download PDF. Please try again.');
@@ -2312,16 +2371,31 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {/* Redact options */}
               {tool.id === 'redact' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
-                  <p className="text-sm font-medium text-surface-200 mb-2">Redaction Method</p>
-                  <div className="flex gap-2">
-                    {['Select Text', 'Draw Rectangle', 'Find & Redact'].map((m) => (
-                      <button key={m} className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${m === 'Select Text' ? 'bg-error-500/20 border border-error-500/40 text-error-300' : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'}`}>{m}</button>
-                    ))}
-                  </div>
                   <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">Search for Text to Redact</p>
-                    <input type="text" placeholder="e.g. SSN, email addresses, phone numbers..." className="w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all" />
+                    <p className="text-sm font-medium text-surface-200 mb-2">Select Areas to Redact</p>
+                    <p className="text-xs text-surface-400 mb-3">
+                      Click "Select Areas" to draw rectangles over sensitive information that should be permanently blacked out.
+                    </p>
+                    <button
+                      onClick={() => setIsRedactSelectorOpen(true)}
+                      className="w-full px-4 py-2.5 rounded-lg bg-error-500/20 border border-error-500/40 text-error-300 hover:bg-error-500/30 transition-colors text-sm font-medium"
+                    >
+                      Select Areas to Redact
+                    </button>
                   </div>
+                  {redactions.length > 0 && (
+                    <div className="p-3 rounded-lg bg-surface-900/50 border border-surface-600/50">
+                      <p className="text-xs text-surface-300 mb-1">
+                        {redactions.length} redaction area{redactions.length !== 1 ? 's' : ''} selected
+                      </p>
+                      <button
+                        onClick={() => setRedactions([])}
+                        className="text-xs text-error-400 hover:text-error-300 transition-colors"
+                      >
+                        Clear all
+                      </button>
+                    </div>
+                  )}
                   <p className="text-xs text-error-400/80">⚠️ Redaction is permanent and cannot be undone</p>
                 </div>
               )}
@@ -2796,6 +2870,19 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
             setSignatureX(x);
             setSignatureY(y);
             setIsPositionSelectorOpen(false);
+          }}
+        />
+      )}
+
+      {/* Redact Selector */}
+      {tool.id === 'redact' && isRedactSelectorOpen && files.length > 0 && (
+        <RedactSelector
+          isOpen={isRedactSelectorOpen}
+          onClose={() => setIsRedactSelectorOpen(false)}
+          pdfFile={files[0]}
+          onRedactionsSelected={(newRedactions) => {
+            setRedactions(newRedactions);
+            setIsRedactSelectorOpen(false);
           }}
         />
       )}
