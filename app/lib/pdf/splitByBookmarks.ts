@@ -187,7 +187,7 @@ export async function splitByBookmarks(
       throw new Error(`No bookmarks found at level ${bookmarkLevel}. Minimum level in this PDF is ${minLevel}.`);
     }
     
-    throw new Error(`No bookmarks found at level ${bookmarkLevel}. Available levels: ${[...new Set(allLevels)].sort().join(', ')}`);
+    throw new Error(`No bookmarks found at level ${bookmarkLevel}. Available levels: ${Array.from(new Set(allLevels)).sort().join(', ')}`);
   }
 
   // Sort bookmarks by page index
@@ -287,9 +287,9 @@ export async function getBookmarkInfo(file: File): Promise<{ hasBookmarks: boole
           };
         }
         
-        // Get all levels from flattened bookmarks
-        const allBookmarks = flattenBookmarks(bookmarks);
-        const levels = [...new Set(allBookmarks.map(b => b.level))].sort((a, b) => a - b);
+    // Get all levels from flattened bookmarks
+    const allBookmarks = flattenBookmarks(bookmarks);
+    const levels = Array.from(new Set(allBookmarks.map(b => b.level))).sort((a, b) => a - b);
         
         return {
           hasBookmarks: true,
