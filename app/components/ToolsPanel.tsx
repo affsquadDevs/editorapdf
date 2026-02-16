@@ -468,18 +468,13 @@ export default function ToolsPanel() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {category.tools.map((tool, index) => {
                 const colors = colorMap[tool.color] || colorMap.primary;
-                const ToolComponent = tool.comingSoon ? 'div' : Link;
-                const toolProps = tool.comingSoon 
-                  ? {} 
-                  : { href: `/tools/${tool.id}` };
+                const commonProps = {
+                  className: `relative group text-left p-5 rounded-2xl border transition-all duration-200 ${colors.bg} ${colors.border} ${colors.hoverBorder} ${tool.comingSoon ? 'opacity-50 cursor-not-allowed' : 'hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] cursor-pointer'} animate-fade-in-up`,
+                  style: { animationDelay: `${index * 40}ms` } as React.CSSProperties,
+                };
                 
-                return (
-                  <ToolComponent
-                    key={tool.id}
-                    {...toolProps}
-                    className={`relative group text-left p-5 rounded-2xl border transition-all duration-200 ${colors.bg} ${colors.border} ${colors.hoverBorder} ${tool.comingSoon ? 'opacity-50 cursor-not-allowed' : 'hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] cursor-pointer'} animate-fade-in-up`}
-                    style={{ animationDelay: `${index * 40}ms` }}
-                  >
+                const content = (
+                  <>
                     {tool.comingSoon && (
                       <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-surface-700/80 border border-surface-600/50 text-[10px] font-semibold text-surface-300 uppercase tracking-wider">Soon</div>
                     )}
@@ -493,7 +488,17 @@ export default function ToolsPanel() {
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
                       </div>
                     )}
-                  </ToolComponent>
+                  </>
+                );
+                
+                return tool.comingSoon ? (
+                  <div key={tool.id} {...commonProps}>
+                    {content}
+                  </div>
+                ) : (
+                  <Link key={tool.id} href={`/tools/${tool.id}`} {...commonProps}>
+                    {content}
+                  </Link>
                 );
               })}
             </div>

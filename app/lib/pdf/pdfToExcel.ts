@@ -270,7 +270,7 @@ function detectTableStructure(texts: any[]): string[][] {
  * Download Excel file
  */
 export function downloadExcel(xlsxBytes: Uint8Array, filename: string): void {
-  const blob = new Blob([xlsxBytes], { 
+  const blob = new Blob([xlsxBytes as BlobPart], { 
     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
   });
   const url = URL.createObjectURL(blob);

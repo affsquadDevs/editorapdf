@@ -95,9 +95,19 @@ const nextConfig = {
     ]
   },
   
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
     // Fix for pdfjs-dist worker in Next.js
     config.resolve.alias.canvas = false;
+    
+    // Ignore problematic modules that aren't used
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        'emitter': false,
+        'batch': false,
+      };
+    }
+    
     return config;
   },
 }

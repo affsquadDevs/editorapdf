@@ -216,7 +216,7 @@ export async function pdfToWord(
  * Download Word document
  */
 export function downloadWord(docxBytes: Uint8Array, filename: string): void {
-  const blob = new Blob([docxBytes], { 
+  const blob = new Blob([docxBytes as BlobPart], { 
     type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
   });
   const url = URL.createObjectURL(blob);

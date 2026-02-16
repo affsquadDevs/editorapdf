@@ -379,7 +379,7 @@ function dataUrlToBytes(dataUrl: string): Uint8Array {
 
 export function downloadPdf(pdfBytes: Uint8Array, filename: string): void {
   // @ts-ignore - Uint8Array is compatible with Blob constructor
-  const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+  const blob = new Blob([pdfBytes as BlobPart], { type: 'application/pdf' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;

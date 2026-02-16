@@ -10,7 +10,7 @@ import Link from 'next/link';
 export default function ToolPage() {
   const params = useParams();
   const router = useRouter();
-  const toolId = params.toolId as string;
+  const toolId = (params?.toolId as string) || '';
 
   const tool = allTools.find(t => t.id === toolId);
 

@@ -175,7 +175,7 @@ function detectTableStructure(texts: any[]): string[][] {
 export async function pdfToCsv(
   file: File,
   options: PdfToCsvOptions = {}
-): Promise<string[]> {
+): Promise<Array<{ bytes: Uint8Array; filename: string }>> {
   const { 
     pageRange, 
     detectTables = true,
@@ -254,13 +254,18 @@ export async function pdfToCsv(
   }
 
   // Convert tables to CSV
-  const csvResults: string[] = [];
+  const results: Array<{ bytes: Uint8Array; filename: string }> = [];
+  const baseName = file.name.replace(/\.pdf$/i, '');
 
   if (separateFiles) {
     // Create separate CSV for each page
     for (const { page, table } of allTables) {
       const csv = tableToCsv(table, delimiter, quoteChar);
-      csvResults.push(csv);
+      const bytes = new TextEncoder().encode(csv);
+      results.push({
+        bytes,
+        filename: `${baseName}_page_${page}.csv`,
+      });
     }
   } else {
     // Combine all pages into single CSV
@@ -287,15 +292,26 @@ export async function pdfToCsv(
     }
     
     const csv = tableToCsv(combinedTable, delimiter, quoteChar);
-    csvResults.push(csv);
+    const bytes = new TextEncoder().encode(csv);
+    results.push({
+      bytes,
+      filename: `${baseName}.csv`,
+    });
   }
 
   // If no tables were found, add a message
-  if (csvResults.length === 0 || csvResults.every(csv => csv.trim() === '')) {
-    return ['No table data found in PDF. This PDF may contain only images or scanned content. Try using OCR to extract text first.'];
+  if (results.length === 0 || results.every(r => {
+    const text = new TextDecoder().decode(r.bytes);
+    return text.trim() === '';
+  })) {
+    const message = 'No table data found in PDF. This PDF may contain only images or scanned content. Try using OCR to extract text first.';
+    results.push({
+      bytes: new TextEncoder().encode(message),
+      filename: `${baseName}.csv`,
+    });
   }
 
-  return csvResults;
+  return results;
 }
 
 /**
@@ -309,8 +325,8 @@ export function csvToUint8Array(csv: string): Uint8Array {
 /**
  * Download CSV file
  */
-export function downloadCsv(csv: string, filename: string): void {
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+export function downloadCsv(csvBytes: Uint8Array, filename: string): void {
+  const blob = new Blob([csvBytes as BlobPart], { type: 'text/csv;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
@@ -326,7 +342,8 @@ export function downloadCsv(csv: string, filename: string): void {
  * Download multiple CSV files as ZIP
  */
 export async function downloadCsvFiles(
-  csvFiles: Array<{ content: string; filename: string }>
+  csvFiles: Array<{ bytes: Uint8Array; filename: string }>,
+  zipFilename: string = 'csv_files.zip'
 ): Promise<void> {
   if (csvFiles.length === 0) {
     throw new Error('No CSV files to download');
@@ -334,7 +351,7 @@ export async function downloadCsvFiles(
 
   if (csvFiles.length === 1) {
     // Single file - download directly
-    downloadCsv(csvFiles[0].content, csvFiles[0].filename);
+    downloadCsv(csvFiles[0].bytes, csvFiles[0].filename);
     return;
   }
 
@@ -346,16 +363,16 @@ export async function downloadCsvFiles(
   } catch (err) {
     // Fallback: download first file if JSZip not available
     console.warn('JSZip not available, downloading first CSV file only');
-    downloadCsv(csvFiles[0].content, csvFiles[0].filename);
+    downloadCsv(csvFiles[0].bytes, csvFiles[0].filename);
     return;
   }
 
   const zip = new JSZip();
 
   // Add each CSV file to ZIP
-  csvFiles.forEach(({ content, filename }) => {
+  csvFiles.forEach(({ bytes, filename }) => {
     const csvFilename = filename.endsWith('.csv') ? filename : `${filename}.csv`;
-    zip.file(csvFilename, content);
+    zip.file(csvFilename, bytes);
   });
 
   // Generate ZIP file
@@ -363,7 +380,7 @@ export async function downloadCsvFiles(
   const url = URL.createObjectURL(zipBlob);
   const link = document.createElement('a');
   link.href = url;
-  link.download = 'csv_files.zip';
+  link.download = zipFilename.endsWith('.zip') ? zipFilename : `${zipFilename}.zip`;
   link.style.display = 'none';
   document.body.appendChild(link);
   link.click();

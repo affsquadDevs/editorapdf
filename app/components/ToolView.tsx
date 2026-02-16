@@ -36,6 +36,47 @@ import { pdfToWord, downloadWord } from '../lib/pdf/pdfToWord';
 import { pdfToExcel, downloadExcel } from '../lib/pdf/pdfToExcel';
 import { pdfToText, downloadText } from '../lib/pdf/pdfToText';
 import { pdfToCsv, downloadCsv, downloadCsvFiles } from '../lib/pdf/pdfToCsv';
+import { pdfToHtml, downloadHtml } from '../lib/pdf/pdfToHtml';
+import { pdfToMarkdown, downloadMarkdown } from '../lib/pdf/pdfToMarkdown';
+import { pdfToPptx, downloadPptx } from '../lib/pdf/pdfToPptx';
+import { htmlToPdf, downloadPdf as downloadHtmlPdf } from '../lib/pdf/htmlToPdf';
+import { wordToPdf, downloadPdf as downloadWordPdf } from '../lib/pdf/wordToPdf';
+import { excelToPdf, downloadPdf as downloadExcelPdf } from '../lib/pdf/excelToPdf';
+import { compressPdf, downloadCompressedPdf } from '../lib/pdf/compressPdf';
+import { addWatermark, downloadWatermarkedPdf } from '../lib/pdf/addWatermark';
+import { addPageNumbers, downloadNumberedPdf } from '../lib/pdf/addPageNumbers';
+import { addHeaderFooter, downloadHeaderFooterPdf } from '../lib/pdf/addHeaderFooter';
+import { addBackground, downloadBackgroundPdf } from '../lib/pdf/addBackground';
+import { cropPages, downloadCroppedPdf } from '../lib/pdf/cropPages';
+import { resizePages, downloadResizedPdf } from '../lib/pdf/resizePages';
+import { flattenPdf, downloadFlattenedPdf } from '../lib/pdf/flattenPdf';
+import { editMetadata, downloadMetadataPdf } from '../lib/pdf/editMetadata';
+import { extractImages, downloadExtractedImages } from '../lib/pdf/extractImages';
+import { removeImages, downloadNoImagesPdf } from '../lib/pdf/removeImages';
+import { optimizeImages, downloadOptimizedPdf } from '../lib/pdf/optimizeImages';
+import { addQrCode, downloadQrCodePdf } from '../lib/pdf/addQrCode';
+import { addBarcode, downloadBarcodePdf } from '../lib/pdf/addBarcode';
+import { addBookmarks, downloadBookmarkedPdf } from '../lib/pdf/addBookmarks';
+import { addHyperlinks, downloadHyperlinkedPdf } from '../lib/pdf/addHyperlinks';
+import { addAttachments, downloadAttachedPdf } from '../lib/pdf/addAttachments';
+import { addStamp, downloadStampedPdf } from '../lib/pdf/addStamp';
+import { batesNumbering, downloadBatesPdf } from '../lib/pdf/batesNumbering';
+import { fillSign, downloadFillSignPdf } from '../lib/pdf/fillSign';
+import { createForm, downloadFormPdf } from '../lib/pdf/createForm';
+import { ocrPdf, downloadOcrPdf } from '../lib/pdf/ocrPdf';
+import { makeSearchable, downloadSearchablePdf } from '../lib/pdf/makeSearchable';
+import { getPdfStatistics } from '../lib/pdf/pdfStatistics';
+import { linearizePdf, downloadLinearizedPdf } from '../lib/pdf/linearizePdf';
+import { comparePdfs } from '../lib/pdf/comparePdfs';
+import { repairPdf, downloadRepairedPdf } from '../lib/pdf/repairPdf';
+import { grayscalePdf, downloadGrayscalePdf } from '../lib/pdf/grayscalePdf';
+import { invertColors, downloadInvertedPdf } from '../lib/pdf/invertColors';
+import { removeAnnotations, downloadNoAnnotationsPdf } from '../lib/pdf/removeAnnotations';
+import { convertColorSpace, downloadColorSpacePdf } from '../lib/pdf/convertColorSpace';
+import { checkAccessibility } from '../lib/pdf/accessibilityCheck';
+import { convertToPdfa, downloadPdfa } from '../lib/pdf/pdfaConversion';
+import { convertToPdfx, downloadPdfx } from '../lib/pdf/pdfxConversion';
+import { validatePdf } from '../lib/pdf/validatePdf';
 
 interface ToolViewProps {
   tool: PdfTool;
@@ -140,7 +181,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
   const [splitPdfResults, setSplitPdfResults] = useState<Array<{ bytes: Uint8Array; filename: string }> | null>(null);
   const [processedPdfBytes, setProcessedPdfBytes] = useState<Uint8Array | null>(null);
   const [processedText, setProcessedText] = useState<string | null>(null);
-  const [processedCsvFiles, setProcessedCsvFiles] = useState<string[] | null>(null);
+  const [processedCsvFiles, setProcessedCsvFiles] = useState<Array<{ bytes: Uint8Array; filename: string }> | null>(null);
   const [pageRange, setPageRange] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState<number | null>(null);
@@ -1179,6 +1220,940 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       } finally {
         setIsProcessing(false);
       }
+    } else if (tool.id === 'pdf-to-html') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file to convert');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const html = await pdfToHtml(file, {
+          pageRange: pageRange || undefined,
+          includeImages: false,
+          preserveFormatting: true,
+        });
+        setProcessedText(html);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to convert PDF to HTML. Please try again.');
+        setIsComplete(false);
+        setProcessedText(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'pdf-to-markdown') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file to convert');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const markdown = await pdfToMarkdown(file, {
+          pageRange: pageRange || undefined,
+          preserveFormatting: true,
+          detectHeadings: true,
+        });
+        setProcessedText(markdown);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to convert PDF to Markdown. Please try again.');
+        setIsComplete(false);
+        setProcessedText(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'pdf-to-pptx') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file to convert');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pptxBytes = await pdfToPptx(file, {
+          pageRange: pageRange || undefined,
+          slideLayout: 'full',
+          includeText: true,
+        });
+        setProcessedPdfBytes(pptxBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to convert PDF to PowerPoint. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'html-to-pdf') {
+      if (files.length === 0) {
+        setError('Please upload an HTML file to convert');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await htmlToPdf(file, {
+          pageSize: 'A4',
+          orientation: 'portrait',
+          margin: { top: 20, right: 20, bottom: 20, left: 20 },
+        });
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to convert HTML to PDF. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'word-to-pdf') {
+      if (files.length === 0) {
+        setError('Please upload a Word document to convert');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await wordToPdf(file, {
+          preserveFormatting: true,
+          pageSize: 'A4',
+          orientation: 'portrait',
+        });
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to convert Word to PDF. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'excel-to-pdf') {
+      if (files.length === 0) {
+        setError('Please upload an Excel file to convert');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await excelToPdf(file, {
+          pageSize: 'A4',
+          orientation: 'portrait',
+          fitToPage: true,
+        });
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to convert Excel to PDF. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'compress') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file to compress');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await compressPdf(file, {
+          quality: 'medium',
+          removeMetadata: false,
+          optimizeImages: true,
+        });
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to compress PDF. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'add-watermark') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        // Note: Watermark text/image should come from UI state
+        const pdfBytes = await addWatermark(file, {
+          text: 'WATERMARK', // This should come from UI
+          pageRange: pageRange || undefined,
+          position: 'diagonal',
+          opacity: 0.3,
+        });
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to add watermark. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'page-numbers') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await addPageNumbers(file, {
+          position: 'bottom-center',
+          format: '{page}',
+          startNumber: 1,
+          pageRange: pageRange || undefined,
+        });
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to add page numbers. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'header-footer') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await addHeaderFooter(file, {
+          headerText: '', // Should come from UI
+          footerText: '', // Should come from UI
+          pageRange: pageRange || undefined,
+          includePageNumbers: false,
+        });
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to add header/footer. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'add-background') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await addBackground(file, {
+          color: { r: 1, g: 1, b: 1 }, // Should come from UI
+          pageRange: pageRange || undefined,
+        });
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to add background. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'crop') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await cropPages(file, {
+          pageRange: pageRange || undefined,
+          margins: { top: 0, right: 0, bottom: 0, left: 0 }, // Should come from UI
+        });
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to crop pages. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'resize') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await resizePages(file, {
+          pageSize: 'A4', // Should come from UI
+          pageRange: pageRange || undefined,
+          scaleContent: true,
+        });
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to resize pages. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'flatten') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await flattenPdf(file, {
+          flattenForms: true,
+          flattenAnnotations: true,
+        });
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to flatten PDF. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'metadata') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await editMetadata(file, {
+          // Metadata should come from UI state
+        });
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to edit metadata. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'extract-images') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const images = await extractImages(file, {
+          pageRange: pageRange || undefined,
+          format: 'PNG',
+        });
+        setImageResults(images.map(img => ({ 
+          dataUrl: img.dataUrl, 
+          pageNumber: img.pageNumber,
+          filename: `page_${img.pageNumber}_${img.index}.${img.format.toLowerCase()}`,
+        })));
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to extract images. Please try again.');
+        setIsComplete(false);
+        setImageResults(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'remove-images') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await removeImages(file);
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to remove images. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'optimize-images') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await optimizeImages(file, {
+          quality: 0.8,
+          maxResolution: 1920,
+        });
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to optimize images. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'add-qr-code') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await addQrCode(file, {
+          content: 'https://example.com', // Should come from UI
+          pageRange: pageRange || undefined,
+          position: { x: 0.9, y: 0.9 },
+          size: 100,
+        });
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to add QR code. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'add-barcode') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await addBarcode(file, {
+          data: '1234567890', // Should come from UI
+          type: 'CODE128',
+          pageRange: pageRange || undefined,
+          position: { x: 0.5, y: 0.9 },
+        });
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to add barcode. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'add-bookmarks') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await addBookmarks(file, {
+          bookmarks: [{ title: 'Bookmark 1', pageNumber: 1, level: 1 }], // Should come from UI
+        });
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to add bookmarks. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'add-hyperlinks') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await addHyperlinks(file, {
+          hyperlinks: [{ text: 'Link', url: 'https://example.com', pageNumber: 1 }], // Should come from UI
+        });
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to add hyperlinks. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'add-attachments') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await addAttachments(file, {
+          attachments: [], // Should come from UI
+        });
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to add attachments. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'stamp') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await addStamp(file, {
+          text: 'STAMP', // Should come from UI
+          pageRange: pageRange || undefined,
+          position: { x: 0.5, y: 0.5 },
+        });
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to add stamp. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'bates-numbering') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await batesNumbering(file, {
+          prefix: 'DOC-', // Should come from UI
+          startNumber: 1,
+          digits: 6,
+          position: 'bottom-right',
+          pageRange: pageRange || undefined,
+        });
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to add Bates numbering. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'fill-sign') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await fillSign(file, {
+          formData: {}, // Should come from UI
+          signatureData: signatureData || undefined,
+          signaturePage: signaturePage,
+          signatureX: signatureX,
+          signatureY: signatureY,
+        });
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fill and sign. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'create-form') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await createForm(file, {
+          fields: [], // Should come from UI
+        });
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to create form. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'ocr') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await ocrPdf(file, {
+          language: 'eng', // Should come from UI
+          pageRange: pageRange || undefined,
+        });
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to perform OCR. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'searchable-pdf') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await makeSearchable(file, {
+          language: 'eng', // Should come from UI
+          pageRange: pageRange || undefined,
+        });
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to make PDF searchable. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'compare') {
+      if (files.length < 2) {
+        setError('Please upload 2 PDF files to compare');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const result = await comparePdfs(files[0], files[1]);
+        setProcessedText(JSON.stringify(result, null, 2));
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to compare PDFs. Please try again.');
+        setIsComplete(false);
+        setProcessedText(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'repair') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await repairPdf(file);
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to repair PDF. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'pdf-statistics') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const stats = await getPdfStatistics(file);
+        setProcessedText(JSON.stringify(stats, null, 2));
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to get PDF statistics. Please try again.');
+        setIsComplete(false);
+        setProcessedText(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'linearize') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await linearizePdf(file);
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to linearize PDF. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'color-space') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await convertColorSpace(file, {
+          targetSpace: 'CMYK', // Should come from UI
+        });
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to convert color space. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'accessibility') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const report = await checkAccessibility(file);
+        setProcessedText(JSON.stringify(report, null, 2));
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to check accessibility. Please try again.');
+        setIsComplete(false);
+        setProcessedText(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'pdfa') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await convertToPdfa(file, {
+          level: 'B', // Should come from UI
+        });
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to convert to PDF/A. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'pdfx') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await convertToPdfx(file, {
+          profile: 'PDF/X-1a', // Should come from UI
+        });
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to convert to PDF/X. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'validate') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const result = await validatePdf(file);
+        setProcessedText(JSON.stringify(result, null, 2));
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to validate PDF. Please try again.');
+        setIsComplete(false);
+        setProcessedText(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'grayscale') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await grayscalePdf(file);
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to convert to grayscale. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'invert-colors') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await invertColors(file);
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to invert colors. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'remove-annotations') {
+      if (files.length === 0) {
+        setError('Please upload a PDF file');
+        return;
+      }
+      setIsProcessing(true);
+      setError(null);
+      try {
+        const file = files[0];
+        const pdfBytes = await removeAnnotations(file);
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to remove annotations. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
     } else if (tool.id === 'images-to-pdf') {
       // Real images to PDF implementation
       if (files.length === 0) {
@@ -1627,20 +2602,185 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       try {
         if (processedCsvFiles.length === 1) {
           // Single CSV file
-          const filename = `${baseName}.csv`;
-          downloadCsv(processedCsvFiles[0], filename);
+          const filename = processedCsvFiles[0].filename || `${baseName}.csv`;
+          downloadCsv(processedCsvFiles[0].bytes, filename);
         } else {
           // Multiple CSV files - download as ZIP
-          const csvFiles = processedCsvFiles.map((csv, index) => ({
-            content: csv,
-            filename: `${baseName}_page_${index + 1}`,
-          }));
-          await downloadCsvFiles(csvFiles);
+          await downloadCsvFiles(processedCsvFiles, `${baseName}.zip`);
         }
       } catch (err) {
         console.error('Error downloading CSV file(s):', err);
         setError('Failed to download CSV file(s). Please try again.');
       }
+    } else if (tool.id === 'pdf-to-html') {
+      if (!processedText) {
+        setError('HTML content is not ready. Please try converting again.');
+        return;
+      }
+      const baseName = files.length > 0 ? files[0].name.replace(/\.pdf$/i, '') : 'converted';
+      downloadHtml(processedText, `${baseName}.html`);
+    } else if (tool.id === 'pdf-to-markdown') {
+      if (!processedText) {
+        setError('Markdown content is not ready. Please try converting again.');
+        return;
+      }
+      const baseName = files.length > 0 ? files[0].name.replace(/\.pdf$/i, '') : 'converted';
+      downloadMarkdown(processedText, `${baseName}.md`);
+    } else if (tool.id === 'pdf-to-pptx') {
+      if (!processedPdfBytes) {
+        setError('PowerPoint file is not ready. Please try converting again.');
+        return;
+      }
+      const baseName = files.length > 0 ? files[0].name.replace(/\.pdf$/i, '') : 'converted';
+      downloadPptx(processedPdfBytes, `${baseName}.pptx`);
+    } else if (tool.id === 'html-to-pdf' || tool.id === 'word-to-pdf' || tool.id === 'excel-to-pdf') {
+      if (!processedPdfBytes) {
+        setError('PDF file is not ready. Please try converting again.');
+        return;
+      }
+      const baseName = files.length > 0 ? files[0].name.replace(/\.(html|htm|docx?|xlsx?)$/i, '') : 'converted';
+      if (tool.id === 'html-to-pdf') {
+        downloadHtmlPdf(processedPdfBytes, `${baseName}.pdf`);
+      } else if (tool.id === 'word-to-pdf') {
+        downloadWordPdf(processedPdfBytes, `${baseName}.pdf`);
+      } else {
+        downloadExcelPdf(processedPdfBytes, `${baseName}.pdf`);
+      }
+    } else if (tool.id === 'compress' || tool.id === 'add-watermark' || tool.id === 'page-numbers' || 
+               tool.id === 'header-footer' || tool.id === 'add-background' || tool.id === 'crop' || 
+               tool.id === 'resize' || tool.id === 'flatten' || tool.id === 'metadata') {
+      if (!processedPdfBytes) {
+        setError('PDF file is not ready. Please try processing again.');
+        return;
+      }
+      const baseName = files.length > 0 ? files[0].name.replace(/\.pdf$/i, '') : 'processed';
+      const suffix = tool.id === 'compress' ? '_compressed' :
+                     tool.id === 'add-watermark' ? '_watermarked' :
+                     tool.id === 'page-numbers' ? '_numbered' :
+                     tool.id === 'header-footer' ? '_headerfooter' :
+                     tool.id === 'add-background' ? '_background' :
+                     tool.id === 'crop' ? '_cropped' :
+                     tool.id === 'resize' ? '_resized' :
+                     tool.id === 'flatten' ? '_flattened' :
+                     '_updated';
+      if (tool.id === 'compress') {
+        downloadCompressedPdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
+      } else if (tool.id === 'add-watermark') {
+        downloadWatermarkedPdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
+      } else if (tool.id === 'page-numbers') {
+        downloadNumberedPdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
+      } else if (tool.id === 'header-footer') {
+        downloadHeaderFooterPdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
+      } else if (tool.id === 'add-background') {
+        downloadBackgroundPdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
+      } else if (tool.id === 'crop') {
+        downloadCroppedPdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
+      } else if (tool.id === 'resize') {
+        downloadResizedPdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
+      } else if (tool.id === 'flatten') {
+        downloadFlattenedPdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
+      } else {
+        downloadMetadataPdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
+      }
+    } else if (tool.id === 'extract-images') {
+      if (!imageResults || imageResults.length === 0) {
+        setError('No images extracted. Please try extracting again.');
+        return;
+      }
+      const baseName = files.length > 0 ? files[0].name.replace(/\.pdf$/i, '') : 'extracted';
+      // Re-extract to get proper format
+      const extractedImages = await extractImages(files[0], {
+        pageRange: pageRange || undefined,
+        format: 'PNG',
+      });
+      await downloadExtractedImages(extractedImages, baseName);
+    } else if (tool.id === 'remove-images' || tool.id === 'optimize-images' || tool.id === 'add-qr-code' ||
+               tool.id === 'add-barcode' || tool.id === 'add-bookmarks' || tool.id === 'add-hyperlinks' ||
+               tool.id === 'add-attachments' || tool.id === 'stamp' || tool.id === 'bates-numbering' ||
+               tool.id === 'fill-sign' || tool.id === 'create-form' || tool.id === 'ocr' ||
+               tool.id === 'searchable-pdf' || tool.id === 'repair' || tool.id === 'linearize' ||
+               tool.id === 'color-space' || tool.id === 'pdfa' || tool.id === 'pdfx' ||
+               tool.id === 'grayscale' || tool.id === 'invert-colors' || tool.id === 'remove-annotations') {
+      if (!processedPdfBytes) {
+        setError('PDF file is not ready. Please try processing again.');
+        return;
+      }
+      const baseName = files.length > 0 ? files[0].name.replace(/\.pdf$/i, '') : 'processed';
+      const suffix = tool.id === 'remove-images' ? '_no_images' :
+                     tool.id === 'optimize-images' ? '_optimized' :
+                     tool.id === 'add-qr-code' ? '_qr' :
+                     tool.id === 'add-barcode' ? '_barcode' :
+                     tool.id === 'add-bookmarks' ? '_bookmarked' :
+                     tool.id === 'add-hyperlinks' ? '_hyperlinked' :
+                     tool.id === 'add-attachments' ? '_attached' :
+                     tool.id === 'stamp' ? '_stamped' :
+                     tool.id === 'bates-numbering' ? '_bates' :
+                     tool.id === 'fill-sign' ? '_filled_signed' :
+                     tool.id === 'create-form' ? '_form' :
+                     tool.id === 'ocr' ? '_ocr' :
+                     tool.id === 'searchable-pdf' ? '_searchable' :
+                     tool.id === 'repair' ? '_repaired' :
+                     tool.id === 'linearize' ? '_linearized' :
+                     tool.id === 'color-space' ? '_colorspace' :
+                     tool.id === 'pdfa' ? '_pdfa' :
+                     tool.id === 'pdfx' ? '_pdfx' :
+                     tool.id === 'grayscale' ? '_grayscale' :
+                     tool.id === 'invert-colors' ? '_inverted' :
+                     '_updated';
+      if (tool.id === 'remove-images') {
+        downloadNoImagesPdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
+      } else if (tool.id === 'optimize-images') {
+        downloadOptimizedPdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
+      } else if (tool.id === 'add-qr-code') {
+        downloadQrCodePdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
+      } else if (tool.id === 'add-barcode') {
+        downloadBarcodePdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
+      } else if (tool.id === 'add-bookmarks') {
+        downloadBookmarkedPdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
+      } else if (tool.id === 'add-hyperlinks') {
+        downloadHyperlinkedPdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
+      } else if (tool.id === 'add-attachments') {
+        downloadAttachedPdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
+      } else if (tool.id === 'stamp') {
+        downloadStampedPdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
+      } else if (tool.id === 'bates-numbering') {
+        downloadBatesPdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
+      } else if (tool.id === 'fill-sign') {
+        downloadFillSignPdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
+      } else if (tool.id === 'create-form') {
+        downloadFormPdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
+      } else if (tool.id === 'ocr') {
+        downloadOcrPdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
+      } else if (tool.id === 'searchable-pdf') {
+        downloadSearchablePdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
+      } else if (tool.id === 'repair') {
+        downloadRepairedPdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
+      } else if (tool.id === 'linearize') {
+        downloadLinearizedPdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
+      } else if (tool.id === 'color-space') {
+        downloadColorSpacePdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
+      } else if (tool.id === 'pdfa') {
+        downloadPdfa(processedPdfBytes, `${baseName}${suffix}.pdf`);
+      } else if (tool.id === 'pdfx') {
+        downloadPdfx(processedPdfBytes, `${baseName}${suffix}.pdf`);
+      } else if (tool.id === 'grayscale') {
+        downloadGrayscalePdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
+      } else if (tool.id === 'invert-colors') {
+        downloadInvertedPdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
+      } else {
+        downloadNoAnnotationsPdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
+      }
+    } else if (tool.id === 'compare' || tool.id === 'pdf-statistics' || tool.id === 'accessibility' || tool.id === 'validate') {
+      if (!processedText) {
+        setError('Results are not ready. Please try processing again.');
+        return;
+      }
+      const baseName = files.length > 0 ? files[0].name.replace(/\.pdf$/i, '') : 'result';
+      const extension = tool.id === 'compare' ? '.json' :
+                        tool.id === 'pdf-statistics' ? '.json' :
+                        tool.id === 'accessibility' ? '.json' :
+                        '.json';
+      downloadText(processedText, `${baseName}_${tool.id}${extension}`);
     } else {
       // Stub for other tools
       alert('This is a stub — download functionality will be implemented soon!');
@@ -1737,9 +2877,23 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                   ((tool.id === 'delete-pages' || tool.id === 'extract-pages') && !processedPdfBytes) ||
                   (tool.id === 'reorder' && !processedPdfBytes) ||
                   (tool.id === 'rotate' && !processedPdfBytes) ||
-                  ((tool.id === 'pdf-to-word' || tool.id === 'pdf-to-excel') && !processedPdfBytes) ||
-                  (tool.id === 'pdf-to-text' && !processedText) ||
-                  (tool.id === 'pdf-to-csv' && (!processedCsvFiles || processedCsvFiles.length === 0))
+                  ((tool.id === 'pdf-to-word' || tool.id === 'pdf-to-excel' || tool.id === 'pdf-to-pptx' || 
+                    tool.id === 'html-to-pdf' || tool.id === 'word-to-pdf' || tool.id === 'excel-to-pdf' ||
+                    tool.id === 'compress' || tool.id === 'add-watermark' || tool.id === 'page-numbers' ||
+                    tool.id === 'header-footer' || tool.id === 'add-background' || tool.id === 'crop' ||
+                    tool.id === 'resize' || tool.id === 'flatten' || tool.id === 'metadata' ||
+                    tool.id === 'remove-images' || tool.id === 'optimize-images' || tool.id === 'add-qr-code' ||
+                    tool.id === 'add-barcode' || tool.id === 'add-bookmarks' || tool.id === 'add-hyperlinks' ||
+                    tool.id === 'add-attachments' || tool.id === 'stamp' || tool.id === 'bates-numbering' ||
+                    tool.id === 'fill-sign' || tool.id === 'create-form' || tool.id === 'ocr' ||
+                    tool.id === 'searchable-pdf' || tool.id === 'repair' || tool.id === 'linearize' ||
+                    tool.id === 'color-space' || tool.id === 'pdfa' || tool.id === 'pdfx' ||
+                    tool.id === 'grayscale' || tool.id === 'invert-colors' || tool.id === 'remove-annotations') && !processedPdfBytes) ||
+                  ((tool.id === 'pdf-to-text' || tool.id === 'pdf-to-html' || tool.id === 'pdf-to-markdown' ||
+                   tool.id === 'compare' || tool.id === 'pdf-statistics' || tool.id === 'accessibility' ||
+                   tool.id === 'validate') && !processedText) ||
+                  (tool.id === 'pdf-to-csv' && (!processedCsvFiles || processedCsvFiles.length === 0)) ||
+                  (tool.id === 'extract-images' && (!imageResults || imageResults.length === 0))
                     ? 'opacity-50 cursor-not-allowed' 
                     : ''
                 }`}
@@ -1750,9 +2904,23 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                   ((tool.id === 'delete-pages' || tool.id === 'extract-pages') && !processedPdfBytes) ||
                   (tool.id === 'reorder' && !processedPdfBytes) ||
                   (tool.id === 'rotate' && !processedPdfBytes) ||
-                  ((tool.id === 'pdf-to-word' || tool.id === 'pdf-to-excel') && !processedPdfBytes) ||
-                  (tool.id === 'pdf-to-text' && !processedText) ||
-                  (tool.id === 'pdf-to-csv' && (!processedCsvFiles || processedCsvFiles.length === 0))
+                  ((tool.id === 'pdf-to-word' || tool.id === 'pdf-to-excel' || tool.id === 'pdf-to-pptx' || 
+                    tool.id === 'html-to-pdf' || tool.id === 'word-to-pdf' || tool.id === 'excel-to-pdf' ||
+                    tool.id === 'compress' || tool.id === 'add-watermark' || tool.id === 'page-numbers' ||
+                    tool.id === 'header-footer' || tool.id === 'add-background' || tool.id === 'crop' ||
+                    tool.id === 'resize' || tool.id === 'flatten' || tool.id === 'metadata' ||
+                    tool.id === 'remove-images' || tool.id === 'optimize-images' || tool.id === 'add-qr-code' ||
+                    tool.id === 'add-barcode' || tool.id === 'add-bookmarks' || tool.id === 'add-hyperlinks' ||
+                    tool.id === 'add-attachments' || tool.id === 'stamp' || tool.id === 'bates-numbering' ||
+                    tool.id === 'fill-sign' || tool.id === 'create-form' || tool.id === 'ocr' ||
+                    tool.id === 'searchable-pdf' || tool.id === 'repair' || tool.id === 'linearize' ||
+                    tool.id === 'color-space' || tool.id === 'pdfa' || tool.id === 'pdfx' ||
+                    tool.id === 'grayscale' || tool.id === 'invert-colors' || tool.id === 'remove-annotations') && !processedPdfBytes) ||
+                  ((tool.id === 'pdf-to-text' || tool.id === 'pdf-to-html' || tool.id === 'pdf-to-markdown' ||
+                   tool.id === 'compare' || tool.id === 'pdf-statistics' || tool.id === 'accessibility' ||
+                   tool.id === 'validate') && !processedText) ||
+                  (tool.id === 'pdf-to-csv' && (!processedCsvFiles || processedCsvFiles.length === 0)) ||
+                  (tool.id === 'extract-images' && (!imageResults || imageResults.length === 0))
                 }
               >
                 <FileText size={20} strokeWidth={2} />
@@ -1909,7 +3077,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
           {files.length > 0 && (
             <div className="mb-6 animate-fade-in">
               {/* Reorder pages */}
-              {tool.id === 'reorder' && totalPages && (
+              {tool.id === 'reorder' && totalPages !== null && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50">
                   <p className="text-sm font-medium text-surface-200 mb-2">
                     Reorder Pages
@@ -1943,7 +3111,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               )}
 
               {/* Rotate pages */}
-              {tool.id === 'rotate' && totalPages && (
+              {tool.id === 'rotate' && totalPages !== null && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50">
                   <p className="text-sm font-medium text-surface-200 mb-2">
                     Rotate Pages
@@ -2492,7 +3660,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                             value={afterPageNumber}
                             onChange={(e) => {
                               const val = parseInt(e.target.value);
-                              if (!isNaN(val)) {
+                              if (!isNaN(val) && totalPages !== null) {
                                 // Allow typing, but clamp to valid range
                                 const clamped = Math.max(1, Math.min(totalPages, val));
                                 setAfterPageNumber(clamped);
@@ -2506,12 +3674,12 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                               const val = parseInt(e.target.value);
                               if (isNaN(val) || val < 1) {
                                 setAfterPageNumber(1);
-                              } else if (val > totalPages) {
+                              } else if (totalPages !== null && val > totalPages) {
                                 setAfterPageNumber(totalPages);
                               }
                             }}
                             min={1}
-                            max={totalPages}
+                            max={totalPages ?? 1}
                             className="w-24 px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all"
                           />
                           <span className="text-xs text-surface-500">of {totalPages}</span>
@@ -2655,7 +3823,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                         </button>
                       </div>
                     </div>
-                    {duplicatePageRange && totalPages && (() => {
+                    {duplicatePageRange && totalPages !== null && (() => {
                       try {
                         const pages = parsePageRange(duplicatePageRange, totalPages);
                         const totalNewPages = pages.length * numberOfCopies;
@@ -2761,7 +3929,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                               const customSizeBytes = parseSizeToBytes(customSizeStr);
                               const isValid = !minSizeBytes || customSizeBytes >= minSizeBytes;
                               
-                              if (!isValid && minSizeBytes) {
+                              if (!isValid && minSizeBytes !== null) {
                                 return (
                                   <p className="text-xs text-error-400">
                                     ⚠ Size must be at least {formatBytes(minSizeBytes)} (largest page size)
