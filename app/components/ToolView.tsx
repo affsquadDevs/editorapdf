@@ -18,6 +18,8 @@ import { splitBySizeString, downloadSplitPdfs as downloadSplitBySizePdfs, format
 import { splitByBookmarksSimple, downloadSplitPdfs as downloadSplitByBookmarksPdfs, getBookmarkInfo } from '../lib/pdf/splitByBookmarks';
 import { signPdf, downloadSignedPdf } from '../lib/pdf/signPdf';
 import { loadPdfDocument, getPdfPagesInfo } from '../lib/pdf/pdfRender';
+import { sanitizePdf, downloadSanitizedPdf } from '../lib/pdf/sanitizePdf';
+import { certificateSignPdf, downloadCertificateSignedPdf } from '../lib/pdf/certificateSignPdf';
 import { exportPdf } from '../lib/pdf/exportPdf';
 import { usePdfStore } from '../store/pdfStore';
 import PageRangeSelector from './PageRangeSelector';
@@ -60,7 +62,6 @@ const toolConfigs: Record<string, {
   // ── Security & Protection ──
   sign:              { acceptMultiple: false, uploadLabel: 'Drop a PDF file to sign',                uploadDescription: 'Upload the PDF you want to add a digital signature to', actionLabel: 'Apply Signature',       resultLabel: 'Signed PDF',        steps: ['Upload a PDF file', 'Draw, type, or upload your signature', 'Place the signature and click "Apply Signature"'] },
   redact:            { acceptMultiple: false, uploadLabel: 'Drop a PDF file to redact',              uploadDescription: 'Upload the PDF with sensitive content to black out',     actionLabel: 'Apply Redaction',       resultLabel: 'Redacted PDF',      steps: ['Upload a PDF file', 'Select areas or text to redact', 'Click "Apply Redaction" — this is permanent'] },
-  permissions:       { acceptMultiple: false, uploadLabel: 'Drop a PDF file to set permissions',     uploadDescription: 'Upload the PDF you want to restrict',                   actionLabel: 'Apply Permissions',     resultLabel: 'Restricted PDF',    steps: ['Upload a PDF file', 'Choose what to restrict (print, copy, edit)', 'Click "Apply Permissions" to save'] },
   'remove-hidden-data': { acceptMultiple: false, uploadLabel: 'Drop a PDF to sanitize',             uploadDescription: 'Upload the PDF to remove all hidden data',              actionLabel: 'Sanitize PDF',          resultLabel: 'Sanitized PDF',     steps: ['Upload a PDF file', 'Review hidden data found', 'Click "Sanitize PDF" to remove all hidden content'] },
   certificate:       { acceptMultiple: false, uploadLabel: 'Drop a PDF to certificate-sign',         uploadDescription: 'Upload the PDF and your .pfx/.p12 certificate',         actionLabel: 'Sign with Certificate', resultLabel: 'Certificate-Signed PDF', steps: ['Upload a PDF file', 'Upload your digital certificate (.pfx/.p12)', 'Click "Sign with Certificate"'] },
 
@@ -161,6 +162,10 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
   const [isPositionSelectorOpen, setIsPositionSelectorOpen] = useState<boolean>(false);
   const [isRedactSelectorOpen, setIsRedactSelectorOpen] = useState<boolean>(false);
   const [redactions, setRedactions] = useState<RedactionArea[]>([]);
+  const [certificateFile, setCertificateFile] = useState<File | null>(null);
+  const [certificatePassword, setCertificatePassword] = useState<string>('');
+  const [certificateReason, setCertificateReason] = useState<string>('');
+  const [certificateLocation, setCertificateLocation] = useState<string>('');
   const validationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { setOriginalFile, setPages, setSelectedPageId, pages: storePages, originalFile: storeOriginalFile } = usePdfStore();
 
@@ -835,6 +840,40 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       } finally {
         setIsProcessing(false);
       }
+    } else if (tool.id === 'remove-hidden-data') {
+      // Real sanitize PDF implementation
+      if (files.length === 0) {
+        setError('Please upload a PDF file to sanitize');
+        return;
+      }
+
+      setIsProcessing(true);
+      setError(null);
+
+      try {
+        const file = files[0];
+        const pdfBytes = await sanitizePdf(file, {
+          removeMetadata: true,
+          removeJavaScript: true,
+          removeEmbeddedFiles: true,
+          removeAnnotations: true,
+          removeFormData: true,
+          removeHiddenLayers: true,
+          removeLinks: true,
+        });
+        
+        console.log('Sanitization successful, bytes:', pdfBytes.length);
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        console.error('Error sanitizing PDF:', err);
+        setError(err instanceof Error ? err.message : 'Failed to sanitize PDF. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
     } else if (tool.id === 'redact') {
       // Real redact PDF implementation
       if (files.length === 0) {
@@ -921,6 +960,47 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       } finally {
         setIsProcessing(false);
       }
+    } else if (tool.id === 'certificate') {
+      // Real certificate signing implementation
+      if (files.length === 0) {
+        setError('Please upload a PDF file to sign');
+        return;
+      }
+
+      if (!certificateFile) {
+        setError('Please upload a certificate file (.pfx or .p12)');
+        return;
+      }
+
+      if (!certificatePassword) {
+        setError('Please enter the certificate password');
+        return;
+      }
+
+      setIsProcessing(true);
+      setError(null);
+
+      try {
+        const file = files[0];
+        const pdfBytes = await certificateSignPdf(file, {
+          certificateFile,
+          certificatePassword,
+          reason: certificateReason || undefined,
+          location: certificateLocation || undefined,
+        });
+        
+        console.log('Certificate signing successful, bytes:', pdfBytes.length);
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        console.error('Error signing PDF with certificate:', err);
+        setError(err instanceof Error ? err.message : 'Failed to sign PDF with certificate. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
     } else {
       // Stub for other tools
       setIsProcessing(true);
@@ -961,6 +1041,10 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
     setIsPositionSelectorOpen(false);
     setIsRedactSelectorOpen(false);
     setRedactions([]);
+    setCertificateFile(null);
+    setCertificatePassword('');
+    setCertificateReason('');
+    setCertificateLocation('');
   };
 
   const handleDownload = async () => {
@@ -1158,6 +1242,44 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       
       try {
         downloadRedactedPdf(processedPdfBytes, filename);
+      } catch (err) {
+        console.error('Error downloading PDF:', err);
+        setError('Failed to download PDF. Please try again.');
+      }
+    } else if (tool.id === 'remove-hidden-data') {
+      if (!processedPdfBytes) {
+        console.error('Sanitized PDF bytes not available');
+        setError('Sanitized PDF is not ready. Please try again.');
+        return;
+      }
+      
+      // Generate filename from input file
+      const baseName = files.length > 0 
+        ? files[0].name.replace(/\.pdf$/i, '') 
+        : 'sanitized';
+      const filename = `${baseName}_sanitized.pdf`;
+      
+      try {
+        downloadSanitizedPdf(processedPdfBytes, filename);
+      } catch (err) {
+        console.error('Error downloading PDF:', err);
+        setError('Failed to download PDF. Please try again.');
+      }
+    } else if (tool.id === 'certificate') {
+      if (!processedPdfBytes) {
+        console.error('Certificate-signed PDF bytes not available');
+        setError('Certificate-signed PDF is not ready. Please try again.');
+        return;
+      }
+      
+      // Generate filename from input file
+      const baseName = files.length > 0 
+        ? files[0].name.replace(/\.pdf$/i, '') 
+        : 'certificate-signed';
+      const filename = `${baseName}_certificate-signed.pdf`;
+      
+      try {
+        downloadCertificateSignedPdf(processedPdfBytes, filename);
       } catch (err) {
         console.error('Error downloading PDF:', err);
         setError('Failed to download PDF. Please try again.');
@@ -1727,19 +1849,6 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                       </div>
                     </div>
                   )}
-                </div>
-              )}
-
-              {/* Permissions checkboxes */}
-              {tool.id === 'permissions' && (
-                <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-3">
-                  <p className="text-sm font-medium text-surface-200 mb-3">Restrict Actions</p>
-                  {['Prevent Printing', 'Prevent Copying Text', 'Prevent Editing', 'Prevent Annotations', 'Prevent Form Filling'].map((perm) => (
-                    <label key={perm} className="flex items-center gap-3 cursor-pointer group">
-                      <input type="checkbox" className="w-4 h-4 rounded border-surface-600 bg-surface-800 text-primary-500 focus:ring-primary-500/25" />
-                      <span className="text-sm text-surface-300 group-hover:text-surface-100 transition-colors">{perm}</span>
-                    </label>
-                  ))}
                 </div>
               )}
 
@@ -2357,14 +2466,48 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
 
               {/* Sanitize / Remove hidden data */}
               {tool.id === 'remove-hidden-data' && (
-                <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-3">
-                  <p className="text-sm font-medium text-surface-200 mb-3">Remove Hidden Data</p>
-                  {['Metadata (author, title, dates)', 'JavaScript & Actions', 'Embedded Files & Attachments', 'Comments & Annotations', 'Form Field Data', 'Hidden Layers', 'Cross-references & Links'].map((item) => (
-                    <label key={item} className="flex items-center gap-3 cursor-pointer group">
-                      <input type="checkbox" defaultChecked className="w-4 h-4 rounded border-surface-600 bg-surface-800 text-primary-500 focus:ring-primary-500/25" />
-                      <span className="text-sm text-surface-300 group-hover:text-surface-100 transition-colors">{item}</span>
-                    </label>
-                  ))}
+                <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
+                  <div>
+                    <p className="text-sm font-medium text-surface-200 mb-2">Sanitize PDF</p>
+                    <p className="text-xs text-surface-400 mb-4">
+                      Remove all hidden data, metadata, and sensitive information from your PDF for safe sharing.
+                    </p>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-xs text-surface-300">
+                        <span className="w-1.5 h-1.5 rounded-full bg-success-400"></span>
+                        Metadata (author, title, dates, etc.)
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-surface-300">
+                        <span className="w-1.5 h-1.5 rounded-full bg-success-400"></span>
+                        JavaScript & Actions
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-surface-300">
+                        <span className="w-1.5 h-1.5 rounded-full bg-success-400"></span>
+                        Embedded Files & Attachments
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-surface-300">
+                        <span className="w-1.5 h-1.5 rounded-full bg-success-400"></span>
+                        Comments & Annotations
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-surface-300">
+                        <span className="w-1.5 h-1.5 rounded-full bg-success-400"></span>
+                        Form Field Data
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-surface-300">
+                        <span className="w-1.5 h-1.5 rounded-full bg-success-400"></span>
+                        Hidden Layers
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-surface-300">
+                        <span className="w-1.5 h-1.5 rounded-full bg-success-400"></span>
+                        Cross-references & Links
+                      </div>
+                    </div>
+                  </div>
+                  <div className="pt-3 border-t border-surface-700/50">
+                    <p className="text-xs text-info-400/80">
+                      ℹ️ All hidden data will be removed. The PDF content (text, images, pages) will remain unchanged.
+                    </p>
+                  </div>
                 </div>
               )}
 
@@ -2724,17 +2867,66 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
                   <div>
                     <p className="text-sm font-medium text-surface-200 mb-2">Certificate File (.pfx / .p12)</p>
-                    <div className="h-16 rounded-lg border-2 border-dashed border-surface-600/50 flex items-center justify-center text-surface-500 text-sm cursor-pointer hover:border-primary-500/30 transition-colors">
-                      Click or drop your certificate file here
-                    </div>
+                    <label className="block cursor-pointer">
+                      <div className="h-16 rounded-lg border-2 border-dashed border-surface-600/50 flex items-center justify-center text-surface-500 text-sm hover:border-primary-500/30 transition-colors">
+                        {certificateFile ? certificateFile.name : 'Click or drop your certificate file here'}
+                      </div>
+                      <input
+                        type="file"
+                        accept=".pfx,.p12"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            setCertificateFile(file);
+                          }
+                        }}
+                        className="hidden"
+                      />
+                    </label>
+                    {certificateFile && (
+                      <button
+                        type="button"
+                        onClick={() => setCertificateFile(null)}
+                        className="mt-2 text-xs text-error-400 hover:text-error-300 transition-colors"
+                      >
+                        Remove certificate
+                      </button>
+                    )}
                   </div>
                   <div>
                     <p className="text-sm font-medium text-surface-200 mb-2">Certificate Password</p>
-                    <input type="password" placeholder="Enter certificate password" className="w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all" />
+                    <input
+                      type="password"
+                      value={certificatePassword}
+                      onChange={(e) => setCertificatePassword(e.target.value)}
+                      placeholder="Enter certificate password"
+                      className="w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all"
+                    />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">Reason for Signing</p>
-                    <input type="text" placeholder="e.g. Document approval" className="w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all" />
+                    <p className="text-sm font-medium text-surface-200 mb-2">Reason for Signing (Optional)</p>
+                    <input
+                      type="text"
+                      value={certificateReason}
+                      onChange={(e) => setCertificateReason(e.target.value)}
+                      placeholder="e.g. Document approval"
+                      className="w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all"
+                    />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-surface-200 mb-2">Location (Optional)</p>
+                    <input
+                      type="text"
+                      value={certificateLocation}
+                      onChange={(e) => setCertificateLocation(e.target.value)}
+                      placeholder="e.g. City, Country"
+                      className="w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all"
+                    />
+                  </div>
+                  <div className="pt-3 border-t border-surface-700/50">
+                    <p className="text-xs text-info-400/80">
+                      ℹ️ Note: A visual signature will be added to the PDF with certificate information. For full digital signature support, server-side processing may be required.
+                    </p>
                   </div>
                 </div>
               )}

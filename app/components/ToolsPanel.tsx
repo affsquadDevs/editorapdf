@@ -120,15 +120,11 @@ const toolCategories: ToolCategory[] = [
         icon: <EyeOff size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'permissions', title: 'Set Permissions', description: 'Restrict printing, copying, or editing', color: 'info',
-        icon: <SlidersHorizontal size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
-      },
-      {
         id: 'remove-hidden-data', title: 'Sanitize PDF', description: 'Remove hidden data, metadata, scripts for safe sharing', color: 'accent',
         icon: <ShieldAlert size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'certificate', title: 'Certificate Sign', description: 'Sign PDF with X.509 digital certificate', color: 'accent', comingSoon: true,
+        id: 'certificate', title: 'Certificate Sign', description: 'Sign PDF with X.509 digital certificate', color: 'accent',
         icon: <Award size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
     ],

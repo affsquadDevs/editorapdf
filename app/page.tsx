@@ -373,7 +373,6 @@ export default function Home() {
                       const tools = [
                         { title: 'Sign PDF', desc: 'Digital signature', color: 'primary', icon: <PenTool size={20} strokeWidth={1.5} /> },
                         { title: 'Redact', desc: 'Black out data', color: 'error', icon: <EyeOff size={20} strokeWidth={1.5} /> },
-                        { title: 'Permissions', desc: 'Control access', color: 'info', icon: <SlidersHorizontal size={20} strokeWidth={1.5} /> },
                       ];
                       const colorClasses: Record<string, { bg: string; border: string; text: string; iconBg: string }> = { primary: { bg: 'bg-primary-500/5', border: 'border-primary-500/20 hover:border-primary-500/40', text: 'text-primary-400', iconBg: 'bg-primary-500/15' }, accent: { bg: 'bg-accent-500/5', border: 'border-accent-500/20 hover:border-accent-500/40', text: 'text-accent-400', iconBg: 'bg-accent-500/15' }, success: { bg: 'bg-success-500/5', border: 'border-success-500/20 hover:border-success-500/40', text: 'text-success-400', iconBg: 'bg-success-500/15' }, error: { bg: 'bg-error-500/5', border: 'border-error-500/20 hover:border-error-500/40', text: 'text-error-400', iconBg: 'bg-error-500/15' }, warning: { bg: 'bg-warning-500/5', border: 'border-warning-500/20 hover:border-warning-500/40', text: 'text-warning-400', iconBg: 'bg-warning-500/15' }, info: { bg: 'bg-info-500/5', border: 'border-info-500/20 hover:border-info-500/40', text: 'text-info-400', iconBg: 'bg-info-500/15' } };
                       return (
