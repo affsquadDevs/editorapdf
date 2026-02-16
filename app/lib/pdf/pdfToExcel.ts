@@ -1,0 +1,285 @@
+import { loadPdfDocument } from './pdfRender';
+import { extractTextFromPage } from './pdfExtract';
+
+export interface PdfToExcelOptions {
+  pageRange?: string; // Optional page range (e.g., "1-5", "1,3,5", "all")
+  detectTables?: boolean; // Try to detect and extract tables
+  preserveFormatting?: boolean; // Try to preserve basic formatting
+}
+
+interface TableCell {
+  row: number;
+  col: number;
+  text: string;
+  x: number;
+  y: number;
+}
+
+/**
+ * Convert PDF to Excel (XLSX) document
+ */
+export async function pdfToExcel(
+  file: File,
+  options: PdfToExcelOptions = {}
+): Promise<Uint8Array> {
+  const { pageRange, detectTables = true, preserveFormatting = true } = options;
+
+  // Try to import xlsx library
+  let XLSX: any;
+  try {
+    const xlsxModule = await import('xlsx');
+    XLSX = xlsxModule;
+  } catch (err) {
+    throw new Error('xlsx library is not installed. Please run: npm install xlsx');
+  }
+
+  // Load PDF document
+  const pdfDoc = await loadPdfDocument(file);
+  const totalPages = pdfDoc.numPages;
+
+  // Parse page range
+  let pagesToConvert: number[] = [];
+  
+  if (!pageRange || pageRange.trim() === '' || pageRange.toLowerCase() === 'all') {
+    // Convert all pages
+    pagesToConvert = Array.from({ length: totalPages }, (_, i) => i + 1);
+  } else {
+    // Parse page range (e.g., "1-5", "1,3,5", "1-3,5,7-9")
+    const parts = pageRange.split(',');
+    for (const part of parts) {
+      const trimmed = part.trim();
+      if (trimmed.includes('-')) {
+        // Range (e.g., "1-5")
+        const [start, end] = trimmed.split('-').map(s => parseInt(s.trim(), 10));
+        if (!isNaN(start) && !isNaN(end)) {
+          const rangeStart = Math.max(1, Math.min(start, totalPages));
+          const rangeEnd = Math.max(1, Math.min(end, totalPages));
+          for (let i = rangeStart; i <= rangeEnd; i++) {
+            if (!pagesToConvert.includes(i)) {
+              pagesToConvert.push(i);
+            }
+          }
+        }
+      } else {
+        // Single page
+        const pageNum = parseInt(trimmed, 10);
+        if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= totalPages) {
+          if (!pagesToConvert.includes(pageNum)) {
+            pagesToConvert.push(pageNum);
+          }
+        }
+      }
+    }
+    // Sort pages
+    pagesToConvert.sort((a, b) => a - b);
+  }
+
+  if (pagesToConvert.length === 0) {
+    throw new Error('No valid pages to convert');
+  }
+
+  // Extract text from all pages
+  const allTables: Array<{ page: number; table: string[][] }> = [];
+  
+  for (const pageNumber of pagesToConvert) {
+    const extractedTexts = await extractTextFromPage(pdfDoc, pageNumber);
+    
+    if (extractedTexts.length === 0) {
+      // Empty page - add empty table
+      allTables.push({ page: pageNumber, table: [['']] });
+      continue;
+    }
+
+    if (detectTables) {
+      // Try to detect tables by grouping text by Y position (rows) and X position (columns)
+      const table = detectTableStructure(extractedTexts);
+      allTables.push({ page: pageNumber, table });
+    } else {
+      // Simple line-by-line extraction
+      const lines = groupTextByLines(extractedTexts);
+      const table: string[][] = lines.map(line => [line]);
+      allTables.push({ page: pageNumber, table });
+    }
+  }
+
+  // Create Excel workbook
+  const workbook = XLSX.utils.book_new();
+
+  // Add each page as a separate sheet
+  for (const { page, table } of allTables) {
+    // Convert table to worksheet
+    const worksheet = XLSX.utils.aoa_to_sheet(table);
+    
+    // Auto-size columns
+    const colWidths = table[0]?.map((_, colIndex) => {
+      const maxLength = Math.max(
+        ...table.map(row => {
+          const cellValue = row[colIndex] || '';
+          return String(cellValue).length;
+        })
+      );
+      return { wch: Math.min(Math.max(maxLength, 10), 50) };
+    }) || [];
+    
+    worksheet['!cols'] = colWidths;
+    
+    // Add worksheet to workbook with sheet name
+    const sheetName = `Page ${page}`;
+    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+  }
+
+  // If no tables were found, add a message sheet
+  if (allTables.length === 0 || allTables.every(t => t.table.length === 0 || (t.table.length === 1 && t.table[0].length === 1 && t.table[0][0] === ''))) {
+    const messageSheet = XLSX.utils.aoa_to_sheet([
+      ['No table data found in PDF'],
+      ['This PDF may contain only images or scanned content.'],
+      ['Try using OCR to extract text first.']
+    ]);
+    XLSX.utils.book_append_sheet(workbook, messageSheet, 'Info');
+  }
+
+  // Generate XLSX file
+  const xlsxBuffer = XLSX.write(workbook, { type: 'array', bookType: 'xlsx' });
+  return new Uint8Array(xlsxBuffer);
+}
+
+/**
+ * Group text items by lines (similar Y position)
+ */
+function groupTextByLines(texts: any[]): string[] {
+  const lines: Array<{ y: number; items: any[] }> = [];
+  
+  for (const text of texts) {
+    // Find line with similar Y position (within 0.02 tolerance)
+    let foundLine = false;
+    for (const line of lines) {
+      if (Math.abs(line.y - text.y) < 0.02) {
+        line.items.push(text);
+        foundLine = true;
+        break;
+      }
+    }
+    
+    if (!foundLine) {
+      lines.push({ y: text.y, items: [text] });
+    }
+  }
+  
+  // Sort lines by Y position (top to bottom)
+  lines.sort((a, b) => b.y - a.y);
+  
+  // Convert to string array
+  return lines.map(line => {
+    // Sort items in line by X position (left to right)
+    line.items.sort((a, b) => a.x - b.x);
+    return line.items.map(item => item.text).join(' ');
+  });
+}
+
+/**
+ * Detect table structure from extracted text
+ */
+function detectTableStructure(texts: any[]): string[][] {
+  // Group texts by Y position (rows)
+  const rows: Array<{ y: number; items: any[] }> = [];
+  
+  for (const text of texts) {
+    // Find row with similar Y position (within 0.015 tolerance for better row detection)
+    let foundRow = false;
+    for (const row of rows) {
+      if (Math.abs(row.y - text.y) < 0.015) {
+        row.items.push(text);
+        foundRow = true;
+        break;
+      }
+    }
+    
+    if (!foundRow) {
+      rows.push({ y: text.y, items: [text] });
+    }
+  }
+  
+  // Sort rows by Y position (top to bottom)
+  rows.sort((a, b) => b.y - a.y);
+  
+  // Detect columns by analyzing X positions
+  // Collect all unique X positions
+  const xPositions = new Set<number>();
+  rows.forEach(row => {
+    row.items.forEach(item => {
+      // Round X position to nearest 0.01 to group similar columns
+      const roundedX = Math.round(item.x * 100) / 100;
+      xPositions.add(roundedX);
+    });
+  });
+  
+  // Sort X positions
+  const sortedXPositions = Array.from(xPositions).sort((a, b) => a - b);
+  
+  // If we have many distinct X positions, it might be a table
+  // Otherwise, treat as simple text
+  const isLikelyTable = sortedXPositions.length >= 3 && rows.length >= 2;
+  
+  if (isLikelyTable) {
+    // Build table structure
+    const table: string[][] = [];
+    
+    for (const row of rows) {
+      // Sort items in row by X position
+      row.items.sort((a, b) => a.x - b.x);
+      
+      // Create row array with cells
+      const tableRow: string[] = [];
+      let currentColIndex = 0;
+      
+      for (const xPos of sortedXPositions) {
+        // Find items in this column (within tolerance)
+        const columnItems = row.items.filter(item => {
+          const roundedX = Math.round(item.x * 100) / 100;
+          return Math.abs(roundedX - xPos) < 0.02;
+        });
+        
+        if (columnItems.length > 0) {
+          // Combine items in this column
+          const cellText = columnItems.map(item => item.text).join(' ').trim();
+          tableRow.push(cellText);
+        } else {
+          // Empty cell
+          tableRow.push('');
+        }
+        currentColIndex++;
+      }
+      
+      // Only add row if it has some content
+      if (tableRow.some(cell => cell.trim() !== '')) {
+        table.push(tableRow);
+      }
+    }
+    
+    return table.length > 0 ? table : [['No table structure detected']];
+  } else {
+    // Simple line-by-line format
+    return rows.map(row => {
+      row.items.sort((a, b) => a.x - b.x);
+      return [row.items.map(item => item.text).join(' ')];
+    });
+  }
+}
+
+/**
+ * Download Excel file
+ */
+export function downloadExcel(xlsxBytes: Uint8Array, filename: string): void {
+  const blob = new Blob([xlsxBytes], { 
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+  });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename.endsWith('.xlsx') ? filename : `${filename}.xlsx`;
+  link.style.display = 'none';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}

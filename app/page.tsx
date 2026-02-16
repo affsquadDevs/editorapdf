@@ -9,7 +9,7 @@ import {
   Image, FileText, Table, Code, AlignLeft,
   Minimize2, Droplets, PenLine, QrCode, Info,
   ArrowRight, Shield, Zap, Globe, Sparkles,
-  AlertCircle,
+  AlertCircle, PenSquare,
 } from 'lucide-react';
 
 const siteUrl = 'https://editorapdf.com';

@@ -30,6 +30,12 @@ import SignaturePad from './SignaturePad';
 import SignaturePositionSelector from './SignaturePositionSelector';
 import RedactSelector from './RedactSelector';
 import { redactPdf, downloadRedactedPdf, type RedactionArea } from '../lib/pdf/redactPdf';
+import { pdfToImages, downloadImagesAsZip, type ImageFormat, type ImageResult } from '../lib/pdf/pdfToImages';
+import { imagesToPdf, downloadPdf as downloadImagesPdf } from '../lib/pdf/imagesToPdf';
+import { pdfToWord, downloadWord } from '../lib/pdf/pdfToWord';
+import { pdfToExcel, downloadExcel } from '../lib/pdf/pdfToExcel';
+import { pdfToText, downloadText } from '../lib/pdf/pdfToText';
+import { pdfToCsv, downloadCsv, downloadCsvFiles } from '../lib/pdf/pdfToCsv';
 
 interface ToolViewProps {
   tool: PdfTool;
@@ -133,6 +139,8 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
   const [mergedPdfBytes, setMergedPdfBytes] = useState<Uint8Array | null>(null);
   const [splitPdfResults, setSplitPdfResults] = useState<Array<{ bytes: Uint8Array; filename: string }> | null>(null);
   const [processedPdfBytes, setProcessedPdfBytes] = useState<Uint8Array | null>(null);
+  const [processedText, setProcessedText] = useState<string | null>(null);
+  const [processedCsvFiles, setProcessedCsvFiles] = useState<string[] | null>(null);
   const [pageRange, setPageRange] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState<number | null>(null);
@@ -166,6 +174,10 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
   const [certificatePassword, setCertificatePassword] = useState<string>('');
   const [certificateReason, setCertificateReason] = useState<string>('');
   const [certificateLocation, setCertificateLocation] = useState<string>('');
+  const [imageFormat, setImageFormat] = useState<ImageFormat>('PNG'); // For pdf-to-images: image format
+  const [imageQuality, setImageQuality] = useState<number>(0.92); // For pdf-to-images: image quality (0-1)
+  const [imageScale, setImageScale] = useState<number>(2); // For pdf-to-images: scale factor
+  const [imageResults, setImageResults] = useState<ImageResult[] | null>(null); // For pdf-to-images: converted images
   const validationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { setOriginalFile, setPages, setSelectedPageId, pages: storePages, originalFile: storeOriginalFile } = usePdfStore();
 
@@ -206,6 +218,19 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
           setTotalPages(total);
           // Initialize order as 1, 2, 3, ...
           setPageOrder(Array.from({ length: total }, (_, i) => i));
+        } catch (err) {
+          console.error('Error loading PDF:', err);
+        }
+      }
+      
+      // Load total pages for pdf-to-images and pdf-to-word tools
+      if ((tool.id === 'pdf-to-images' || tool.id === 'pdf-to-word') && validFiles[0].type === 'application/pdf') {
+        try {
+          const { PDFDocument } = await import('pdf-lib');
+          const arrayBuffer = await validFiles[0].arrayBuffer();
+          const pdf = await PDFDocument.load(arrayBuffer);
+          const total = pdf.getPageCount();
+          setTotalPages(total);
         } catch (err) {
           console.error('Error loading PDF:', err);
         }
@@ -1001,6 +1026,200 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       } finally {
         setIsProcessing(false);
       }
+    } else if (tool.id === 'pdf-to-images') {
+      // Real PDF to images implementation
+      if (files.length === 0) {
+        setError('Please upload a PDF file to convert');
+        return;
+      }
+
+      setIsProcessing(true);
+      setError(null);
+
+      try {
+        const file = files[0];
+        const images = await pdfToImages(file, {
+          format: imageFormat,
+          quality: imageQuality,
+          scale: imageScale,
+          pageRange: pageRange || undefined,
+        });
+        
+        console.log(`PDF to images successful: ${images.length} image(s) created`);
+        setImageResults(images);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        console.error('Error converting PDF to images:', err);
+        setError(err instanceof Error ? err.message : 'Failed to convert PDF to images. Please try again.');
+        setIsComplete(false);
+        setImageResults(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'pdf-to-word') {
+      // Real PDF to Word implementation
+      if (files.length === 0) {
+        setError('Please upload a PDF file to convert');
+        return;
+      }
+
+      setIsProcessing(true);
+      setError(null);
+
+      try {
+        const file = files[0];
+        const docxBytes = await pdfToWord(file, {
+          pageRange: pageRange || undefined,
+          preserveFormatting: true,
+          includeImages: false,
+        });
+        
+        console.log('PDF to Word successful, bytes:', docxBytes.length);
+        setProcessedPdfBytes(docxBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        console.error('Error converting PDF to Word:', err);
+        setError(err instanceof Error ? err.message : 'Failed to convert PDF to Word. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'pdf-to-excel') {
+      // Real PDF to Excel implementation
+      if (files.length === 0) {
+        setError('Please upload a PDF file to convert');
+        return;
+      }
+
+      setIsProcessing(true);
+      setError(null);
+
+      try {
+        const file = files[0];
+        const xlsxBytes = await pdfToExcel(file, {
+          pageRange: pageRange || undefined,
+          detectTables: true,
+          preserveFormatting: true,
+        });
+        
+        console.log('PDF to Excel successful, bytes:', xlsxBytes.length);
+        setProcessedPdfBytes(xlsxBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        console.error('Error converting PDF to Excel:', err);
+        setError(err instanceof Error ? err.message : 'Failed to convert PDF to Excel. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'pdf-to-text') {
+      // Real PDF to Text implementation
+      if (files.length === 0) {
+        setError('Please upload a PDF file to convert');
+        return;
+      }
+
+      setIsProcessing(true);
+      setError(null);
+
+      try {
+        const file = files[0];
+        const text = await pdfToText(file, {
+          pageRange: pageRange || undefined,
+          preserveLineBreaks: true,
+          includePageNumbers: false,
+        });
+        
+        console.log('PDF to Text successful, length:', text.length);
+        setProcessedText(text);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        console.error('Error converting PDF to Text:', err);
+        setError(err instanceof Error ? err.message : 'Failed to convert PDF to Text. Please try again.');
+        setIsComplete(false);
+        setProcessedText(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'pdf-to-csv') {
+      // Real PDF to CSV implementation
+      if (files.length === 0) {
+        setError('Please upload a PDF file to convert');
+        return;
+      }
+
+      setIsProcessing(true);
+      setError(null);
+
+      try {
+        const file = files[0];
+        const csvFiles = await pdfToCsv(file, {
+          pageRange: pageRange || undefined,
+          detectTables: true,
+          delimiter: ',',
+          quoteChar: '"',
+          separateFiles: false, // Combine all pages into one CSV
+        });
+        
+        console.log('PDF to CSV successful, files:', csvFiles.length);
+        setProcessedCsvFiles(csvFiles);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        console.error('Error converting PDF to CSV:', err);
+        setError(err instanceof Error ? err.message : 'Failed to convert PDF to CSV. Please try again.');
+        setIsComplete(false);
+        setProcessedCsvFiles(null);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else if (tool.id === 'images-to-pdf') {
+      // Real images to PDF implementation
+      if (files.length === 0) {
+        setError('Please upload at least one image file');
+        return;
+      }
+
+      // Validate that all files are images
+      const invalidFiles = files.filter(
+        file => !file.type.startsWith('image/') && 
+        !file.name.match(/\.(png|jpg|jpeg|webp|gif|bmp)$/i)
+      );
+      
+      if (invalidFiles.length > 0) {
+        setError(`Invalid image files: ${invalidFiles.map(f => f.name).join(', ')}`);
+        return;
+      }
+
+      setIsProcessing(true);
+      setError(null);
+
+      try {
+        const pdfBytes = await imagesToPdf(files, {
+          pageSize: 'A4',
+          orientation: 'portrait',
+          fitToPage: true,
+          margin: 0,
+        });
+        
+        console.log('Images to PDF successful, bytes:', pdfBytes.length);
+        setProcessedPdfBytes(pdfBytes);
+        setIsComplete(true);
+        setError(null);
+      } catch (err) {
+        console.error('Error converting images to PDF:', err);
+        setError(err instanceof Error ? err.message : 'Failed to convert images to PDF. Please try again.');
+        setIsComplete(false);
+        setProcessedPdfBytes(null);
+      } finally {
+        setIsProcessing(false);
+      }
     } else {
       // Stub for other tools
       setIsProcessing(true);
@@ -1018,6 +1237,8 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
     setMergedPdfBytes(null);
     setSplitPdfResults(null);
     setProcessedPdfBytes(null);
+    setProcessedText(null);
+    setProcessedCsvFiles(null);
     setPageRange('');
     setError(null);
     setTotalPages(null);
@@ -1045,6 +1266,10 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
     setCertificatePassword('');
     setCertificateReason('');
     setCertificateLocation('');
+    setImageFormat('PNG');
+    setImageQuality(0.92);
+    setImageScale(2);
+    setImageResults(null);
   };
 
   const handleDownload = async () => {
@@ -1284,6 +1509,138 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
         console.error('Error downloading PDF:', err);
         setError('Failed to download PDF. Please try again.');
       }
+    } else if (tool.id === 'pdf-to-images') {
+      if (!imageResults || imageResults.length === 0) {
+        console.error('Image results not available');
+        setError('Images are not ready. Please try converting again.');
+        return;
+      }
+      
+      try {
+        // Download as ZIP if multiple images, otherwise download single image
+        if (imageResults.length > 1) {
+          await downloadImagesAsZip(imageResults);
+        } else {
+          // Single image download
+          const link = document.createElement('a');
+          link.href = imageResults[0].dataUrl;
+          link.download = imageResults[0].filename;
+          link.style.display = 'none';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      } catch (err) {
+        console.error('Error downloading images:', err);
+        setError('Failed to download images. Please try again.');
+      }
+    } else if (tool.id === 'images-to-pdf') {
+      if (!processedPdfBytes) {
+        console.error('PDF bytes not available');
+        setError('PDF is not ready. Please try converting again.');
+        return;
+      }
+      
+      // Generate filename from input files
+      const baseName = files.length > 0 
+        ? files[0].name.replace(/\.(png|jpg|jpeg|webp|gif|bmp)$/i, '')
+        : 'combined';
+      const filename = files.length === 1
+        ? `${baseName}.pdf`
+        : `${baseName}_combined.pdf`;
+      
+      try {
+        downloadImagesPdf(processedPdfBytes, filename);
+      } catch (err) {
+        console.error('Error downloading PDF:', err);
+        setError('Failed to download PDF. Please try again.');
+      }
+    } else if (tool.id === 'pdf-to-word') {
+      if (!processedPdfBytes) {
+        console.error('Word document bytes not available');
+        setError('Word document is not ready. Please try converting again.');
+        return;
+      }
+      
+      // Generate filename from input file
+      const baseName = files.length > 0 
+        ? files[0].name.replace(/\.pdf$/i, '')
+        : 'converted';
+      const filename = `${baseName}.docx`;
+      
+      try {
+        downloadWord(processedPdfBytes, filename);
+      } catch (err) {
+        console.error('Error downloading Word document:', err);
+        setError('Failed to download Word document. Please try again.');
+      }
+    } else if (tool.id === 'pdf-to-excel') {
+      if (!processedPdfBytes) {
+        console.error('Excel file bytes not available');
+        setError('Excel file is not ready. Please try converting again.');
+        return;
+      }
+      
+      // Generate filename from input file
+      const baseName = files.length > 0 
+        ? files[0].name.replace(/\.pdf$/i, '')
+        : 'converted';
+      const filename = `${baseName}.xlsx`;
+      
+      try {
+        downloadExcel(processedPdfBytes, filename);
+      } catch (err) {
+        console.error('Error downloading Excel file:', err);
+        setError('Failed to download Excel file. Please try again.');
+      }
+    } else if (tool.id === 'pdf-to-text') {
+      if (!processedText) {
+        console.error('Text content not available');
+        setError('Text content is not ready. Please try converting again.');
+        return;
+      }
+      
+      // Generate filename from input file
+      const baseName = files.length > 0 
+        ? files[0].name.replace(/\.pdf$/i, '')
+        : 'extracted';
+      const filename = `${baseName}.txt`;
+      
+      try {
+        downloadText(processedText, filename);
+      } catch (err) {
+        console.error('Error downloading text file:', err);
+        setError('Failed to download text file. Please try again.');
+      }
+    } else if (tool.id === 'pdf-to-csv') {
+      if (!processedCsvFiles || processedCsvFiles.length === 0) {
+        console.error('CSV files not available');
+        setError('CSV files are not ready. Please try converting again.');
+        return;
+      }
+      
+      // Generate filename from input file
+      const baseName = files.length > 0 
+        ? files[0].name.replace(/\.pdf$/i, '')
+        : 'extracted';
+      
+      try {
+        if (processedCsvFiles.length === 1) {
+          // Single CSV file
+          const filename = `${baseName}.csv`;
+          downloadCsv(processedCsvFiles[0], filename);
+        } else {
+          // Multiple CSV files - download as ZIP
+          const csvFiles = processedCsvFiles.map((csv, index) => ({
+            content: csv,
+            filename: `${baseName}_page_${index + 1}`,
+          }));
+          await downloadCsvFiles(csvFiles);
+        }
+      } catch (err) {
+        console.error('Error downloading CSV file(s):', err);
+        setError('Failed to download CSV file(s). Please try again.');
+      }
     } else {
       // Stub for other tools
       alert('This is a stub — download functionality will be implemented soon!');
@@ -1379,7 +1736,10 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                   ((tool.id === 'split' || tool.id === 'split-by-size' || tool.id === 'split-by-bookmarks') && (!splitPdfResults || splitPdfResults.length === 0)) ||
                   ((tool.id === 'delete-pages' || tool.id === 'extract-pages') && !processedPdfBytes) ||
                   (tool.id === 'reorder' && !processedPdfBytes) ||
-                  (tool.id === 'rotate' && !processedPdfBytes)
+                  (tool.id === 'rotate' && !processedPdfBytes) ||
+                  ((tool.id === 'pdf-to-word' || tool.id === 'pdf-to-excel') && !processedPdfBytes) ||
+                  (tool.id === 'pdf-to-text' && !processedText) ||
+                  (tool.id === 'pdf-to-csv' && (!processedCsvFiles || processedCsvFiles.length === 0))
                     ? 'opacity-50 cursor-not-allowed' 
                     : ''
                 }`}
@@ -1389,13 +1749,19 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                   ((tool.id === 'split' || tool.id === 'split-by-size' || tool.id === 'split-by-bookmarks') && (!splitPdfResults || splitPdfResults.length === 0)) ||
                   ((tool.id === 'delete-pages' || tool.id === 'extract-pages') && !processedPdfBytes) ||
                   (tool.id === 'reorder' && !processedPdfBytes) ||
-                  (tool.id === 'rotate' && !processedPdfBytes)
+                  (tool.id === 'rotate' && !processedPdfBytes) ||
+                  ((tool.id === 'pdf-to-word' || tool.id === 'pdf-to-excel') && !processedPdfBytes) ||
+                  (tool.id === 'pdf-to-text' && !processedText) ||
+                  (tool.id === 'pdf-to-csv' && (!processedCsvFiles || processedCsvFiles.length === 0))
                 }
               >
                 <FileText size={20} strokeWidth={2} />
                 Download {config.resultLabel}
                 {(tool.id === 'split' || tool.id === 'split-by-size' || tool.id === 'split-by-bookmarks') && splitPdfResults && splitPdfResults.length > 0 && (
                   <span className="ml-2 text-xs">({splitPdfResults.length} files)</span>
+                )}
+                {tool.id === 'pdf-to-csv' && processedCsvFiles && processedCsvFiles.length > 1 && (
+                  <span className="ml-2 text-xs">({processedCsvFiles.length} files)</span>
                 )}
               </button>
               <button
@@ -1593,19 +1959,123 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                 </div>
               )}
 
-              {/* Image format for pdf-to-images */}
+              {/* Image format and settings for pdf-to-images */}
               {tool.id === 'pdf-to-images' && (
-                <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50">
-                  <p className="text-sm font-medium text-surface-200 mb-3">Image Format</p>
-                  <div className="flex gap-2">
-                    {['PNG', 'JPEG', 'WebP'].map((format) => (
-                      <button
-                        key={format}
-                        className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${format === 'PNG' ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300' : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'}`}
-                      >
-                        {format}
-                      </button>
-                    ))}
+                <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
+                  <div>
+                    <p className="text-sm font-medium text-surface-200 mb-3">Image Format</p>
+                    <div className="flex gap-2">
+                      {(['PNG', 'JPEG', 'WebP'] as ImageFormat[]).map((format) => (
+                        <button
+                          key={format}
+                          onClick={() => setImageFormat(format)}
+                          className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                            format === imageFormat
+                              ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300'
+                              : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'
+                          }`}
+                        >
+                          {format}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Quality slider for JPEG/WebP */}
+                  {(imageFormat === 'JPEG' || imageFormat === 'WebP') && (
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-sm font-medium text-surface-200">Quality</p>
+                        <span className="text-xs text-surface-400">{Math.round(imageQuality * 100)}%</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0.1"
+                        max="1"
+                        step="0.01"
+                        value={imageQuality}
+                        onChange={(e) => setImageQuality(parseFloat(e.target.value))}
+                        className="w-full h-2 bg-surface-700 rounded-lg appearance-none cursor-pointer accent-primary-500"
+                      />
+                      <div className="flex justify-between text-xs text-surface-500 mt-1">
+                        <span>Lower size</span>
+                        <span>Higher quality</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Scale factor */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm font-medium text-surface-200">Resolution Scale</p>
+                      <span className="text-xs text-surface-400">{imageScale}x</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0.5"
+                      max="4"
+                      step="0.5"
+                      value={imageScale}
+                      onChange={(e) => setImageScale(parseFloat(e.target.value))}
+                      className="w-full h-2 bg-surface-700 rounded-lg appearance-none cursor-pointer accent-primary-500"
+                    />
+                    <div className="flex justify-between text-xs text-surface-500 mt-1">
+                      <span>Lower quality</span>
+                      <span>Higher quality</span>
+                    </div>
+                    <p className="text-xs text-surface-500 mt-2">
+                      {imageScale === 1 ? 'Original size' : imageScale < 1 ? 'Reduced size' : 'Enhanced size'} ({imageScale * 100}% of original)
+                    </p>
+                  </div>
+
+                  {/* Page range selector */}
+                  {totalPages && (
+                    <div>
+                      <p className="text-sm font-medium text-surface-200 mb-2">
+                        Pages to Convert (optional)
+                      </p>
+                      <p className="text-xs text-surface-400 mb-3">
+                        Leave empty to convert all pages. Examples: "1-5", "1,3,5", "1-3,5,7-9"
+                      </p>
+                      <input
+                        type="text"
+                        value={pageRange}
+                        onChange={(e) => setPageRange(e.target.value)}
+                        placeholder={`All pages (1-${totalPages})`}
+                        className="w-full px-3 py-2 rounded-lg bg-surface-700/50 border border-surface-600/50 text-surface-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50"
+                      />
+                      {pageRange.trim() && (
+                        <p className="text-xs text-surface-500 mt-2">
+                          PDF has {totalPages} page{totalPages !== 1 ? 's' : ''}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Page range for pdf-to-word */}
+              {tool.id === 'pdf-to-word' && totalPages && (
+                <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-3">
+                  <div>
+                    <p className="text-sm font-medium text-surface-200 mb-2">
+                      Pages to Convert (optional)
+                    </p>
+                    <p className="text-xs text-surface-400 mb-3">
+                      Leave empty to convert all pages. Examples: "1-5", "1,3,5", "1-3,5,7-9"
+                    </p>
+                    <input
+                      type="text"
+                      value={pageRange}
+                      onChange={(e) => setPageRange(e.target.value)}
+                      placeholder={`All pages (1-${totalPages})`}
+                      className="w-full px-3 py-2 rounded-lg bg-surface-700/50 border border-surface-600/50 text-surface-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50"
+                    />
+                    {pageRange.trim() && (
+                      <p className="text-xs text-surface-500 mt-2">
+                        PDF has {totalPages} page{totalPages !== 1 ? 's' : ''}
+                      </p>
+                    )}
                   </div>
                 </div>
               )}
@@ -2960,7 +3430,8 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                 onClick={handleProcess}
                 disabled={
                   isProcessing ||
-                  (config.acceptMultiple && files.length < 2) ||
+                  (config.acceptMultiple && tool.id !== 'images-to-pdf' && files.length < 2) ||
+                  (tool.id === 'images-to-pdf' && files.length < 1) ||
                   (tool.id === 'split' && !pageRange.trim()) ||
                   (tool.id === 'split-by-size' && files.length === 0) ||
                   (tool.id === 'split-by-bookmarks' && (!bookmarkInfo || !bookmarkInfo.hasBookmarks)) ||
@@ -2971,7 +3442,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                 className={`
                   w-full btn-primary btn-lg font-semibold justify-center
                   ${isProcessing ? 'opacity-75 cursor-wait' : ''}
-                  ${(config.acceptMultiple && files.length < 2) || (tool.id === 'split' && !pageRange.trim()) || (tool.id === 'split-by-size' && files.length === 0) || ((tool.id === 'delete-pages' || tool.id === 'extract-pages') && !pageRange.trim()) || (tool.id === 'reorder' && (!totalPages || pageOrder.length === 0)) || (tool.id === 'rotate' && (!totalPages || Object.keys(pageRotations).length === 0)) ? 'opacity-50 cursor-not-allowed' : ''}
+                  ${(config.acceptMultiple && tool.id !== 'images-to-pdf' && files.length < 2) || (tool.id === 'images-to-pdf' && files.length < 1) || (tool.id === 'split' && !pageRange.trim()) || (tool.id === 'split-by-size' && files.length === 0) || ((tool.id === 'delete-pages' || tool.id === 'extract-pages') && !pageRange.trim()) || (tool.id === 'reorder' && (!totalPages || pageOrder.length === 0)) || (tool.id === 'rotate' && (!totalPages || Object.keys(pageRotations).length === 0)) ? 'opacity-50 cursor-not-allowed' : ''}
                 `}
               >
                 {isProcessing ? (
@@ -2986,9 +3457,14 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                   </>
                 )}
               </button>
-              {config.acceptMultiple && files.length < 2 && (
+              {config.acceptMultiple && tool.id !== 'images-to-pdf' && files.length < 2 && (
                 <p className="text-xs text-surface-500 text-center mt-2">
                   Please add at least 2 files
+                </p>
+              )}
+              {tool.id === 'images-to-pdf' && files.length < 1 && (
+                <p className="text-xs text-surface-500 text-center mt-2">
+                  Please add at least 1 image file
                 </p>
               )}
               {tool.id === 'split' && !pageRange.trim() && (
