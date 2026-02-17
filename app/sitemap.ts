@@ -3,12 +3,100 @@ import { MetadataRoute } from 'next'
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://editorapdf.com' // Replace with your actual domain
   
+  // All available PDF tools (excluding comingSoon ones)
+  const tools = [
+    // Organize & Pages
+    'merge',
+    'split',
+    'delete-pages',
+    'extract-pages',
+    'reorder',
+    'rotate',
+    'insert-blank',
+    'duplicate-pages',
+    'reverse-order',
+    'split-by-size',
+    'split-by-bookmarks',
+    // Security & Protection
+    'sign',
+    'redact',
+    'remove-hidden-data',
+    'certificate',
+    // Convert
+    'pdf-to-images',
+    'images-to-pdf',
+    'pdf-to-word',
+    'pdf-to-excel',
+    'pdf-to-text',
+    'pdf-to-csv',
+    'pdf-to-html',
+    'pdf-to-markdown',
+    // Edit & Enhance (all available)
+    'compress',
+    'add-watermark',
+    'page-numbers',
+    'crop',
+    'resize',
+    'grayscale',
+    'invert-colors',
+    'flatten',
+    'remove-annotations',
+    // Content & Media (all available)
+    'extract-images',
+    'remove-images',
+    'optimize-images',
+    'add-qr-code',
+    'add-barcode',
+    'add-bookmarks',
+    'add-hyperlinks',
+    'add-attachments',
+    // Forms & Signing (all available)
+    'fill-sign',
+    'stamp',
+    'bates-numbering',
+    'create-form',
+    // OCR & Text (all available)
+    'ocr',
+    'searchable-pdf',
+    // Analyze & Optimize (all available)
+    'compare',
+    'repair',
+    'metadata',
+    'pdf-statistics',
+    'linearize',
+    'color-space',
+    'accessibility',
+    'pdfa',
+    'pdfx',
+    'validate',
+  ]
+  
+  // Generate tool URLs
+  const toolUrls = tools.map(toolId => ({
+    url: `${baseUrl}/tools/${toolId}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+  }))
+  
   return [
     {
       url: baseUrl,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 1,
+    },
+    {
+      url: `${baseUrl}/edit`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.95,
+    },
+    {
+      url: `${baseUrl}/tools`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.95,
     },
     {
       url: `${baseUrl}/how-it-works`,
@@ -94,5 +182,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'monthly',
       priority: 0.5,
     },
+    // Add all tool URLs
+    ...toolUrls,
   ]
 }
