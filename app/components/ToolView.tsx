@@ -82,7 +82,6 @@ interface ToolViewProps {
   tool: PdfTool;
   onBack: () => void;
 }
-
 // Tool-specific configurations
 const toolConfigs: Record<string, {
   acceptMultiple: boolean;
@@ -272,6 +271,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
 
     if (config.acceptMultiple) {
       setFiles(prev => [...prev, ...validFiles]);
+      console.log(1)
     } else {
       setFiles([validFiles[0]]);
       
