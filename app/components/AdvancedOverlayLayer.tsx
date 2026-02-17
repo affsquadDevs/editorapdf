@@ -114,11 +114,13 @@ export default function AdvancedOverlayLayer({ pageId, pageWidth, pageHeight, zo
     fontStyle: string
   ) => {
     // Padding around text inside the box:
-    // top/left = 2px, bottom/right = 4px (user asked +2px on bottom & right)
-    const paddingTop = 2;
-    const paddingLeft = 2;
-    const paddingBottom = 4;
-    const paddingRight = 4;
+    // Padding пропорційний до fontSize, щоб відповідати прев'ю:
+    // paddingTop/Left = fontSize * 0.125 (2px при fontSize=16)
+    // paddingBottom/Right = fontSize * 0.25 (4px при fontSize=16)
+    const paddingTop = fontSizePx * 0.125;
+    const paddingLeft = fontSizePx * 0.125;
+    const paddingBottom = fontSizePx * 0.25;
+    const paddingRight = fontSizePx * 0.25;
     const lineHeight = 1; // keep consistent with rendered text
     const roundPx = (v: number) => Math.round(v * 2) / 2; // 0.5px steps -> less jitter
     const canvas = document.createElement('canvas');
@@ -894,15 +896,14 @@ export default function AdvancedOverlayLayer({ pageId, pageWidth, pageHeight, zo
                 />
               )}
 
-              {/* Text Content - рівно по розміру тексту з 2px padding */}
+              {/* Text Content - рівно по розміру тексту з padding пропорційним до fontSize */}
               <div
                 className="relative w-full h-full flex break-words"
                 style={{
-                  // Scale padding with zoom so text remains visually centered at different zoom levels
-                  padding: `${Math.max(1, Math.round(2 * zoom))}px ${Math.max(1, Math.round(4 * zoom))}px ${Math.max(
-                    1,
-                    Math.round(4 * zoom)
-                  )}px ${Math.max(1, Math.round(2 * zoom))}px`,
+                  // Padding пропорційний до fontSize, а не до zoom, щоб відповідати прев'ю
+                  // paddingTop/Left = fontSize * 0.125 (2px при fontSize=16)
+                  // paddingBottom/Right = fontSize * 0.25 (4px при fontSize=16)
+                  padding: `${overlay.fontSize * 0.125 * zoom}px ${overlay.fontSize * 0.25 * zoom}px ${overlay.fontSize * 0.25 * zoom}px ${overlay.fontSize * 0.125 * zoom}px`,
                   alignItems: 'center',
                   justifyContent:
                     (overlay.textAlign || 'left') === 'center'

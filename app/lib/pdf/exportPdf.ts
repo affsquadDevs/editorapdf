@@ -124,38 +124,53 @@ async function applyTextOverlay(
   }
   
   // Calculate text position with padding
-  const padding = 4;
-  const x = overlay.x * pageWidth + padding;
-  const boxWidth = (overlay.boxWidth || 0.25) * pageWidth - (padding * 2);
-  
+  // Padding пропорційний до fontSize, щоб відповідати редактору:
+  // paddingTop/Left = fontSize * 0.125 (2px при fontSize=16)
+  // paddingBottom/Right = fontSize * 0.25 (4px при fontSize=16)
   const color = hexToRgb(overlay.color);
   const lines = overlay.text.split('\n');
   let fontSize = overlay.fontSize;
   
   // Auto-reduce font size if text doesn't fit in box
-  if (overlay.backgroundColor && boxWidth > 0) {
-    let maxLineWidth = 0;
-    for (const line of lines) {
-      if (line.trim()) {
-        const lineWidth = font.widthOfTextAtSize(line, fontSize);
-        maxLineWidth = Math.max(maxLineWidth, lineWidth);
-      }
-    }
+  if (overlay.backgroundColor) {
+    // Calculate padding based on fontSize (same as in editor)
+    let paddingLeft = fontSize * 0.125;
+    let paddingRight = fontSize * 0.25;
+    let boxWidth = (overlay.boxWidth || 0.25) * pageWidth - (paddingLeft + paddingRight);
     
-    while (maxLineWidth > boxWidth && fontSize > 6) {
-      fontSize -= 0.5;
-      maxLineWidth = 0;
+    if (boxWidth > 0) {
+      let maxLineWidth = 0;
       for (const line of lines) {
         if (line.trim()) {
           const lineWidth = font.widthOfTextAtSize(line, fontSize);
           maxLineWidth = Math.max(maxLineWidth, lineWidth);
         }
       }
+      
+      while (maxLineWidth > boxWidth && fontSize > 6) {
+        fontSize -= 0.5;
+        // Recalculate padding with new fontSize
+        paddingLeft = fontSize * 0.125;
+        paddingRight = fontSize * 0.25;
+        boxWidth = (overlay.boxWidth || 0.25) * pageWidth - (paddingLeft + paddingRight);
+        maxLineWidth = 0;
+        for (const line of lines) {
+          if (line.trim()) {
+            const lineWidth = font.widthOfTextAtSize(line, fontSize);
+            maxLineWidth = Math.max(maxLineWidth, lineWidth);
+          }
+        }
+      }
     }
   }
   
+  // Calculate final padding based on final fontSize
+  const paddingLeft = fontSize * 0.125;
+  const paddingTop = fontSize * 0.125;
+  const x = overlay.x * pageWidth + paddingLeft;
+  
   // Draw text lines
-  let currentY = pageHeight - (overlay.y * pageHeight) - fontSize - padding;
+  let currentY = pageHeight - (overlay.y * pageHeight) - fontSize - paddingTop;
   const lineHeight = fontSize * 1.4;
   
   for (const line of lines) {

@@ -38,12 +38,29 @@ export async function compressPdf(
     pdfDoc.setModificationDate(new Date());
   }
 
-  // Save with compression options
-  // pdf-lib automatically applies compression
-  const pdfBytes = await pdfDoc.save({
-    useObjectStreams: true, // Enable object streams for better compression
+  // Save with compression options based on quality level
+  // pdf-lib automatically applies compression, but we can adjust settings
+  const saveOptions: any = {
     addDefaultPage: false,
-  });
+  };
+
+  // Apply different compression strategies based on quality
+  switch (quality) {
+    case 'high':
+      // Maximum compression: use object streams and remove unnecessary data
+      saveOptions.useObjectStreams = true;
+      break;
+    case 'medium':
+      // Balanced compression
+      saveOptions.useObjectStreams = true;
+      break;
+    case 'low':
+      // Minimal compression: preserve quality
+      saveOptions.useObjectStreams = false;
+      break;
+  }
+
+  const pdfBytes = await pdfDoc.save(saveOptions);
 
   return pdfBytes;
 }

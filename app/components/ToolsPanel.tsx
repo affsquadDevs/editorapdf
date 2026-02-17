@@ -198,47 +198,39 @@ const toolCategories: ToolCategory[] = [
     icon: <PenLine size={20} strokeWidth={1.5} />,
     tools: [
       {
-        id: 'compress', title: 'Compress PDF', description: 'Reduce file size while maintaining quality', color: 'success',
+        id: 'compress', title: 'Compress PDF', description: 'Reduce file size while maintaining quality', color: 'success', comingSoon: true,
         icon: <Minimize2 size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'add-watermark', title: 'Add Watermark', description: 'Overlay text or image watermark on pages', color: 'info',
+        id: 'add-watermark', title: 'Add Watermark', description: 'Overlay text or image watermark on pages', color: 'info', comingSoon: true,
         icon: <Droplets size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'page-numbers', title: 'Add Page Numbers', description: 'Insert page numbers with custom positioning', color: 'primary',
+        id: 'page-numbers', title: 'Add Page Numbers', description: 'Insert page numbers with custom positioning', color: 'primary', comingSoon: true,
         icon: <ListOrdered size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'header-footer', title: 'Header & Footer', description: 'Add custom headers and footers to all pages', color: 'accent',
-        icon: <PanelTop size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
-      },
-      {
-        id: 'add-background', title: 'Add Background', description: 'Add a color or image background to all pages', color: 'warning',
-        icon: <Palette size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
-      },
-      {
-        id: 'crop', title: 'Crop Pages', description: 'Crop or trim PDF page margins', color: 'error',
+        id: 'crop', title: 'Crop Pages', description: 'Crop or trim PDF page margins', color: 'error', comingSoon: true,
         icon: <Crop size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'resize', title: 'Resize Pages', description: 'Change page size (A4, Letter, custom)', color: 'info',
+        id: 'resize', title: 'Resize Pages', description: 'Change page size (A4, Letter, custom)', color: 'info', comingSoon: true,
         icon: <Maximize2 size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'grayscale', title: 'Grayscale PDF', description: 'Convert colored PDF to black & white', color: 'primary',
+        id: 'grayscale', title: 'Grayscale PDF', description: 'Convert colored PDF to black & white', color: 'primary', comingSoon: true,
         icon: <Contrast size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'invert-colors', title: 'Invert Colors', description: 'Invert PDF colors for dark mode reading', color: 'accent',
+        id: 'invert-colors', title: 'Invert Colors', description: 'Invert PDF colors for dark mode reading', color: 'accent', comingSoon: true,
         icon: <Moon size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'flatten', title: 'Flatten PDF', description: 'Flatten form fields and annotations into content', color: 'warning',
+        id: 'flatten', title: 'Flatten PDF', description: 'Flatten form fields and annotations into content', color: 'warning', comingSoon: true,
         icon: <Layers size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'remove-annotations', title: 'Remove Annotations', description: 'Strip all comments, highlights, and notes', color: 'error',
+        id: 'remove-annotations', title: 'Remove Annotations', description: 'Strip all comments, highlights, and notes', color: 'error', comingSoon: true,
         icon: <MessageSquareX size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
     ],
@@ -253,35 +245,35 @@ const toolCategories: ToolCategory[] = [
     icon: <Image size={20} strokeWidth={1.5} />,
     tools: [
       {
-        id: 'extract-images', title: 'Extract Images', description: 'Pull out all embedded images from a PDF', color: 'accent',
+        id: 'extract-images', title: 'Extract Images', description: 'Pull out all embedded images from a PDF', color: 'accent', comingSoon: true,
         icon: <ImageDown size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'remove-images', title: 'Remove Images', description: 'Strip all images from PDF, keep text only', color: 'error',
+        id: 'remove-images', title: 'Remove Images', description: 'Strip all images from PDF, keep text only', color: 'error', comingSoon: true,
         icon: <ImageOff size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'optimize-images', title: 'Optimize Images', description: 'Downscale and optimize images inside PDF', color: 'success',
+        id: 'optimize-images', title: 'Optimize Images', description: 'Downscale and optimize images inside PDF', color: 'success', comingSoon: true,
         icon: <Zap size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'add-qr-code', title: 'Add QR Code', description: 'Insert QR codes with links or text onto pages', color: 'primary',
+        id: 'add-qr-code', title: 'Add QR Code', description: 'Insert QR codes with links or text onto pages', color: 'primary', comingSoon: true,
         icon: <QrCode size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'add-barcode', title: 'Add Barcode', description: 'Insert barcodes (Code128, EAN, UPC) into PDF', color: 'warning',
+        id: 'add-barcode', title: 'Add Barcode', description: 'Insert barcodes (Code128, EAN, UPC) into PDF', color: 'warning', comingSoon: true,
         icon: <ScanBarcode size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'add-bookmarks', title: 'Add Bookmarks', description: 'Create or edit bookmarks and table of contents', color: 'info',
+        id: 'add-bookmarks', title: 'Add Bookmarks', description: 'Create or edit bookmarks and table of contents', color: 'info', comingSoon: true,
         icon: <BookMarked size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'add-hyperlinks', title: 'Add Hyperlinks', description: 'Add or edit clickable links in your PDF', color: 'accent',
+        id: 'add-hyperlinks', title: 'Add Hyperlinks', description: 'Add or edit clickable links in your PDF', color: 'accent', comingSoon: true,
         icon: <Link2 size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'add-attachments', title: 'Embed Attachments', description: 'Embed files (images, docs, data) inside PDF', color: 'primary',
+        id: 'add-attachments', title: 'Embed Attachments', description: 'Embed files (images, docs, data) inside PDF', color: 'primary', comingSoon: true,
         icon: <Paperclip size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
     ],
@@ -296,15 +288,15 @@ const toolCategories: ToolCategory[] = [
     icon: <PenLine size={20} strokeWidth={1.5} />,
     tools: [
       {
-        id: 'fill-sign', title: 'Fill & Sign', description: 'Fill out forms and add your signature', color: 'primary',
+        id: 'fill-sign', title: 'Fill & Sign', description: 'Fill out forms and add your signature', color: 'primary', comingSoon: true,
         icon: <PenLine size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'stamp', title: 'Add Stamp', description: 'Place stamps: Approved, Draft, Confidential, etc.', color: 'error',
+        id: 'stamp', title: 'Add Stamp', description: 'Place stamps: Approved, Draft, Confidential, etc.', color: 'error', comingSoon: true,
         icon: <Stamp size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'bates-numbering', title: 'Bates Numbering', description: 'Add sequential Bates numbers for legal documents', color: 'warning',
+        id: 'bates-numbering', title: 'Bates Numbering', description: 'Add sequential Bates numbers for legal documents', color: 'warning', comingSoon: true,
         icon: <Binary size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
@@ -342,27 +334,27 @@ const toolCategories: ToolCategory[] = [
     icon: <BarChart3 size={20} strokeWidth={1.5} />,
     tools: [
       {
-        id: 'compare', title: 'Compare PDFs', description: 'Highlight differences between two PDF files', color: 'accent',
+        id: 'compare', title: 'Compare PDFs', description: 'Highlight differences between two PDF files', color: 'accent', comingSoon: true,
         icon: <GitCompareArrows size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'repair', title: 'Repair PDF', description: 'Fix corrupted or damaged PDF files', color: 'error',
+        id: 'repair', title: 'Repair PDF', description: 'Fix corrupted or damaged PDF files', color: 'error', comingSoon: true,
         icon: <Wrench size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'metadata', title: 'Edit Metadata', description: 'View & edit title, author, keywords, dates', color: 'primary',
+        id: 'metadata', title: 'Edit Metadata', description: 'View & edit title, author, keywords, dates', color: 'primary', comingSoon: true,
         icon: <Info size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'pdf-statistics', title: 'PDF Statistics', description: 'Count pages, words, images, fonts, file breakdown', color: 'info',
+        id: 'pdf-statistics', title: 'PDF Statistics', description: 'Count pages, words, images, fonts, file breakdown', color: 'info', comingSoon: true,
         icon: <BarChart3 size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'linearize', title: 'Linearize (Fast Web)', description: 'Optimize PDF for fast web viewing', color: 'success',
+        id: 'linearize', title: 'Linearize (Fast Web)', description: 'Optimize PDF for fast web viewing', color: 'success', comingSoon: true,
         icon: <Bolt size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'color-space', title: 'Convert Color Space', description: 'Convert between RGB and CMYK for print', color: 'warning',
+        id: 'color-space', title: 'Convert Color Space', description: 'Convert between RGB and CMYK for print', color: 'warning', comingSoon: true,
         icon: <Paintbrush size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {

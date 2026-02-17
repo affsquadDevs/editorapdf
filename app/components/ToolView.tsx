@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import type { PdfTool } from './ToolsPanel';
 import {
   ArrowLeft, CheckCircle, Upload, X, FileText, Plus,
-  CircleCheck, GripVertical, Zap
+  CircleCheck, GripVertical, Zap, PenSquare
 } from 'lucide-react';
 import { mergePdf, downloadMergedPdf } from '../lib/pdf/mergePdf';
 import { splitPdf, parsePageRange, downloadSplitPdfs } from '../lib/pdf/splitPdf';
@@ -43,10 +43,9 @@ import { htmlToPdf, downloadPdf as downloadHtmlPdf } from '../lib/pdf/htmlToPdf'
 import { wordToPdf, downloadPdf as downloadWordPdf } from '../lib/pdf/wordToPdf';
 import { excelToPdf, downloadPdf as downloadExcelPdf } from '../lib/pdf/excelToPdf';
 import { compressPdf, downloadCompressedPdf } from '../lib/pdf/compressPdf';
-import { addWatermark, downloadWatermarkedPdf } from '../lib/pdf/addWatermark';
+import { addWatermark, downloadWatermarkedPdf, type WatermarkConfig } from '../lib/pdf/addWatermark';
+import WatermarkPreview from './WatermarkPreview';
 import { addPageNumbers, downloadNumberedPdf } from '../lib/pdf/addPageNumbers';
-import { addHeaderFooter, downloadHeaderFooterPdf } from '../lib/pdf/addHeaderFooter';
-import { addBackground, downloadBackgroundPdf } from '../lib/pdf/addBackground';
 import { cropPages, downloadCroppedPdf } from '../lib/pdf/cropPages';
 import { resizePages, downloadResizedPdf } from '../lib/pdf/resizePages';
 import { flattenPdf, downloadFlattenedPdf } from '../lib/pdf/flattenPdf';
@@ -130,8 +129,6 @@ const toolConfigs: Record<string, {
   compress:          { acceptMultiple: false, uploadLabel: 'Drop a PDF file to compress',            uploadDescription: 'Upload the PDF you want to reduce in size',             actionLabel: 'Compress PDF',          resultLabel: 'Compressed PDF',    steps: ['Upload a PDF file', 'Choose compression level', 'Click "Compress PDF" to reduce size'] },
   'add-watermark':   { acceptMultiple: false, uploadLabel: 'Drop a PDF file to watermark',           uploadDescription: 'Upload the PDF you want to add a watermark to',         actionLabel: 'Add Watermark',         resultLabel: 'Watermarked PDF',   steps: ['Upload a PDF file', 'Configure watermark text or image', 'Click "Add Watermark" to apply'] },
   'page-numbers':    { acceptMultiple: false, uploadLabel: 'Drop a PDF to add page numbers',         uploadDescription: 'Upload the PDF you want to number',                     actionLabel: 'Add Page Numbers',      resultLabel: 'Numbered PDF',      steps: ['Upload a PDF file', 'Choose position, style, and starting number', 'Click "Add Page Numbers" to apply'] },
-  'header-footer':   { acceptMultiple: false, uploadLabel: 'Drop a PDF to add headers/footers',      uploadDescription: 'Upload the PDF to add custom header and footer',        actionLabel: 'Apply Header & Footer', resultLabel: 'Updated PDF',       steps: ['Upload a PDF file', 'Enter header and footer text', 'Click "Apply Header & Footer" to save'] },
-  'add-background':  { acceptMultiple: false, uploadLabel: 'Drop a PDF to add a background',         uploadDescription: 'Upload the PDF to add a color or image background',     actionLabel: 'Apply Background',      resultLabel: 'Updated PDF',       steps: ['Upload a PDF file', 'Choose background color or image', 'Click "Apply Background" to apply'] },
   crop:              { acceptMultiple: false, uploadLabel: 'Drop a PDF file to crop',                uploadDescription: 'Upload the PDF with pages to crop or trim',             actionLabel: 'Crop Pages',            resultLabel: 'Cropped PDF',       steps: ['Upload a PDF file', 'Set crop margins or draw crop area', 'Click "Crop Pages" to apply'] },
   resize:            { acceptMultiple: false, uploadLabel: 'Drop a PDF file to resize',              uploadDescription: 'Upload the PDF to change page dimensions',              actionLabel: 'Resize Pages',          resultLabel: 'Resized PDF',       steps: ['Upload a PDF file', 'Choose target page size (A4, Letter, custom)', 'Click "Resize Pages" to apply'] },
   grayscale:         { acceptMultiple: false, uploadLabel: 'Drop a PDF to convert to grayscale',     uploadDescription: 'Upload the PDF to convert to black & white',            actionLabel: 'Convert to Grayscale',  resultLabel: 'Grayscale PDF',     steps: ['Upload a PDF file', 'Preview grayscale conversion', 'Click "Convert to Grayscale" to apply'] },
@@ -219,6 +216,48 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
   const [imageQuality, setImageQuality] = useState<number>(0.92); // For pdf-to-images: image quality (0-1)
   const [imageScale, setImageScale] = useState<number>(2); // For pdf-to-images: scale factor
   const [imageResults, setImageResults] = useState<ImageResult[] | null>(null); // For pdf-to-images: converted images
+  const [compressionLevel, setCompressionLevel] = useState<'low' | 'medium' | 'high'>('medium'); // For compress: compression level
+  // Load watermarks from localStorage on mount or when tool changes
+  const [watermarks, setWatermarks] = useState<WatermarkConfig[]>([]);
+  
+  // Load watermarks from localStorage when tool becomes 'add-watermark'
+  useEffect(() => {
+    if (tool.id === 'add-watermark' && typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('pdfeditor_watermarks');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          // imageDataUrl is already saved, imageFile will be null (we'll use imageDataUrl)
+          setWatermarks(parsed);
+        }
+      } catch (e) {
+        console.error('Error loading watermarks from localStorage:', e);
+        setWatermarks([]);
+      }
+    } else {
+      // Clear watermarks when switching to a different tool
+      setWatermarks([]);
+    }
+  }, [tool.id]);
+  
+  // Save watermarks to localStorage whenever they change (only for add-watermark tool)
+  useEffect(() => {
+    if (tool.id === 'add-watermark' && typeof window !== 'undefined') {
+      try {
+        // Remove imageFile before saving (we keep imageDataUrl instead)
+        const watermarksToSave = watermarks.map(w => {
+          const { imageFile, ...rest } = w;
+          return rest;
+        });
+        localStorage.setItem('pdfeditor_watermarks', JSON.stringify(watermarksToSave));
+      } catch (e) {
+        console.error('Error saving watermarks to localStorage:', e);
+      }
+    }
+  }, [watermarks, tool.id]);
+
+  const [isWatermarkPreviewOpen, setIsWatermarkPreviewOpen] = useState(false); // For add-watermark: preview modal
+  const [editingWatermarkId, setEditingWatermarkId] = useState<string | null>(null); // For add-watermark: currently editing watermark
   const validationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { setOriginalFile, setPages, setSelectedPageId, pages: storePages, originalFile: storeOriginalFile } = usePdfStore();
 
@@ -1374,8 +1413,8 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       try {
         const file = files[0];
         const pdfBytes = await compressPdf(file, {
-          quality: 'medium',
-          removeMetadata: false,
+          quality: compressionLevel,
+          removeMetadata: compressionLevel === 'high', // Remove metadata for high compression
           optimizeImages: true,
         });
         setProcessedPdfBytes(pdfBytes);
@@ -1397,16 +1436,23 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       setError(null);
       try {
         const file = files[0];
-        // Note: Watermark text/image should come from UI state
+        if (watermarks.length === 0) {
+          setError('Please add at least one watermark');
+          setIsProcessing(false);
+          return;
+        }
         const pdfBytes = await addWatermark(file, {
-          text: 'WATERMARK', // This should come from UI
+          watermarks: watermarks,
           pageRange: pageRange || undefined,
-          position: 'diagonal',
-          opacity: 0.3,
         });
         setProcessedPdfBytes(pdfBytes);
         setIsComplete(true);
         setError(null);
+        // Clear watermarks after successful application to avoid confusion
+        setWatermarks([]);
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('pdfeditor_watermarks');
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to add watermark. Please try again.');
         setIsComplete(false);
@@ -1434,54 +1480,6 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to add page numbers. Please try again.');
-        setIsComplete(false);
-        setProcessedPdfBytes(null);
-      } finally {
-        setIsProcessing(false);
-      }
-    } else if (tool.id === 'header-footer') {
-      if (files.length === 0) {
-        setError('Please upload a PDF file');
-        return;
-      }
-      setIsProcessing(true);
-      setError(null);
-      try {
-        const file = files[0];
-        const pdfBytes = await addHeaderFooter(file, {
-          headerText: '', // Should come from UI
-          footerText: '', // Should come from UI
-          pageRange: pageRange || undefined,
-          includePageNumbers: false,
-        });
-        setProcessedPdfBytes(pdfBytes);
-        setIsComplete(true);
-        setError(null);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to add header/footer. Please try again.');
-        setIsComplete(false);
-        setProcessedPdfBytes(null);
-      } finally {
-        setIsProcessing(false);
-      }
-    } else if (tool.id === 'add-background') {
-      if (files.length === 0) {
-        setError('Please upload a PDF file');
-        return;
-      }
-      setIsProcessing(true);
-      setError(null);
-      try {
-        const file = files[0];
-        const pdfBytes = await addBackground(file, {
-          color: { r: 1, g: 1, b: 1 }, // Should come from UI
-          pageRange: pageRange || undefined,
-        });
-        setProcessedPdfBytes(pdfBytes);
-        setIsComplete(true);
-        setError(null);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to add background. Please try again.');
         setIsComplete(false);
         setProcessedPdfBytes(null);
       } finally {
@@ -2647,7 +2645,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
         downloadExcelPdf(processedPdfBytes, `${baseName}.pdf`);
       }
     } else if (tool.id === 'compress' || tool.id === 'add-watermark' || tool.id === 'page-numbers' || 
-               tool.id === 'header-footer' || tool.id === 'add-background' || tool.id === 'crop' || 
+               tool.id === 'crop' || 
                tool.id === 'resize' || tool.id === 'flatten' || tool.id === 'metadata') {
       if (!processedPdfBytes) {
         setError('PDF file is not ready. Please try processing again.');
@@ -2657,8 +2655,6 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       const suffix = tool.id === 'compress' ? '_compressed' :
                      tool.id === 'add-watermark' ? '_watermarked' :
                      tool.id === 'page-numbers' ? '_numbered' :
-                     tool.id === 'header-footer' ? '_headerfooter' :
-                     tool.id === 'add-background' ? '_background' :
                      tool.id === 'crop' ? '_cropped' :
                      tool.id === 'resize' ? '_resized' :
                      tool.id === 'flatten' ? '_flattened' :
@@ -2669,10 +2665,6 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
         downloadWatermarkedPdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
       } else if (tool.id === 'page-numbers') {
         downloadNumberedPdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
-      } else if (tool.id === 'header-footer') {
-        downloadHeaderFooterPdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
-      } else if (tool.id === 'add-background') {
-        downloadBackgroundPdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
       } else if (tool.id === 'crop') {
         downloadCroppedPdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
       } else if (tool.id === 'resize') {
@@ -2880,7 +2872,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                   ((tool.id === 'pdf-to-word' || tool.id === 'pdf-to-excel' || tool.id === 'pdf-to-pptx' || 
                     tool.id === 'html-to-pdf' || tool.id === 'word-to-pdf' || tool.id === 'excel-to-pdf' ||
                     tool.id === 'compress' || tool.id === 'add-watermark' || tool.id === 'page-numbers' ||
-                    tool.id === 'header-footer' || tool.id === 'add-background' || tool.id === 'crop' ||
+                    tool.id === 'crop' ||
                     tool.id === 'resize' || tool.id === 'flatten' || tool.id === 'metadata' ||
                     tool.id === 'remove-images' || tool.id === 'optimize-images' || tool.id === 'add-qr-code' ||
                     tool.id === 'add-barcode' || tool.id === 'add-bookmarks' || tool.id === 'add-hyperlinks' ||
@@ -2907,7 +2899,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                   ((tool.id === 'pdf-to-word' || tool.id === 'pdf-to-excel' || tool.id === 'pdf-to-pptx' || 
                     tool.id === 'html-to-pdf' || tool.id === 'word-to-pdf' || tool.id === 'excel-to-pdf' ||
                     tool.id === 'compress' || tool.id === 'add-watermark' || tool.id === 'page-numbers' ||
-                    tool.id === 'header-footer' || tool.id === 'add-background' || tool.id === 'crop' ||
+                    tool.id === 'crop' ||
                     tool.id === 'resize' || tool.id === 'flatten' || tool.id === 'metadata' ||
                     tool.id === 'remove-images' || tool.id === 'optimize-images' || tool.id === 'add-qr-code' ||
                     tool.id === 'add-barcode' || tool.id === 'add-bookmarks' || tool.id === 'add-hyperlinks' ||
@@ -3098,14 +3090,23 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50">
                   <p className="text-sm font-medium text-surface-200 mb-3">Compression Level</p>
                   <div className="flex gap-2">
-                    {['Low', 'Medium', 'High'].map((level) => (
-                      <button
-                        key={level}
-                        className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${level === 'Medium' ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300' : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'}`}
-                      >
-                        {level}
-                      </button>
-                    ))}
+                    {(['Low', 'Medium', 'High'] as const).map((level) => {
+                      const levelKey = level.toLowerCase() as 'low' | 'medium' | 'high';
+                      const isSelected = compressionLevel === levelKey;
+                      return (
+                        <button
+                          key={level}
+                          onClick={() => setCompressionLevel(levelKey)}
+                          className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                            isSelected 
+                              ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300' 
+                              : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'
+                          }`}
+                        >
+                          {level}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -3493,24 +3494,337 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {/* Watermark options */}
               {tool.id === 'add-watermark' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
-                  <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">Watermark Text</p>
-                    <input
-                      type="text"
-                      placeholder="e.g. CONFIDENTIAL, DRAFT"
-                      className="w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all"
-                    />
-                  </div>
-                  <div className="flex gap-4">
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-surface-200 mb-2">Opacity</p>
-                      <input type="range" min="10" max="100" defaultValue="30" className="w-full" />
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <p className="text-sm font-medium text-surface-200">Watermarks</p>
+                      {watermarks.length > 0 && (
+                        <button
+                          onClick={() => {
+                            if (confirm('Clear all watermarks? This will remove them from localStorage as well.')) {
+                              setWatermarks([]);
+                              if (typeof window !== 'undefined') {
+                                localStorage.removeItem('pdfeditor_watermarks');
+                              }
+                            }
+                          }}
+                          className="px-2 py-1 rounded-lg bg-surface-700/50 hover:bg-surface-700 text-surface-400 hover:text-surface-200 text-xs transition-colors"
+                          title="Clear all watermarks"
+                        >
+                          Clear All
+                        </button>
+                      )}
                     </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-surface-200 mb-2">Angle</p>
-                      <input type="range" min="-90" max="90" defaultValue="-45" className="w-full" />
-                    </div>
+                    <button
+                      onClick={() => {
+                        const newWatermark: WatermarkConfig = {
+                          id: `watermark-${Date.now()}`,
+                          type: 'text',
+                          text: 'WATERMARK',
+                          position: 'diagonal',
+                          opacity: 30,
+                          rotation: -45,
+                          fontSize: 48,
+                          color: { r: 0.7, g: 0.7, b: 0.7 },
+                          scale: 0.5,
+                        };
+                        setWatermarks([...watermarks, newWatermark]);
+                        setEditingWatermarkId(newWatermark.id);
+                        // Automatically open preview after adding watermark
+                        if (files.length > 0) {
+                          setTimeout(() => setIsWatermarkPreviewOpen(true), 100);
+                        }
+                      }}
+                      className="px-6 py-3 rounded-lg bg-primary-500/20 hover:bg-primary-500/30 border-2 border-primary-500/40 text-primary-300 text-sm font-semibold transition-all flex items-center gap-2 shadow-lg shadow-primary-500/20 hover:shadow-xl hover:shadow-primary-500/30 hover:scale-105"
+                    >
+                      <Plus size={18} />
+                      Add Watermark
+                    </button>
                   </div>
+
+                  {watermarks.length === 0 ? (
+                    <p className="text-xs text-surface-500 text-center py-4">
+                      No watermarks added. Click "Add Watermark" to create one.
+                    </p>
+                  ) : (
+                    <div className="space-y-3">
+                      {watermarks.map((watermark, index) => {
+                        const isEditing = editingWatermarkId === watermark.id;
+                        return (
+                          <div
+                            key={watermark.id}
+                            className={`p-3 rounded-lg border transition-all ${
+                              isEditing
+                                ? 'bg-surface-700/50 border-primary-500/50'
+                                : 'bg-surface-900/30 border-surface-600/30'
+                            }`}
+                          >
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs font-medium text-surface-400">
+                                  Watermark {index + 1}
+                                </span>
+                                <span className="text-xs px-2 py-0.5 rounded bg-surface-700/50 text-surface-400">
+                                  {watermark.type === 'text' ? 'Text' : 'Image'}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <button
+                                  onClick={() => setIsWatermarkPreviewOpen(true)}
+                                  className="p-1.5 rounded hover:bg-surface-700 text-surface-400 hover:text-surface-200 transition-colors"
+                                  title="Preview"
+                                >
+                                  <FileText size={14} />
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    if (isEditing) {
+                                      setEditingWatermarkId(null);
+                                    } else {
+                                      setEditingWatermarkId(watermark.id);
+                                    }
+                                  }}
+                                  className="p-1.5 rounded hover:bg-surface-700 text-surface-400 hover:text-surface-200 transition-colors"
+                                  title={isEditing ? 'Done' : 'Edit'}
+                                >
+                                  {isEditing ? <CheckCircle size={14} /> : <PenSquare size={14} />}
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setWatermarks(watermarks.filter(w => w.id !== watermark.id));
+                                    if (editingWatermarkId === watermark.id) {
+                                      setEditingWatermarkId(null);
+                                    }
+                                  }}
+                                  className="p-1.5 rounded hover:bg-surface-700 text-surface-400 hover:text-surface-200 transition-colors"
+                                  title="Delete"
+                                >
+                                  <X size={14} />
+                                </button>
+                              </div>
+                            </div>
+
+                            {isEditing && (
+                              <div className="space-y-3 mt-3 pt-3 border-t border-surface-700/50">
+                                {/* Type selector */}
+                                <div>
+                                  <p className="text-xs font-medium text-surface-300 mb-2">Type</p>
+                                  <div className="flex gap-2">
+                                    <button
+                                      onClick={() => {
+                                        setWatermarks(watermarks.map(w =>
+                                          w.id === watermark.id ? { ...w, type: 'text' as const } : w
+                                        ));
+                                      }}
+                                      className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                                        watermark.type === 'text'
+                                          ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300'
+                                          : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'
+                                      }`}
+                                    >
+                                      Text
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        setWatermarks(watermarks.map(w =>
+                                          w.id === watermark.id ? { ...w, type: 'image' as const } : w
+                                        ));
+                                      }}
+                                      className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                                        watermark.type === 'image'
+                                          ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300'
+                                          : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'
+                                      }`}
+                                    >
+                                      Image
+                                    </button>
+                                  </div>
+                                </div>
+
+                                {/* Text watermark options */}
+                                {watermark.type === 'text' && (
+                                  <>
+                                    <div>
+                                      <p className="text-xs font-medium text-surface-300 mb-2">Text</p>
+                                      <input
+                                        type="text"
+                                        value={watermark.text || ''}
+                                        onChange={(e) => {
+                                          setWatermarks(watermarks.map(w =>
+                                            w.id === watermark.id ? { ...w, text: e.target.value } : w
+                                          ));
+                                        }}
+                                        placeholder="e.g. CONFIDENTIAL, DRAFT"
+                                        className="w-full px-3 py-2 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all"
+                                      />
+                                    </div>
+                                    <div>
+                                      <p className="text-xs font-medium text-surface-300 mb-2">
+                                        Font Size: {watermark.fontSize || 48}px
+                                      </p>
+                                      <input
+                                        type="range"
+                                        min="12"
+                                        max="120"
+                                        value={watermark.fontSize || 48}
+                                        onChange={(e) => {
+                                          setWatermarks(watermarks.map(w =>
+                                            w.id === watermark.id ? { ...w, fontSize: parseInt(e.target.value) } : w
+                                          ));
+                                        }}
+                                        className="w-full"
+                                      />
+                                    </div>
+                                  </>
+                                )}
+
+                                {/* Image watermark options */}
+                                {watermark.type === 'image' && (
+                                  <div>
+                                    <p className="text-xs font-medium text-surface-300 mb-2">Image</p>
+                                    <input
+                                      type="file"
+                                      accept="image/png,image/jpeg,image/jpg"
+                                      onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                          const reader = new FileReader();
+                                          reader.onload = (event) => {
+                                            const dataUrl = event.target?.result as string;
+                                            setWatermarks(watermarks.map(w =>
+                                              w.id === watermark.id
+                                                ? { ...w, imageFile: file, imageDataUrl: dataUrl }
+                                                : w
+                                            ));
+                                          };
+                                          reader.readAsDataURL(file);
+                                        }
+                                      }}
+                                      className="w-full px-3 py-2 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all"
+                                    />
+                                    {watermark.imageDataUrl && (
+                                      <img
+                                        src={watermark.imageDataUrl}
+                                        alt="Watermark preview"
+                                        className="mt-2 max-w-full max-h-32 object-contain rounded"
+                                      />
+                                    )}
+                                    <div className="mt-2">
+                                      <p className="text-xs font-medium text-surface-300 mb-2">
+                                        Scale: {Math.round((watermark.scale || 0.5) * 100)}%
+                                      </p>
+                                      <input
+                                        type="range"
+                                        min="10"
+                                        max="100"
+                                        value={(watermark.scale || 0.5) * 100}
+                                        onChange={(e) => {
+                                          setWatermarks(watermarks.map(w =>
+                                            w.id === watermark.id
+                                              ? { ...w, scale: parseInt(e.target.value) / 100 }
+                                              : w
+                                          ));
+                                        }}
+                                        className="w-full"
+                                      />
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Position selector */}
+                                <div>
+                                  <p className="text-xs font-medium text-surface-300 mb-2">Position</p>
+                                  <div className="grid grid-cols-3 gap-2">
+                                    {['center', 'top-left', 'top-right', 'bottom-left', 'bottom-right', 'diagonal'].map((pos) => (
+                                      <button
+                                        key={pos}
+                                      onClick={() => {
+                                        setWatermarks(watermarks.map(w =>
+                                          w.id === watermark.id
+                                            ? { ...w, position: pos as WatermarkConfig['position'] }
+                                            : w
+                                        ));
+                                      }}
+                                        className={`px-2 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                                          watermark.position === pos
+                                            ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300'
+                                            : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'
+                                        }`}
+                                      >
+                                        {pos.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
+                                      </button>
+                                    ))}
+                                  </div>
+                                </div>
+
+                                {/* Opacity and Rotation */}
+                                <div className="grid grid-cols-2 gap-3">
+                                  <div>
+                                    <p className="text-xs font-medium text-surface-300 mb-2">
+                                      Opacity: {watermark.opacity}%
+                                    </p>
+                                    <input
+                                      type="range"
+                                      min="10"
+                                      max="100"
+                                      value={watermark.opacity}
+                                      onChange={(e) => {
+                                        setWatermarks(watermarks.map(w =>
+                                          w.id === watermark.id ? { ...w, opacity: parseInt(e.target.value) } : w
+                                        ));
+                                      }}
+                                      className="w-full"
+                                    />
+                                  </div>
+                                  <div>
+                                    <p className="text-xs font-medium text-surface-300 mb-2">
+                                      Angle: {watermark.rotation}°
+                                    </p>
+                                    <input
+                                      type="range"
+                                      min="-90"
+                                      max="90"
+                                      value={watermark.rotation}
+                                      onChange={(e) => {
+                                        setWatermarks(watermarks.map(w =>
+                                          w.id === watermark.id ? { ...w, rotation: parseInt(e.target.value) } : w
+                                        ));
+                                      }}
+                                      className="w-full"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {!isEditing && (
+                              <div className="text-xs text-surface-500 mt-2">
+                                {watermark.type === 'text' && watermark.text && (
+                                  <span>Text: "{watermark.text}"</span>
+                                )}
+                                {watermark.type === 'image' && watermark.imageFile && (
+                                  <span>Image: {watermark.imageFile.name}</span>
+                                )}
+                                <span className="mx-2">•</span>
+                                <span>Position: {watermark.position}</span>
+                                <span className="mx-2">•</span>
+                                <span>Opacity: {watermark.opacity}%</span>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {watermarks.length > 0 && (
+                    <button
+                      onClick={() => setIsWatermarkPreviewOpen(true)}
+                      className="w-full mt-4 px-4 py-2.5 rounded-lg bg-primary-500/20 hover:bg-primary-500/30 border border-primary-500/40 text-primary-300 text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                    >
+                      <FileText size={16} />
+                      Preview Watermarks
+                    </button>
+                  )}
                 </div>
               )}
 
@@ -3605,27 +3919,6 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                 </div>
               )}
 
-              {/* Header/Footer text */}
-              {tool.id === 'header-footer' && (
-                <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
-                  <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">Header Text</p>
-                    <input
-                      type="text"
-                      placeholder="e.g. Company Name — Confidential"
-                      className="w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all"
-                    />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">Footer Text</p>
-                    <input
-                      type="text"
-                      placeholder="e.g. Page {page} of {total}"
-                      className="w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all"
-                    />
-                  </div>
-                </div>
-              )}
 
               {/* Insert blank page - position */}
               {tool.id === 'insert-blank' && (
@@ -4181,31 +4474,6 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                 </div>
               )}
 
-              {/* Background options */}
-              {tool.id === 'add-background' && (
-                <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
-                  <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">Background Type</p>
-                    <div className="flex gap-2">
-                      {['Solid Color', 'Image'].map((t) => (
-                        <button key={t} className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${t === 'Solid Color' ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300' : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'}`}>{t}</button>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">Color</p>
-                    <div className="flex gap-2">
-                      {['#FFFFFF', '#F5F5DC', '#F0F8FF', '#FFF8DC', '#F0FFF0'].map((c) => (
-                        <button key={c} className="w-10 h-10 rounded-lg border-2 border-surface-600 hover:border-primary-400 transition-all" style={{ backgroundColor: c }}></button>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">Opacity</p>
-                    <input type="range" min="10" max="100" defaultValue="100" className="w-full" />
-                  </div>
-                </div>
-              )}
 
               {/* Invert colors */}
               {tool.id === 'invert-colors' && (
@@ -4720,6 +4988,17 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
             setRedactions(newRedactions);
             setIsRedactSelectorOpen(false);
           }}
+        />
+      )}
+
+      {/* Watermark Preview */}
+      {tool.id === 'add-watermark' && isWatermarkPreviewOpen && files.length > 0 && (
+        <WatermarkPreview
+          isOpen={isWatermarkPreviewOpen}
+          onClose={() => setIsWatermarkPreviewOpen(false)}
+          pdfFile={files[0]}
+          watermarks={watermarks}
+          onWatermarksUpdate={setWatermarks}
         />
       )}
     </div>
