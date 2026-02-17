@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Outfit, JetBrains_Mono, Lexend } from 'next/font/google'
 import './globals.css'
 import Script from 'next/script'
+import Footer from './components/Footer'
 
 // Primary font - Modern geometric sans
 // Optimized for mobile: reduced weights for better performance
@@ -706,8 +707,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <div className="fixed inset-0 bg-grid opacity-30 -z-10" aria-hidden="true" />
         
         {/* Main Content */}
-        <div id="main-content" className="relative min-h-screen">
+        <div id="main-content" className="relative min-h-screen flex flex-col">
           {children}
+          <Footer />
         </div>
       </body>
     </html>

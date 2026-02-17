@@ -29,6 +29,7 @@ import PageRotate from './PageRotate';
 import SignaturePad from './SignaturePad';
 import SignaturePositionSelector from './SignaturePositionSelector';
 import RedactSelector from './RedactSelector';
+import ToolInfo from './ToolInfo';
 import { redactPdf, downloadRedactedPdf, type RedactionArea } from '../lib/pdf/redactPdf';
 import { pdfToImages, downloadImagesAsZip, type ImageFormat, type ImageResult } from '../lib/pdf/pdfToImages';
 import { imagesToPdf, downloadPdf as downloadImagesPdf } from '../lib/pdf/imagesToPdf';
@@ -3012,6 +3013,9 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
             </label>
           </div>
 
+          {/* Tool Info Section - Show before file upload */}
+          {files.length === 0 && <ToolInfo tool={tool} />}
+
           {/* Files list */}
           {files.length > 0 && (
             <div className="mb-6 space-y-2 animate-fade-in">
@@ -4915,6 +4919,9 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               )}
             </div>
           )}
+
+          {/* Tool Info Section */}
+          {files.length > 0 && <ToolInfo tool={tool} />}
         </>
       )}
 
