@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import Script from 'next/script'
-import MobileMenu from '../../components/MobileMenu'
+import Header from '../../components/Header'
 
 const siteUrl = 'https://editorapdf.com'
 const postUrl = `${siteUrl}/blog/is-it-safe-to-edit-pdfs-online`
@@ -29,6 +29,9 @@ export const metadata: Metadata = {
     title: 'Is It Safe to Edit PDFs Online? Privacy & Security Guide',
     description: 'Learn how online PDF editors handle files, what privacy risks exist, and best practices for safely editing PDF documents online.',
     images: [`${siteUrl}/og/is-it-safe-to-edit-pdfs-online.png`],
+  },
+  alternates: {
+    canonical: postUrl,
   },
 }
 
@@ -170,34 +173,7 @@ export default function BlogPost() {
       />
 
       <main className="min-h-screen flex flex-col">
-        {/* Header */}
-        <header className="relative z-10 glass border-b border-surface-700/50" role="banner">
-          <div className="px-6 py-3">
-            <div className="flex items-center justify-between max-w-7xl mx-auto">
-              <div className="flex items-center gap-3">
-                <MobileMenu />
-                <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                  <img src="/logo.svg" alt="EditoraPDF Logo" width={120} height={40} className="h-10 w-auto" />
-                </Link>
-              </div>
-              
-              <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
-                <Link href="/" className="nav-link">Home</Link>
-                <Link href="/how-it-works" className="nav-link">How It Works</Link>
-                <Link href="/about" className="nav-link">About</Link>
-                <Link href="/blog" className="nav-link text-primary-400">Blog</Link>
-                <Link href="/contact" className="nav-link">Contact</Link>
-              </nav>
-              
-              <Link href="/edit" className="btn-primary btn-md hidden sm:flex">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                </svg>
-                Edit PDF
-              </Link>
-            </div>
-          </div>
-        </header>
+        <Header />
 
         {/* Breadcrumbs */}
         <nav className="bg-surface-800/30 border-b border-surface-700/30" aria-label="Breadcrumb">

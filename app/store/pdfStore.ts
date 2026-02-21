@@ -81,6 +81,7 @@ interface PdfState {
   selectedShapeType: ShapeOverlay['type'];
   selectedShapeStyle: 'outline' | 'filled';
   extractTextOnLoad: boolean;
+  editableTextMode: boolean;
   
   // History for Undo/Redo
   history: HistoryEntry[];
@@ -114,6 +115,7 @@ interface PdfState {
   setSelectedShapeType: (type: ShapeOverlay['type']) => void;
   setSelectedShapeStyle: (style: 'outline' | 'filled') => void;
   setExtractTextOnLoad: (extract: boolean) => void;
+  setEditableTextMode: (enabled: boolean) => void;
   setIsExporting: (isExporting: boolean) => void;
   
   // History actions
@@ -151,6 +153,7 @@ const initialState = {
   // By default behave more like a simple \"Word for PDF\":
   // do NOT auto-extract original text (user can turn it on in the toolbar)
   extractTextOnLoad: false,
+  editableTextMode: false,
   history: [] as HistoryEntry[],
   historyIndex: -1,
   selectedItems: [] as string[],
@@ -318,6 +321,8 @@ export const usePdfStore = create<PdfState>((set) => ({
   setSelectedShapeStyle: (style) => set({ selectedShapeStyle: style }),
 
   setExtractTextOnLoad: (extract) => set({ extractTextOnLoad: extract }),
+
+  setEditableTextMode: (enabled) => set({ editableTextMode: enabled }),
 
   setIsExporting: (isExporting) => set({ isExporting }),
 
