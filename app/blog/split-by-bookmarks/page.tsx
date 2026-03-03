@@ -7,26 +7,29 @@ const siteUrl = 'https://editorapdf.com'
 const postUrl = `${siteUrl}/blog/split-by-bookmarks`
 
 export const metadata: Metadata = {
-  title: 'How to Split PDF by Bookmarks - Free Online Tool Guide | 2025',
-  description: 'Learn how to split PDF files by bookmarks automatically. Free, secure online tool that divides PDFs using bookmark structure. No software installation required. Step-by-step guide for splitting PDFs by outline.',
+  title: 'How to Split PDF by Bookmarks Online (Step-by-Step Guide)',
+  description: 'Divide PDF files using their bookmark structure. Split documents automatically by chapters or outline and download separate PDFs securely.',
   openGraph: {
-    title: 'How to Split PDF by Bookmarks - Free Online Tool Guide',
-    description: 'Learn how to split PDF files by bookmarks automatically. Free, secure online tool that divides PDFs using bookmark structure. No software installation required.',
+    type: 'article',
+    title: 'How to Split PDF by Bookmarks Online (Step-by-Step Guide)',
+    description: 'Divide PDF files using their bookmark structure. Split documents automatically by chapters or outline and download separate PDFs securely.',
     url: postUrl,
+    siteName: 'EditoraPDF',
     images: [
       {
-        url: `${siteUrl}/blog1.png`,
+        url: `${siteUrl}/images/blog/split-by-bookmarks-hero.png`,
         width: 1200,
         height: 630,
-        alt: 'How to split PDF by bookmarks - Free online tool guide',
+        alt: 'Banner showing PDF divided into multiple documents based on bookmark chapters',
       },
     ],
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'How to Split PDF by Bookmarks - Free Online Tool Guide',
-    description: 'Learn how to split PDF files by bookmarks automatically. Free, secure online tool that divides PDFs using bookmark structure.',
-    images: [`${siteUrl}/blog1.png`],
+    title: 'How to Split PDF by Bookmarks Online (Step-by-Step Guide)',
+    description: 'Divide PDF files using their bookmark structure. Split documents automatically by chapters or outline and download separate PDFs securely.',
+    images: [`${siteUrl}/images/blog/split-by-bookmarks-hero.png`],
   },
   alternates: {
     canonical: postUrl,
@@ -124,7 +127,7 @@ const articleSchema = {
   '@id': `${postUrl}#article`,
   headline: 'How to Split PDF by Bookmarks - Complete Guide to Dividing PDFs Using Bookmark Structure',
   description: 'Complete guide on how to split PDF files by bookmarks. Learn to divide large PDF documents into smaller files using bookmark structure automatically. Step-by-step instructions, tips, and best practices for splitting PDFs by outline.',
-  image: `${siteUrl}/blog1.png`,
+  image: `${siteUrl}/blog/How to Split PDF by Bookmarks_ Complete Guide to Dividing PDFs Using Bookmark Structure.png`,
   author: {
     '@type': 'Organization',
     name: 'EditoraPDF',
@@ -192,7 +195,7 @@ export default function BlogPost() {
         {/* Hero Image with Title Overlay */}
         <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden bg-surface-800">
           <img
-            src="/blog1.png"
+            src="/blog/How to Split PDF by Bookmarks_ Complete Guide to Dividing PDFs Using Bookmark Structure.png"
             alt="How to split PDF by bookmarks - Free online tool guide"
             className="w-full h-full object-cover shadow-[inset_0_0_200px_100px_rgba(0,0,0,0.8),0_0_100px_50px_rgba(0,0,0,0.6)]"
             style={{

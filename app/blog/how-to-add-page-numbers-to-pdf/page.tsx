@@ -7,26 +7,29 @@ const siteUrl = 'https://editorapdf.com'
 const postUrl = `${siteUrl}/blog/how-to-add-page-numbers-to-pdf`
 
 export const metadata: Metadata = {
-  title: 'How to Add Page Numbers to PDF Online - Free PDF Page Numbering Tool Guide | 2026',
-  description: 'Learn how to add page numbers to PDF documents online. Free, secure, and easy-to-use PDF page numbering tool. Number PDF pages without software installation. Step-by-step guide with customization options.',
+  title: 'How to Add Page Numbers to PDF Online: Complete Guide to PDF Page Numbering',
+  description: 'Learn how to add page numbers to PDF documents online. Insert custom numbering formats, positions, and styles in minutes without installing software.',
   openGraph: {
-    title: 'How to Add Page Numbers to PDF Online - Free PDF Page Numbering Tool Guide',
-    description: 'Learn how to add page numbers to PDF documents online. Free, secure, and easy-to-use PDF page numbering tool. Number PDF pages without software installation.',
+    type: 'article',
+    title: 'How to Add Page Numbers to PDF Online: Complete Guide to PDF Page Numbering',
+    description: 'Learn how to add page numbers to PDF documents online. Insert custom numbering formats, positions, and styles in minutes without installing software.',
     url: postUrl,
+    siteName: 'EditoraPDF',
     images: [
       {
-        url: `${siteUrl}/blog1.png`,
+        url: `${siteUrl}/images/blog/add-page-numbers-pdf-hero.png`,
         width: 1200,
         height: 630,
-        alt: 'How to add page numbers to PDF online - Free PDF page numbering tool',
+        alt: 'Illustration showing a PDF document with newly added page numbers in the footer',
       },
     ],
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'How to Add Page Numbers to PDF Online - Free PDF Page Numbering Tool Guide',
-    description: 'Learn how to add page numbers to PDF documents online. Free, secure, and easy-to-use PDF page numbering tool.',
-    images: [`${siteUrl}/blog1.png`],
+    title: 'How to Add Page Numbers to PDF Online: Complete Guide to PDF Page Numbering',
+    description: 'Learn how to add page numbers to PDF documents online. Insert custom numbering formats, positions, and styles in minutes without installing software.',
+    images: [`${siteUrl}/images/blog/add-page-numbers-pdf-hero.png`],
   },
   alternates: {
     canonical: postUrl,
@@ -140,7 +143,7 @@ const articleSchema = {
   '@id': `${postUrl}#article`,
   headline: 'How to Add Page Numbers to PDF Online - Complete Guide to PDF Page Numbering',
   description: 'Complete guide on how to add page numbers to PDF documents online. Learn to number PDF pages using free online tools. Step-by-step instructions, customization options, tips, and best practices for PDF page numbering.',
-  image: `${siteUrl}/blog1.png`,
+  image: `${siteUrl}/blog/How to Add Page Numbers to PDF Online_ Complete Guide to PDF Page Numbering.png`,
   author: {
     '@type': 'Organization',
     name: 'EditoraPDF',
@@ -208,7 +211,7 @@ export default function BlogPost() {
         {/* Hero Image with Title Overlay */}
         <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden bg-surface-800">
           <img
-            src="/blog1.png"
+            src="/blog/How to Add Page Numbers to PDF Online_ Complete Guide to PDF Page Numbering.png"
             alt="How to add page numbers to PDF online - Free PDF page numbering tool guide"
             className="w-full h-full object-cover shadow-[inset_0_0_200px_100px_rgba(0,0,0,0.8),0_0_100px_50px_rgba(0,0,0,0.6)]"
             style={{

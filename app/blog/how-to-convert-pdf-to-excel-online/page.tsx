@@ -7,26 +7,29 @@ const siteUrl = 'https://editorapdf.com'
 const postUrl = `${siteUrl}/blog/how-to-convert-pdf-to-excel-online`
 
 export const metadata: Metadata = {
-  title: 'How to Convert PDF to Excel Online - Free PDF to Excel Converter Guide | 2026',
-  description: 'Learn how to convert PDF files to Excel spreadsheets online. Free, secure, and accurate PDF to Excel converter. Extract tables and data from PDFs to Excel without software installation. Step-by-step guide.',
+  title: 'How to Convert PDF to Excel Online (Step-by-Step Guide)',
+  description: 'Convert PDF tables into editable Excel spreadsheets instantly. Extract data accurately and download XLSX files online — no installation required.',
   openGraph: {
-    title: 'How to Convert PDF to Excel Online - Free PDF to Excel Converter Guide',
-    description: 'Learn how to convert PDF files to Excel spreadsheets online. Free, secure, and accurate PDF to Excel converter. Extract tables and data from PDFs to Excel without software installation.',
+    type: 'article',
+    title: 'How to Convert PDF to Excel Online (Step-by-Step Guide)',
+    description: 'Convert PDF tables into editable Excel spreadsheets instantly. Extract data accurately and download XLSX files online — no installation required.',
     url: postUrl,
+    siteName: 'EditoraPDF',
     images: [
       {
-        url: `${siteUrl}/blog1.png`,
+        url: `${siteUrl}/images/blog/how-to-convert-pdf-to-excel-online-hero.png`,
         width: 1200,
         height: 630,
-        alt: 'How to convert PDF to Excel online - Free PDF to Excel converter tool',
+        alt: 'Banner showing PDF document converting into Excel spreadsheet with table extraction',
       },
     ],
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'How to Convert PDF to Excel Online - Free PDF to Excel Converter Guide',
-    description: 'Learn how to convert PDF files to Excel spreadsheets online. Free, secure, and accurate PDF to Excel converter.',
-    images: [`${siteUrl}/blog1.png`],
+    title: 'How to Convert PDF to Excel Online (Step-by-Step Guide)',
+    description: 'Convert PDF tables into editable Excel spreadsheets instantly. Extract data accurately and download XLSX files online — no installation required.',
+    images: [`${siteUrl}/images/blog/how-to-convert-pdf-to-excel-online-hero.png`],
   },
   alternates: {
     canonical: postUrl,
@@ -140,7 +143,7 @@ const articleSchema = {
   '@id': `${postUrl}#article`,
   headline: 'How to Convert PDF to Excel Online - Complete Guide to PDF to Spreadsheet Conversion',
   description: 'Complete guide on how to convert PDF files to Excel spreadsheets online. Learn to extract tables and data from PDF documents using free online tools. Step-by-step instructions, tips, and best practices for accurate PDF to Excel conversion.',
-  image: `${siteUrl}/blog1.png`,
+  image: `${siteUrl}/blog/How to Convert PDF to Excel Online_ Complete Guide to PDF to Spreadsheet Conversion.png`,
   author: {
     '@type': 'Organization',
     name: 'EditoraPDF',
@@ -208,7 +211,7 @@ export default function BlogPost() {
         {/* Hero Image with Title Overlay */}
         <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden bg-surface-800">
           <img
-            src="/blog1.png"
+            src="/blog/How to Convert PDF to Excel Online_ Complete Guide to PDF to Spreadsheet Conversion.png"
             alt="How to convert PDF to Excel online - Free PDF to Excel converter tool guide"
             className="w-full h-full object-cover shadow-[inset_0_0_200px_100px_rgba(0,0,0,0.8),0_0_100px_50px_rgba(0,0,0,0.6)]"
             style={{

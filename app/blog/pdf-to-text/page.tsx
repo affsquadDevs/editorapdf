@@ -7,26 +7,29 @@ const siteUrl = 'https://editorapdf.com'
 const postUrl = `${siteUrl}/blog/pdf-to-text`
 
 export const metadata: Metadata = {
-  title: 'PDF to Text Converter - Extract Text from PDF Online Free | 2026',
-  description: 'Convert PDF to text online for free. Extract text from PDF files instantly with our secure PDF to text converter. No software installation required. Preserve formatting and extract text from scanned PDFs.',
+  title: 'PDF to Text Converter: Complete Guide to Extracting Text from PDF Files',
+  description: 'Learn how to extract text from PDF files online. Convert PDFs into editable plain text format quickly, securely, and without installing software.',
   openGraph: {
-    title: 'PDF to Text Converter - Extract Text from PDF Online Free',
-    description: 'Convert PDF to text online for free. Extract text from PDF files instantly with our secure PDF to text converter. No software installation required.',
+    type: 'article',
+    title: 'PDF to Text Converter: Complete Guide to Extracting Text from PDF Files',
+    description: 'Learn how to extract text from PDF files online. Convert PDFs into editable plain text format quickly, securely, and without installing software.',
     url: postUrl,
+    siteName: 'EditoraPDF',
     images: [
       {
-        url: `${siteUrl}/blog1.png`,
+        url: `${siteUrl}/images/blog/pdf-to-text-hero.png`,
         width: 1200,
         height: 630,
-        alt: 'PDF to Text Converter - Extract text from PDF files online',
+        alt: 'Illustration showing a PDF document being converted into plain text format with an arrow and convert button',
       },
     ],
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'PDF to Text Converter - Extract Text from PDF Online Free',
-    description: 'Convert PDF to text online for free. Extract text from PDF files instantly with our secure PDF to text converter.',
-    images: [`${siteUrl}/blog1.png`],
+    title: 'PDF to Text Converter: Complete Guide to Extracting Text from PDF Files',
+    description: 'Learn how to extract text from PDF files online. Convert PDFs into editable plain text format quickly, securely, and without installing software.',
+    images: [`${siteUrl}/images/blog/pdf-to-text-hero.png`],
   },
   alternates: {
     canonical: postUrl,
@@ -132,7 +135,7 @@ const articleSchema = {
   '@id': `${postUrl}#article`,
   headline: 'PDF to Text Converter - Complete Guide to Extracting Text from PDF Files',
   description: 'Complete guide on how to convert PDF to text online. Learn to extract text from PDF files using free online tools. Step-by-step instructions, tips, and best practices for PDF text extraction.',
-  image: `${siteUrl}/blog1.png`,
+  image: `${siteUrl}/blog/PDF to Text Converter_ Complete Guide to Extracting Text from PDF Files.png`,
   author: {
     '@type': 'Organization',
     name: 'EditoraPDF',
@@ -200,7 +203,7 @@ export default function BlogPost() {
         {/* Hero Image with Title Overlay */}
         <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden bg-surface-800">
           <img
-            src="/blog1.png"
+            src="/blog/PDF to Text Converter_ Complete Guide to Extracting Text from PDF Files.png"
             alt="PDF to Text Converter - Extract text from PDF files online"
             className="w-full h-full object-cover shadow-[inset_0_0_200px_100px_rgba(0,0,0,0.8),0_0_100px_50px_rgba(0,0,0,0.6)]"
             style={{

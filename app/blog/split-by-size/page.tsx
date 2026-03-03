@@ -4,29 +4,32 @@ import Script from 'next/script'
 import Header from '../../components/Header'
 
 const siteUrl = 'https://editorapdf.com'
-const postUrl = `${siteUrl}/split-by-size`
+const postUrl = `${siteUrl}/blog/split-by-size`
 
 export const metadata: Metadata = {
-  title: 'Split PDF by Size - Divide Large PDFs by File Size Online | Free Tool 2026',
-  description: 'Learn how to split PDF files by size online. Free tool to divide large PDFs into smaller files based on file size limits. Perfect for email attachments and file sharing. No software installation required.',
+  title: 'Split PDF by Size Online (Divide Large PDFs by MB)',
+  description: 'Split large PDF files by file size. Set maximum MB limits and automatically divide your PDF into smaller downloadable parts.',
   openGraph: {
-    title: 'Split PDF by Size - Divide Large PDFs by File Size Online | Free Tool',
-    description: 'Learn how to split PDF files by size online. Free tool to divide large PDFs into smaller files based on file size limits. Perfect for email attachments and file sharing.',
+    type: 'article',
+    title: 'Split PDF by Size Online (Divide Large PDFs by MB)',
+    description: 'Split large PDF files by file size. Set maximum MB limits and automatically divide your PDF into smaller downloadable parts.',
     url: postUrl,
+    siteName: 'EditoraPDF',
     images: [
       {
-        url: `${siteUrl}/blog1.png`,
+        url: `${siteUrl}/images/blog/split-by-size-hero.png`,
         width: 1200,
         height: 630,
-        alt: 'Split PDF by size - Free online PDF splitter tool',
+        alt: 'Banner showing large PDF file divided into smaller PDFs by file size limits',
       },
     ],
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Split PDF by Size - Divide Large PDFs by File Size Online | Free Tool',
-    description: 'Learn how to split PDF files by size online. Free tool to divide large PDFs into smaller files based on file size limits.',
-    images: [`${siteUrl}/blog1.png`],
+    title: 'Split PDF by Size Online (Divide Large PDFs by MB)',
+    description: 'Split large PDF files by file size. Set maximum MB limits and automatically divide your PDF into smaller downloadable parts.',
+    images: [`${siteUrl}/images/blog/split-by-size-hero.png`],
   },
   alternates: {
     canonical: postUrl,
@@ -140,7 +143,7 @@ const articleSchema = {
   '@id': `${postUrl}#article`,
   headline: 'Split PDF by Size: Complete Guide to Dividing Large PDFs by File Size',
   description: 'Complete guide on how to split PDF files by size online. Learn to divide large PDF documents into smaller files based on file size limits. Perfect for email attachments, file sharing, and managing large documents. Step-by-step instructions and best practices.',
-  image: `${siteUrl}/blog1.png`,
+  image: `${siteUrl}/blog/Split PDF by Size_ Complete Guide to Dividing Large PDFs by File Size.png`,
   author: {
     '@type': 'Organization',
     name: 'EditoraPDF',
@@ -208,7 +211,7 @@ export default function BlogPost() {
         {/* Hero Image with Title Overlay */}
         <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden bg-surface-800">
           <img
-            src="/blog1.png"
+            src="/blog/Split PDF by Size_ Complete Guide to Dividing Large PDFs by File Size.png"
             alt="Split PDF by size - Free online PDF splitter tool guide"
             className="w-full h-full object-cover shadow-[inset_0_0_200px_100px_rgba(0,0,0,0.8),0_0_100px_50px_rgba(0,0,0,0.6)]"
             style={{

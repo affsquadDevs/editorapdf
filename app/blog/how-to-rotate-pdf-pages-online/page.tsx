@@ -7,26 +7,29 @@ const siteUrl = 'https://editorapdf.com'
 const postUrl = `${siteUrl}/blog/how-to-rotate-pdf-pages-online`
 
 export const metadata: Metadata = {
-  title: 'How to Rotate PDF Pages Online - Free PDF Page Rotation Tool Guide | 2026',
-  description: 'Learn how to rotate PDF pages online for free. Fix orientation issues, rotate scanned documents, and adjust page angles. Secure, browser-based PDF page rotation tool. Step-by-step guide.',
+  title: 'How to Rotate PDF Pages Online (Step-by-Step Guide)',
+  description: 'Fix PDF orientation easily. Rotate PDF pages online and download your corrected document securely in just a few clicks.',
   openGraph: {
-    title: 'How to Rotate PDF Pages Online - Free PDF Page Rotation Tool Guide',
-    description: 'Learn how to rotate PDF pages online for free. Fix orientation issues, rotate scanned documents, and adjust page angles. Secure, browser-based PDF page rotation tool.',
+    type: 'article',
+    title: 'How to Rotate PDF Pages Online (Step-by-Step Guide)',
+    description: 'Fix PDF orientation easily. Rotate PDF pages online and download your corrected document securely in just a few clicks.',
     url: postUrl,
+    siteName: 'EditoraPDF',
     images: [
       {
-        url: `${siteUrl}/blog1.png`,
+        url: `${siteUrl}/images/blog/how-to-rotate-pdf-pages-online-hero.png`,
         width: 1200,
         height: 630,
-        alt: 'How to rotate PDF pages online - Free PDF page rotation tool',
+        alt: 'Banner showing PDF pages being rotated with 90, 180, and 270 degree options',
       },
     ],
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'How to Rotate PDF Pages Online - Free PDF Page Rotation Tool Guide',
-    description: 'Learn how to rotate PDF pages online for free. Fix orientation issues, rotate scanned documents, and adjust page angles.',
-    images: [`${siteUrl}/blog1.png`],
+    title: 'How to Rotate PDF Pages Online (Step-by-Step Guide)',
+    description: 'Fix PDF orientation easily. Rotate PDF pages online and download your corrected document securely in just a few clicks.',
+    images: [`${siteUrl}/images/blog/how-to-rotate-pdf-pages-online-hero.png`],
   },
   alternates: {
     canonical: postUrl,
@@ -140,7 +143,7 @@ const articleSchema = {
   '@id': `${postUrl}#article`,
   headline: 'How to Rotate PDF Pages Online - Complete Guide to Fixing PDF Orientation',
   description: 'Complete guide on how to rotate PDF pages online. Learn to fix orientation issues, rotate scanned documents, and adjust page angles using free online tools. Step-by-step instructions, tips, and best practices for rotating PDF pages.',
-  image: `${siteUrl}/blog1.png`,
+  image: `${siteUrl}/blog/How to Rotate PDF Pages Online_ Complete Guide to Fixing PDF Orientation.png`,
   author: {
     '@type': 'Organization',
     name: 'EditoraPDF',
@@ -208,7 +211,7 @@ export default function BlogPost() {
         {/* Hero Image with Title Overlay */}
         <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden bg-surface-800">
           <img
-            src="/blog1.png"
+            src="/blog/How to Rotate PDF Pages Online_ Complete Guide to Fixing PDF Orientation.png"
             alt="How to rotate PDF pages online - Free PDF page rotation tool guide"
             className="w-full h-full object-cover shadow-[inset_0_0_200px_100px_rgba(0,0,0,0.8),0_0_100px_50px_rgba(0,0,0,0.6)]"
             style={{

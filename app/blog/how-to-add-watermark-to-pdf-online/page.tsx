@@ -7,26 +7,29 @@ const siteUrl = 'https://editorapdf.com'
 const postUrl = `${siteUrl}/blog/how-to-add-watermark-to-pdf-online`
 
 export const metadata: Metadata = {
-  title: 'How to Add Watermark to PDF Online - Free PDF Watermark Tool Guide | 2026',
-  description: 'Learn how to add watermarks to PDF files online. Free, secure, and easy-to-use PDF watermark tool. Add text or image watermarks to protect and brand your documents. Step-by-step guide.',
+  title: 'How to Add Watermark to PDF Online: Complete Guide to Watermarking PDF Documents',
+  description: 'Learn how to add text or image watermarks to PDF files online. Protect your documents with custom watermarks like CONFIDENTIAL, DRAFT, or branding logos.',
   openGraph: {
-    title: 'How to Add Watermark to PDF Online - Free PDF Watermark Tool Guide',
-    description: 'Learn how to add watermarks to PDF files online. Free, secure, and easy-to-use PDF watermark tool. Add text or image watermarks to protect and brand your documents.',
+    type: 'article',
+    title: 'How to Add Watermark to PDF Online: Complete Guide to Watermarking PDF Documents',
+    description: 'Learn how to add text or image watermarks to PDF files online. Protect your documents with custom watermarks like CONFIDENTIAL, DRAFT, or branding logos.',
     url: postUrl,
+    siteName: 'EditoraPDF',
     images: [
       {
-        url: `${siteUrl}/blog1.png`,
+        url: `${siteUrl}/images/blog/add-watermark-pdf-hero.png`,
         width: 1200,
         height: 630,
-        alt: 'How to add watermark to PDF online - Free PDF watermark tool',
+        alt: 'Illustration showing a PDF document being stamped with a CONFIDENTIAL watermark',
       },
     ],
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'How to Add Watermark to PDF Online - Free PDF Watermark Tool Guide',
-    description: 'Learn how to add watermarks to PDF files online. Free, secure, and easy-to-use PDF watermark tool.',
-    images: [`${siteUrl}/blog1.png`],
+    title: 'How to Add Watermark to PDF Online: Complete Guide to Watermarking PDF Documents',
+    description: 'Learn how to add text or image watermarks to PDF files online. Protect your documents with custom watermarks like CONFIDENTIAL, DRAFT, or branding logos.',
+    images: [`${siteUrl}/images/blog/add-watermark-pdf-hero.png`],
   },
   alternates: {
     canonical: postUrl,
@@ -140,7 +143,7 @@ const articleSchema = {
   '@id': `${postUrl}#article`,
   headline: 'How to Add Watermark to PDF Online - Complete Guide to Watermarking PDF Documents',
   description: 'Complete guide on how to add watermarks to PDF files online. Learn to protect and brand your documents with text or image watermarks using free online tools. Step-by-step instructions, tips, and best practices.',
-  image: `${siteUrl}/blog1.png`,
+  image: `${siteUrl}/blog/How to Add Watermark to PDF Online_ Complete Guide to Watermarking PDF Documents.png`,
   author: {
     '@type': 'Organization',
     name: 'EditoraPDF',
@@ -208,7 +211,7 @@ export default function BlogPost() {
         {/* Hero Image with Title Overlay */}
         <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden bg-surface-800">
           <img
-            src="/blog1.png"
+            src="/blog/How to Add Watermark to PDF Online_ Complete Guide to Watermarking PDF Documents.png"
             alt="How to add watermark to PDF online - Free PDF watermark tool guide"
             className="w-full h-full object-cover shadow-[inset_0_0_200px_100px_rgba(0,0,0,0.8),0_0_100px_50px_rgba(0,0,0,0.6)]"
             style={{

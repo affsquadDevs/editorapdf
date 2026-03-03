@@ -7,26 +7,29 @@ const siteUrl = 'https://editorapdf.com'
 const postUrl = `${siteUrl}/blog/how-to-redact-pdf-online`
 
 export const metadata: Metadata = {
-  title: 'How to Redact PDF Online - Free PDF Redaction Tool Guide | 2026',
-  description: 'Learn how to redact sensitive information from PDF files online. Free, secure, and easy-to-use PDF redaction tool. Permanently remove text, images, and data from documents without software installation. Step-by-step guide.',
+  title: 'How to Redact PDF Online (Step-by-Step Secure Guide)',
+  description: 'Securely remove confidential text from your PDF file online. Black out sensitive information and download a safely redacted document instantly.',
   openGraph: {
-    title: 'How to Redact PDF Online - Free PDF Redaction Tool Guide',
-    description: 'Learn how to redact sensitive information from PDF files online. Free, secure, and easy-to-use PDF redaction tool. Permanently remove text, images, and data from documents.',
+    type: 'article',
+    title: 'How to Redact PDF Online (Step-by-Step Secure Guide)',
+    description: 'Securely remove confidential text from your PDF file online. Black out sensitive information and download a safely redacted document instantly.',
     url: postUrl,
+    siteName: 'EditoraPDF',
     images: [
       {
-        url: `${siteUrl}/blog1.png`,
+        url: `${siteUrl}/images/blog/how-to-redact-pdf-online-hero.png`,
         width: 1200,
         height: 630,
-        alt: 'How to redact PDF files online - Free PDF redaction tool',
+        alt: 'Banner showing a PDF document with blacked out text and a redaction marker tool',
       },
     ],
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'How to Redact PDF Online - Free PDF Redaction Tool Guide',
-    description: 'Learn how to redact sensitive information from PDF files online. Free, secure, and easy-to-use PDF redaction tool.',
-    images: [`${siteUrl}/blog1.png`],
+    title: 'How to Redact PDF Online (Step-by-Step Secure Guide)',
+    description: 'Securely remove confidential text from your PDF file online. Black out sensitive information and download a safely redacted document instantly.',
+    images: [`${siteUrl}/images/blog/how-to-redact-pdf-online-hero.png`],
   },
   alternates: {
     canonical: postUrl,
@@ -140,7 +143,7 @@ const articleSchema = {
   '@id': `${postUrl}#article`,
   headline: 'How to Redact PDF Online - Complete Guide to Removing Sensitive Information from PDF Documents',
   description: 'Complete guide on how to redact PDF files online. Learn to permanently remove sensitive information, text, images, and data from PDF documents using free online tools. Step-by-step instructions, tips, and best practices for secure PDF redaction.',
-  image: `${siteUrl}/blog1.png`,
+  image: `${siteUrl}/blog/How to Redact PDF Online_ Complete Guide to Removing Sensitive Information.png`,
   author: {
     '@type': 'Organization',
     name: 'EditoraPDF',
@@ -208,7 +211,7 @@ export default function BlogPost() {
         {/* Hero Image with Title Overlay */}
         <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden bg-surface-800">
           <img
-            src="/blog1.png"
+            src="/blog/How to Redact PDF Online_ Complete Guide to Removing Sensitive Information.png"
             alt="How to redact PDF files online - Free PDF redaction tool guide"
             className="w-full h-full object-cover shadow-[inset_0_0_200px_100px_rgba(0,0,0,0.8),0_0_100px_50px_rgba(0,0,0,0.6)]"
             style={{

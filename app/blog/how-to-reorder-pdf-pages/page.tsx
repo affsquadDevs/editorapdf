@@ -7,26 +7,29 @@ const siteUrl = 'https://editorapdf.com'
 const postUrl = `${siteUrl}/blog/how-to-reorder-pdf-pages`
 
 export const metadata: Metadata = {
-  title: 'How to Reorder PDF Pages Online - Free PDF Page Organizer Guide | 2026',
-  description: 'Learn how to reorder PDF pages online for free. Drag and drop pages to rearrange your PDF document. No software installation required. Step-by-step guide to organizing PDF pages.',
+  title: 'How to Reorder PDF Pages Online (Step-by-Step Guide)',
+  description: 'Rearrange PDF pages online using drag-and-drop. Quickly change page order and download your updated document securely.',
   openGraph: {
-    title: 'How to Reorder PDF Pages Online - Free PDF Page Organizer Guide',
-    description: 'Learn how to reorder PDF pages online for free. Drag and drop pages to rearrange your PDF document. No software installation required.',
+    type: 'article',
+    title: 'How to Reorder PDF Pages Online (Step-by-Step Guide)',
+    description: 'Rearrange PDF pages online using drag-and-drop. Quickly change page order and download your updated document securely.',
     url: postUrl,
+    siteName: 'EditoraPDF',
     images: [
       {
-        url: `${siteUrl}/blog1.png`,
+        url: `${siteUrl}/images/blog/how-to-reorder-pdf-pages-hero.png`,
         width: 1200,
         height: 630,
-        alt: 'How to reorder PDF pages online - Free PDF page organizer',
+        alt: 'Banner showing PDF pages being rearranged with arrows and drag and drop interface',
       },
     ],
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'How to Reorder PDF Pages Online - Free PDF Page Organizer Guide',
-    description: 'Learn how to reorder PDF pages online for free. Drag and drop pages to rearrange your PDF document.',
-    images: [`${siteUrl}/blog1.png`],
+    title: 'How to Reorder PDF Pages Online (Step-by-Step Guide)',
+    description: 'Rearrange PDF pages online using drag-and-drop. Quickly change page order and download your updated document securely.',
+    images: [`${siteUrl}/images/blog/how-to-reorder-pdf-pages-hero.png`],
   },
   alternates: {
     canonical: postUrl,
@@ -140,7 +143,7 @@ const articleSchema = {
   '@id': `${postUrl}#article`,
   headline: 'How to Reorder PDF Pages Online - Complete Guide to Rearranging PDF Documents',
   description: 'Complete guide on how to reorder PDF pages online. Learn to rearrange and organize PDF document pages using free online tools. Step-by-step instructions, tips, and best practices for organizing PDF pages.',
-  image: `${siteUrl}/blog1.png`,
+  image: `${siteUrl}/blog/How to Reorder PDF Pages Online_ Complete Guide to Rearranging PDF Documents.png`,
   author: {
     '@type': 'Organization',
     name: 'EditoraPDF',
@@ -208,7 +211,7 @@ export default function BlogPost() {
         {/* Hero Image with Title Overlay */}
         <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden bg-surface-800">
           <img
-            src="/blog1.png"
+            src="/blog/How to Reorder PDF Pages Online_ Complete Guide to Rearranging PDF Documents.png"
             alt="How to reorder PDF pages online - Free PDF page organizer guide"
             className="w-full h-full object-cover shadow-[inset_0_0_200px_100px_rgba(0,0,0,0.8),0_0_100px_50px_rgba(0,0,0,0.6)]"
             style={{

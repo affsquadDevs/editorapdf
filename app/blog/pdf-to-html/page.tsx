@@ -7,26 +7,29 @@ const siteUrl = 'https://editorapdf.com'
 const postUrl = `${siteUrl}/blog/pdf-to-html`
 
 export const metadata: Metadata = {
-  title: 'How to Convert PDF to HTML Online - Free PDF to HTML Converter Guide | 2026',
-  description: 'Learn how to convert PDF files to HTML format online. Free, secure PDF to HTML converter. Transform PDF documents into web pages without software installation. Step-by-step guide with best practices.',
+  title: 'How to Convert PDF to HTML Online: Complete Guide to PDF to HTML Conversion',
+  description: 'Convert PDF files to clean HTML format online. Learn how to transform PDFs into web-ready HTML for websites, documentation, and content publishing.',
   openGraph: {
-    title: 'How to Convert PDF to HTML Online - Free PDF to HTML Converter Guide',
-    description: 'Learn how to convert PDF files to HTML format online. Free, secure PDF to HTML converter. Transform PDF documents into web pages without software installation.',
+    type: 'article',
+    title: 'How to Convert PDF to HTML Online: Complete Guide to PDF to HTML Conversion',
+    description: 'Convert PDF files to clean HTML format online. Learn how to transform PDFs into web-ready HTML for websites, documentation, and content publishing.',
     url: postUrl,
+    siteName: 'EditoraPDF',
     images: [
       {
-        url: `${siteUrl}/blog1.png`,
+        url: `${siteUrl}/images/blog/pdf-to-html-hero.png`,
         width: 1200,
         height: 630,
-        alt: 'How to convert PDF to HTML online - Free PDF to HTML converter tool',
+        alt: 'Illustration showing a PDF document being converted into HTML code with tags and web layout preview',
       },
     ],
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'How to Convert PDF to HTML Online - Free PDF to HTML Converter Guide',
-    description: 'Learn how to convert PDF files to HTML format online. Free, secure PDF to HTML converter. Transform PDF documents into web pages without software installation.',
-    images: [`${siteUrl}/blog1.png`],
+    title: 'How to Convert PDF to HTML Online: Complete Guide to PDF to HTML Conversion',
+    description: 'Convert PDF files to clean HTML format online. Learn how to transform PDFs into web-ready HTML for websites, documentation, and content publishing.',
+    images: [`${siteUrl}/images/blog/pdf-to-html-hero.png`],
   },
   alternates: {
     canonical: postUrl,
@@ -140,7 +143,7 @@ const articleSchema = {
   '@id': `${postUrl}#article`,
   headline: 'How to Convert PDF to HTML Online - Complete Guide to PDF to HTML Conversion',
   description: 'Complete guide on how to convert PDF files to HTML format online. Learn to transform PDF documents into web pages using free online tools. Step-by-step instructions, tips, and best practices for PDF to HTML conversion.',
-  image: `${siteUrl}/blog1.png`,
+  image: `${siteUrl}/blog/How to Convert PDF to HTML Online_ Complete Guide to PDF to HTML Conversion.png`,
   author: {
     '@type': 'Organization',
     name: 'EditoraPDF',
@@ -208,7 +211,7 @@ export default function BlogPost() {
         {/* Hero Image with Title Overlay */}
         <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden bg-surface-800">
           <img
-            src="/blog1.png"
+            src="/blog/How to Convert PDF to HTML Online_ Complete Guide to PDF to HTML Conversion.png"
             alt="How to convert PDF to HTML online - Free PDF to HTML converter tool guide"
             className="w-full h-full object-cover shadow-[inset_0_0_200px_100px_rgba(0,0,0,0.8),0_0_100px_50px_rgba(0,0,0,0.6)]"
             style={{
