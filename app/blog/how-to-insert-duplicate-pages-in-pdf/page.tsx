@@ -143,7 +143,7 @@ const articleSchema = {
   '@id': `${postUrl}#article`,
   headline: 'How to Insert Duplicate Pages in PDF - Complete Guide to Copying PDF Pages',
   description: 'Complete guide on how to insert duplicate pages in PDF files online. Learn to copy and duplicate PDF pages using free online tools. Step-by-step instructions, tips, and best practices for duplicating pages.',
-  image: `${siteUrl}/blog1.png`,
+  image: `${siteUrl}/blog/How to Insert Duplicate Pages in PDF_ Complete Guide to Copying PDF Pages.png`,
   author: {
     '@type': 'Organization',
     name: 'EditoraPDF',
@@ -211,7 +211,7 @@ export default function BlogPost() {
         {/* Hero Image with Title Overlay */}
         <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden bg-surface-800">
           <img
-            src="/blog1.png"
+            src="/blog/How to Insert Duplicate Pages in PDF_ Complete Guide to Copying PDF Pages.png"
             alt="How to insert duplicate pages in PDF - Free online tool guide"
             className="w-full h-full object-cover shadow-[inset_0_0_200px_100px_rgba(0,0,0,0.8),0_0_100px_50px_rgba(0,0,0,0.6)]"
             style={{

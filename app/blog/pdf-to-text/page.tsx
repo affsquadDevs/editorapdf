@@ -135,7 +135,7 @@ const articleSchema = {
   '@id': `${postUrl}#article`,
   headline: 'PDF to Text Converter - Complete Guide to Extracting Text from PDF Files',
   description: 'Complete guide on how to convert PDF to text online. Learn to extract text from PDF files using free online tools. Step-by-step instructions, tips, and best practices for PDF text extraction.',
-  image: `${siteUrl}/blog1.png`,
+  image: `${siteUrl}/blog/PDF to Text Converter_ Complete Guide to Extracting Text from PDF Files.png`,
   author: {
     '@type': 'Organization',
     name: 'EditoraPDF',
@@ -203,7 +203,7 @@ export default function BlogPost() {
         {/* Hero Image with Title Overlay */}
         <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden bg-surface-800">
           <img
-            src="/blog1.png"
+            src="/blog/PDF to Text Converter_ Complete Guide to Extracting Text from PDF Files.png"
             alt="PDF to Text Converter - Extract text from PDF files online"
             className="w-full h-full object-cover shadow-[inset_0_0_200px_100px_rgba(0,0,0,0.8),0_0_100px_50px_rgba(0,0,0,0.6)]"
             style={{

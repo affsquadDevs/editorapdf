@@ -151,7 +151,7 @@ const articleSchema = {
   '@id': `${postUrl}#article`,
   headline: 'PDF to Markdown Converter - Complete Guide to Converting PDF Documents to Markdown Format',
   description: 'Complete guide on how to convert PDF to Markdown online. Learn to transform PDF documents into Markdown format using free online tools. Step-by-step instructions, tips, and best practices for PDF to Markdown conversion.',
-  image: `${siteUrl}/blog1.png`,
+  image: `${siteUrl}/blog/PDF to Markdown Converter_ Complete Guide to Transforming PDF Documents into Markdown Format.png`,
   author: {
     '@type': 'Organization',
     name: 'EditoraPDF',
@@ -219,7 +219,7 @@ export default function BlogPost() {
         {/* Hero Image with Title Overlay */}
         <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden bg-surface-800">
           <img
-            src="/blog1.png"
+            src="/blog/PDF to Markdown Converter_ Complete Guide to Transforming PDF Documents into Markdown Format.png"
             alt="PDF to Markdown Converter - Convert PDF files to Markdown format online"
             className="w-full h-full object-cover shadow-[inset_0_0_200px_100px_rgba(0,0,0,0.8),0_0_100px_50px_rgba(0,0,0,0.6)]"
             style={{

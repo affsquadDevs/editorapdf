@@ -143,7 +143,7 @@ const articleSchema = {
   '@id': `${postUrl}#article`,
   headline: 'How to Convert PDF to Word Online - Complete Guide to PDF to DOCX Conversion',
   description: 'Complete guide on how to convert PDF files to Word documents online. Learn to transform PDF documents into editable Word files using free online tools. Step-by-step instructions, tips, and best practices for PDF to DOCX conversion.',
-  image: `${siteUrl}/blog1.png`,
+  image: `${siteUrl}/blog/How to Convert PDF to Word Online_ Complete Guide to PDF to DOCX Conversion.png`,
   author: {
     '@type': 'Organization',
     name: 'EditoraPDF',
@@ -211,7 +211,7 @@ export default function BlogPost() {
         {/* Hero Image with Title Overlay */}
         <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden bg-surface-800">
           <img
-            src="/blog1.png"
+            src="/blog/How to Convert PDF to Word Online_ Complete Guide to PDF to DOCX Conversion.png"
             alt="How to convert PDF to Word online - Free PDF to DOCX converter guide"
             className="w-full h-full object-cover shadow-[inset_0_0_200px_100px_rgba(0,0,0,0.8),0_0_100px_50px_rgba(0,0,0,0.6)]"
             style={{

@@ -143,7 +143,7 @@ const articleSchema = {
   '@id': `${postUrl}#article`,
   headline: 'Split PDF by Size: Complete Guide to Dividing Large PDFs by File Size',
   description: 'Complete guide on how to split PDF files by size online. Learn to divide large PDF documents into smaller files based on file size limits. Perfect for email attachments, file sharing, and managing large documents. Step-by-step instructions and best practices.',
-  image: `${siteUrl}/blog1.png`,
+  image: `${siteUrl}/blog/Split PDF by Size_ Complete Guide to Dividing Large PDFs by File Size.png`,
   author: {
     '@type': 'Organization',
     name: 'EditoraPDF',
@@ -211,7 +211,7 @@ export default function BlogPost() {
         {/* Hero Image with Title Overlay */}
         <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden bg-surface-800">
           <img
-            src="/blog1.png"
+            src="/blog/Split PDF by Size_ Complete Guide to Dividing Large PDFs by File Size.png"
             alt="Split PDF by size - Free online PDF splitter tool guide"
             className="w-full h-full object-cover shadow-[inset_0_0_200px_100px_rgba(0,0,0,0.8),0_0_100px_50px_rgba(0,0,0,0.6)]"
             style={{

@@ -127,7 +127,7 @@ const articleSchema = {
   '@id': `${postUrl}#article`,
   headline: 'How to Merge PDF Files Online - Complete Guide to Combining PDF Documents',
   description: 'Complete guide on how to merge PDF files online. Learn to combine multiple PDF documents into one file using free online tools. Step-by-step instructions, tips, and best practices.',
-  image: `${siteUrl}/blog1.png`,
+  image: `${siteUrl}/blog/How to Merge PDF Files Online_ Complete Guide to Combining PDF Documents.png`,
   author: {
     '@type': 'Organization',
     name: 'EditoraPDF',
@@ -222,7 +222,7 @@ export default function BlogPost() {
         {/* Hero Image with Title Overlay */}
         <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden bg-surface-800">
           <img
-            src="/blog1.png"
+            src="/blog/How to Merge PDF Files Online_ Complete Guide to Combining PDF Documents.png"
             alt="How to merge PDF files online - Free PDF merger tool guide"
             className="w-full h-full object-cover shadow-[inset_0_0_200px_100px_rgba(0,0,0,0.8),0_0_100px_50px_rgba(0,0,0,0.6)]"
             style={{

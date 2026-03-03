@@ -143,7 +143,7 @@ const articleSchema = {
   '@id': `${postUrl}#article`,
   headline: 'How to Add Watermark to PDF Online - Complete Guide to Watermarking PDF Documents',
   description: 'Complete guide on how to add watermarks to PDF files online. Learn to protect and brand your documents with text or image watermarks using free online tools. Step-by-step instructions, tips, and best practices.',
-  image: `${siteUrl}/blog1.png`,
+  image: `${siteUrl}/blog/How to Add Watermark to PDF Online_ Complete Guide to Watermarking PDF Documents.png`,
   author: {
     '@type': 'Organization',
     name: 'EditoraPDF',
@@ -211,7 +211,7 @@ export default function BlogPost() {
         {/* Hero Image with Title Overlay */}
         <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden bg-surface-800">
           <img
-            src="/blog1.png"
+            src="/blog/How to Add Watermark to PDF Online_ Complete Guide to Watermarking PDF Documents.png"
             alt="How to add watermark to PDF online - Free PDF watermark tool guide"
             className="w-full h-full object-cover shadow-[inset_0_0_200px_100px_rgba(0,0,0,0.8),0_0_100px_50px_rgba(0,0,0,0.6)]"
             style={{

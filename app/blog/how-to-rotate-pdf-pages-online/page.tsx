@@ -143,7 +143,7 @@ const articleSchema = {
   '@id': `${postUrl}#article`,
   headline: 'How to Rotate PDF Pages Online - Complete Guide to Fixing PDF Orientation',
   description: 'Complete guide on how to rotate PDF pages online. Learn to fix orientation issues, rotate scanned documents, and adjust page angles using free online tools. Step-by-step instructions, tips, and best practices for rotating PDF pages.',
-  image: `${siteUrl}/blog1.png`,
+  image: `${siteUrl}/blog/How to Rotate PDF Pages Online_ Complete Guide to Fixing PDF Orientation.png`,
   author: {
     '@type': 'Organization',
     name: 'EditoraPDF',
@@ -211,7 +211,7 @@ export default function BlogPost() {
         {/* Hero Image with Title Overlay */}
         <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden bg-surface-800">
           <img
-            src="/blog1.png"
+            src="/blog/How to Rotate PDF Pages Online_ Complete Guide to Fixing PDF Orientation.png"
             alt="How to rotate PDF pages online - Free PDF page rotation tool guide"
             className="w-full h-full object-cover shadow-[inset_0_0_200px_100px_rgba(0,0,0,0.8),0_0_100px_50px_rgba(0,0,0,0.6)]"
             style={{

@@ -143,7 +143,7 @@ const articleSchema = {
   '@id': `${postUrl}#article`,
   headline: 'How to Insert Blank Pages in PDF - Complete Guide to Adding Empty Pages',
   description: 'Complete guide on how to insert blank pages into PDF documents online. Learn to add empty pages anywhere in your PDF using free online tools. Step-by-step instructions, tips, and best practices for inserting blank pages.',
-  image: `${siteUrl}/blog1.png`,
+  image: `${siteUrl}/blog/How to Insert Blank Pages in PDF_ Complete Guide to Adding Empty Pages.png`,
   author: {
     '@type': 'Organization',
     name: 'EditoraPDF',
@@ -211,7 +211,7 @@ export default function BlogPost() {
         {/* Hero Image with Title Overlay */}
         <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden bg-surface-800">
           <img
-            src="/blog1.png"
+            src="/blog/How to Insert Blank Pages in PDF_ Complete Guide to Adding Empty Pages.png"
             alt="How to insert blank pages in PDF - Add empty pages online guide"
             className="w-full h-full object-cover shadow-[inset_0_0_200px_100px_rgba(0,0,0,0.8),0_0_100px_50px_rgba(0,0,0,0.6)]"
             style={{

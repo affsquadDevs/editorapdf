@@ -2,10 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Header from '../components/Header'
 import {
-  FilePlus2, Scissors, Copy, Github, ShieldCheck, Lock,
-  FileText, Hash, Eye, BarChart3, ArrowRight, User,
-  ListOrdered, Droplets, Image, FileImage, Table, Code,
-  Minimize2, Trash2, RotateCw, Bookmark, FileOutput, GripVertical,
+  Github, ShieldCheck, Lock, BarChart3, ArrowRight, Code,
 } from 'lucide-react'
 
 export const metadata: Metadata = {
@@ -36,10 +33,12 @@ export default function BlogPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Blog Post: How to Merge PDF Files Online */}
             <Link href="/blog/how-to-merge-pdf-files-online" className="card overflow-hidden hover:scale-105 transition-transform duration-300 group">
-              <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-primary-500/20 to-success-500/20">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <FilePlus2 className="w-24 h-24 text-primary-400/50" strokeWidth={1.5} />
-                </div>
+              <div className="relative w-full h-48 overflow-hidden bg-surface-800">
+                <img
+                  src="/blog/How to Merge PDF Files Online_ Complete Guide to Combining PDF Documents.png"
+                  alt="How to Merge PDF Files Online"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
@@ -61,10 +60,12 @@ export default function BlogPage() {
 
             {/* Blog Post: How to Split PDF Files Online */}
             <Link href="/blog/how-to-split-pdf-files-online" className="card overflow-hidden hover:scale-105 transition-transform duration-300 group">
-              <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-accent-500/20 to-primary-500/20">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Scissors className="w-24 h-24 text-accent-400/50" strokeWidth={1.5} />
-                </div>
+              <div className="relative w-full h-48 overflow-hidden bg-surface-800">
+                <img
+                  src="/blog/How to Split PDF Files Online_ Complete Guide to Dividing PDF Documents.png"
+                  alt="How to Split PDF Files Online"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
@@ -86,10 +87,12 @@ export default function BlogPage() {
 
             {/* Blog Post: How to Insert Duplicate Pages in PDF */}
             <Link href="/blog/how-to-insert-duplicate-pages-in-pdf" className="card overflow-hidden hover:scale-105 transition-transform duration-300 group">
-              <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-warning-500/20 to-accent-500/20">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Copy className="w-24 h-24 text-warning-400/50" strokeWidth={1.5} />
-                </div>
+              <div className="relative w-full h-48 overflow-hidden bg-surface-800">
+                <img
+                  src="/blog/How to Insert Duplicate Pages in PDF_ Complete Guide to Copying PDF Pages.png"
+                  alt="How to Insert Duplicate Pages in PDF"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
@@ -236,10 +239,12 @@ export default function BlogPage() {
 
             {/* Blog Post: PDF to Markdown Converter */}
             <Link href="/blog/pdf-to-markdown" className="card overflow-hidden hover:scale-105 transition-transform duration-300 group">
-              <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-primary-500/20 to-accent-500/20">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Hash className="w-24 h-24 text-primary-400/50" strokeWidth={1.5} />
-                </div>
+              <div className="relative w-full h-48 overflow-hidden bg-surface-800">
+                <img
+                  src="/blog/PDF to Markdown Converter_ Complete Guide to Transforming PDF Documents into Markdown Format.png"
+                  alt="PDF to Markdown Converter"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
@@ -307,10 +312,12 @@ export default function BlogPage() {
 
             {/* Blog Post: PDF to HTML Converter */}
             <Link href="/blog/pdf-to-html" className="card overflow-hidden hover:scale-105 transition-transform duration-300 group">
-              <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-primary-500/20 to-accent-500/20">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Code className="w-24 h-24 text-primary-400/50" strokeWidth={1.5} />
-                </div>
+              <div className="relative w-full h-48 overflow-hidden bg-surface-800">
+                <img
+                  src="/blog/How to Convert PDF to HTML Online_ Complete Guide to PDF to HTML Conversion.png"
+                  alt="PDF to HTML Converter"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
@@ -332,10 +339,12 @@ export default function BlogPage() {
 
             {/* Blog Post: PDF to Text Converter */}
             <Link href="/blog/pdf-to-text" className="card overflow-hidden hover:scale-105 transition-transform duration-300 group">
-              <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-success-500/20 to-primary-500/20">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <FileText className="w-24 h-24 text-success-400/50" strokeWidth={1.5} />
-                </div>
+              <div className="relative w-full h-48 overflow-hidden bg-surface-800">
+                <img
+                  src="/blog/PDF to Text Converter_ Complete Guide to Extracting Text from PDF Files.png"
+                  alt="PDF to Text Converter"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
@@ -357,10 +366,12 @@ export default function BlogPage() {
 
             {/* Blog Post: Digital Signature */}
             <Link href="/blog/digital-signature" className="card overflow-hidden hover:scale-105 transition-transform duration-300 group">
-              <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-accent-500/20 to-primary-500/20">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <User className="w-24 h-24 text-accent-400/50" strokeWidth={1.5} />
-                </div>
+              <div className="relative w-full h-48 overflow-hidden bg-surface-800">
+                <img
+                  src="/blog/How to Add Digital Signatures to PDFs Online_ Complete Guide to E-Signing Documents.png"
+                  alt="Digital Signature"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
@@ -382,10 +393,12 @@ export default function BlogPage() {
 
             {/* Blog Post: How to Add Headers and Footers to PDF */}
             <Link href="/blog/how-to-add-headers-and-footers-to-pdf" className="card overflow-hidden hover:scale-105 transition-transform duration-300 group">
-              <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-warning-500/20 to-primary-500/20">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <FileText className="w-24 h-24 text-warning-400/50" strokeWidth={1.5} />
-                </div>
+              <div className="relative w-full h-48 overflow-hidden bg-surface-800">
+                <img
+                  src="/blog/How to Add Headers and Footers to PDF_ Complete Guide to Customizing PDF Documents.png"
+                  alt="How to Add Headers and Footers to PDF"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
@@ -407,10 +420,12 @@ export default function BlogPage() {
 
             {/* Blog Post: How to Add Page Numbers to PDF */}
             <Link href="/blog/how-to-add-page-numbers-to-pdf" className="card overflow-hidden hover:scale-105 transition-transform duration-300 group">
-              <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-primary-500/20 to-success-500/20">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <ListOrdered className="w-24 h-24 text-primary-400/50" strokeWidth={1.5} />
-                </div>
+              <div className="relative w-full h-48 overflow-hidden bg-surface-800">
+                <img
+                  src="/blog/How to Add Page Numbers to PDF Online_ Complete Guide to PDF Page Numbering.png"
+                  alt="How to Add Page Numbers to PDF"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
@@ -432,10 +447,12 @@ export default function BlogPage() {
 
             {/* Blog Post: How to Add Watermark to PDF */}
             <Link href="/blog/how-to-add-watermark-to-pdf-online" className="card overflow-hidden hover:scale-105 transition-transform duration-300 group">
-              <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-accent-500/20 to-warning-500/20">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Droplets className="w-24 h-24 text-accent-400/50" strokeWidth={1.5} />
-                </div>
+              <div className="relative w-full h-48 overflow-hidden bg-surface-800">
+                <img
+                  src="/blog/How to Add Watermark to PDF Online_ Complete Guide to Watermarking PDF Documents.png"
+                  alt="How to Add Watermark to PDF"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
@@ -457,10 +474,12 @@ export default function BlogPage() {
 
             {/* Blog Post: How to Compress PDF Online */}
             <Link href="/blog/how-to-compress-pdf-online" className="card overflow-hidden hover:scale-105 transition-transform duration-300 group">
-              <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-success-500/20 to-primary-500/20">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Minimize2 className="w-24 h-24 text-success-400/50" strokeWidth={1.5} />
-                </div>
+              <div className="relative w-full h-48 overflow-hidden bg-surface-800">
+                <img
+                  src="/blog/How to Compress PDF Files Online_ Complete Guide to Reducing PDF File Size.png"
+                  alt="How to Compress PDF Online"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
@@ -482,10 +501,12 @@ export default function BlogPage() {
 
             {/* Blog Post: How to Convert Images to PDF */}
             <Link href="/blog/how-to-convert-images-to-pdf-online" className="card overflow-hidden hover:scale-105 transition-transform duration-300 group">
-              <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-primary-500/20 to-accent-500/20">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <FileImage className="w-24 h-24 text-primary-400/50" strokeWidth={1.5} />
-                </div>
+              <div className="relative w-full h-48 overflow-hidden bg-surface-800">
+                <img
+                  src="/blog/How to Convert Images to PDF Online_ Complete Guide to Image to PDF Conversion.png"
+                  alt="How to Convert Images to PDF"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
@@ -507,10 +528,12 @@ export default function BlogPage() {
 
             {/* Blog Post: How to Convert PDF to CSV */}
             <Link href="/blog/how-to-convert-pdf-to-csv-online" className="card overflow-hidden hover:scale-105 transition-transform duration-300 group">
-              <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-success-500/20 to-accent-500/20">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Table className="w-24 h-24 text-success-400/50" strokeWidth={1.5} />
-                </div>
+              <div className="relative w-full h-48 overflow-hidden bg-surface-800">
+                <img
+                  src="/blog/How to Convert PDF to Excel Online_ Complete Guide to PDF to Spreadsheet Conversion.png"
+                  alt="How to Convert PDF to CSV"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
@@ -532,10 +555,12 @@ export default function BlogPage() {
 
             {/* Blog Post: How to Convert PDF to Excel */}
             <Link href="/blog/how-to-convert-pdf-to-excel-online" className="card overflow-hidden hover:scale-105 transition-transform duration-300 group">
-              <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-primary-500/20 to-success-500/20">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Table className="w-24 h-24 text-primary-400/50" strokeWidth={1.5} />
-                </div>
+              <div className="relative w-full h-48 overflow-hidden bg-surface-800">
+                <img
+                  src="/blog/How to Convert PDF to Excel Online_ Complete Guide to PDF to Spreadsheet Conversion.png"
+                  alt="How to Convert PDF to Excel"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
@@ -557,10 +582,12 @@ export default function BlogPage() {
 
             {/* Blog Post: How to Convert PDF to Word */}
             <Link href="/blog/how-to-convert-pdf-to-word-online" className="card overflow-hidden hover:scale-105 transition-transform duration-300 group">
-              <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-accent-500/20 to-primary-500/20">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <FileText className="w-24 h-24 text-accent-400/50" strokeWidth={1.5} />
-                </div>
+              <div className="relative w-full h-48 overflow-hidden bg-surface-800">
+                <img
+                  src="/blog/How to Convert PDF to Word Online_ Complete Guide to PDF to DOCX Conversion.png"
+                  alt="How to Convert PDF to Word"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
@@ -582,10 +609,12 @@ export default function BlogPage() {
 
             {/* Blog Post: How to Delete Pages from PDF */}
             <Link href="/blog/how-to-delete-pages-from-pdf" className="card overflow-hidden hover:scale-105 transition-transform duration-300 group">
-              <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-error-500/20 to-warning-500/20">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Trash2 className="w-24 h-24 text-error-400/50" strokeWidth={1.5} />
-                </div>
+              <div className="relative w-full h-48 overflow-hidden bg-surface-800">
+                <img
+                  src="/blog/How to Delete Pages from PDF Online_ Complete Guide to Removing Unwanted Pages.png"
+                  alt="How to Delete Pages from PDF"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
@@ -607,10 +636,12 @@ export default function BlogPage() {
 
             {/* Blog Post: How to Extract Pages from PDF */}
             <Link href="/blog/how-to-extract-pages-from-pdf-online" className="card overflow-hidden hover:scale-105 transition-transform duration-300 group">
-              <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-primary-500/20 to-accent-500/20">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <FileOutput className="w-24 h-24 text-primary-400/50" strokeWidth={1.5} />
-                </div>
+              <div className="relative w-full h-48 overflow-hidden bg-surface-800">
+                <img
+                  src="/blog/How to Extract Pages from PDF Online_ Complete Guide to PDF Page Extraction.png"
+                  alt="How to Extract Pages from PDF"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
@@ -632,10 +663,12 @@ export default function BlogPage() {
 
             {/* Blog Post: How to Insert Blank Pages in PDF */}
             <Link href="/blog/how-to-insert-blank-pages-in-pdf" className="card overflow-hidden hover:scale-105 transition-transform duration-300 group">
-              <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-warning-500/20 to-primary-500/20">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <FilePlus2 className="w-24 h-24 text-warning-400/50" strokeWidth={1.5} />
-                </div>
+              <div className="relative w-full h-48 overflow-hidden bg-surface-800">
+                <img
+                  src="/blog/How to Insert Blank Pages in PDF_ Complete Guide to Adding Empty Pages.png"
+                  alt="How to Insert Blank Pages in PDF"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
@@ -657,10 +690,12 @@ export default function BlogPage() {
 
             {/* Blog Post: How to Redact PDF Online */}
             <Link href="/blog/how-to-redact-pdf-online" className="card overflow-hidden hover:scale-105 transition-transform duration-300 group">
-              <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-error-500/20 to-accent-500/20">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Eye className="w-24 h-24 text-error-400/50" strokeWidth={1.5} />
-                </div>
+              <div className="relative w-full h-48 overflow-hidden bg-surface-800">
+                <img
+                  src="/blog/How to Redact PDF Online_ Complete Guide to Removing Sensitive Information.png"
+                  alt="How to Redact PDF Online"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
@@ -682,10 +717,12 @@ export default function BlogPage() {
 
             {/* Blog Post: How to Reorder PDF Pages */}
             <Link href="/blog/how-to-reorder-pdf-pages" className="card overflow-hidden hover:scale-105 transition-transform duration-300 group">
-              <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-primary-500/20 to-success-500/20">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <GripVertical className="w-24 h-24 text-primary-400/50" strokeWidth={1.5} />
-                </div>
+              <div className="relative w-full h-48 overflow-hidden bg-surface-800">
+                <img
+                  src="/blog/How to Reorder PDF Pages Online_ Complete Guide to Rearranging PDF Documents.png"
+                  alt="How to Reorder PDF Pages"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
@@ -707,10 +744,12 @@ export default function BlogPage() {
 
             {/* Blog Post: How to Reverse PDF Page Order */}
             <Link href="/blog/how-to-reverse-pdf-page-order" className="card overflow-hidden hover:scale-105 transition-transform duration-300 group">
-              <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-accent-500/20 to-primary-500/20">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <GripVertical className="w-24 h-24 text-accent-400/50" strokeWidth={1.5} />
-                </div>
+              <div className="relative w-full h-48 overflow-hidden bg-surface-800">
+                <img
+                  src="/blog/How to Reverse PDF Page Order Online_ Complete Guide to Flipping PDF Pages.png"
+                  alt="How to Reverse PDF Page Order"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
@@ -732,10 +771,12 @@ export default function BlogPage() {
 
             {/* Blog Post: How to Rotate PDF Pages */}
             <Link href="/blog/how-to-rotate-pdf-pages-online" className="card overflow-hidden hover:scale-105 transition-transform duration-300 group">
-              <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-warning-500/20 to-accent-500/20">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <RotateCw className="w-24 h-24 text-warning-400/50" strokeWidth={1.5} />
-                </div>
+              <div className="relative w-full h-48 overflow-hidden bg-surface-800">
+                <img
+                  src="/blog/How to Rotate PDF Pages Online_ Complete Guide to Fixing PDF Orientation.png"
+                  alt="How to Rotate PDF Pages"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
@@ -757,10 +798,12 @@ export default function BlogPage() {
 
             {/* Blog Post: How to Sanitize PDF */}
             <Link href="/blog/how-to-sanitize-pdf" className="card overflow-hidden hover:scale-105 transition-transform duration-300 group">
-              <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-success-500/20 to-primary-500/20">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <ShieldCheck className="w-24 h-24 text-success-400/50" strokeWidth={1.5} />
-                </div>
+              <div className="relative w-full h-48 overflow-hidden bg-surface-800">
+                <img
+                  src="/blog/How to Sanitize PDF Files Online_ Complete Guide to Removing Hidden Data and Metadata.png"
+                  alt="How to Sanitize PDF"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
@@ -782,10 +825,12 @@ export default function BlogPage() {
 
             {/* Blog Post: Split PDF by Bookmarks */}
             <Link href="/blog/split-by-bookmarks" className="card overflow-hidden hover:scale-105 transition-transform duration-300 group">
-              <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-primary-500/20 to-accent-500/20">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Bookmark className="w-24 h-24 text-primary-400/50" strokeWidth={1.5} />
-                </div>
+              <div className="relative w-full h-48 overflow-hidden bg-surface-800">
+                <img
+                  src="/blog/How to Split PDF by Bookmarks_ Complete Guide to Dividing PDFs Using Bookmark Structure.png"
+                  alt="Split PDF by Bookmarks"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">
@@ -807,10 +852,12 @@ export default function BlogPage() {
 
             {/* Blog Post: Split PDF by Size */}
             <Link href="/blog/split-by-size" className="card overflow-hidden hover:scale-105 transition-transform duration-300 group">
-              <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-accent-500/20 to-success-500/20">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Scissors className="w-24 h-24 text-accent-400/50" strokeWidth={1.5} />
-                </div>
+              <div className="relative w-full h-48 overflow-hidden bg-surface-800">
+                <img
+                  src="/blog/Split PDF by Size_ Complete Guide to Dividing Large PDFs by File Size.png"
+                  alt="Split PDF by Size"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-2 mb-2">

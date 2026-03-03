@@ -159,7 +159,7 @@ const articleSchema = {
   '@id': `${postUrl}#article`,
   headline: 'How to Add Digital Signatures to PDFs Online - Complete Guide to E-Signing Documents',
   description: 'Complete guide on how to add digital signatures to PDF documents online. Learn to sign PDFs electronically using free online tools. Step-by-step instructions, legal considerations, and best practices for e-signatures.',
-  image: `${siteUrl}/blog1.png`,
+  image: `${siteUrl}/blog/How to Add Digital Signatures to PDFs Online_ Complete Guide to E-Signing Documents.png`,
   author: {
     '@type': 'Organization',
     name: 'EditoraPDF',
@@ -227,7 +227,7 @@ export default function BlogPost() {
         {/* Hero Image with Title Overlay */}
         <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden bg-surface-800">
           <img
-            src="/blog1.png"
+            src="/blog/How to Add Digital Signatures to PDFs Online_ Complete Guide to E-Signing Documents.png"
             alt="How to add digital signatures to PDFs online - Free e-signature tool guide"
             className="w-full h-full object-cover shadow-[inset_0_0_200px_100px_rgba(0,0,0,0.8),0_0_100px_50px_rgba(0,0,0,0.6)]"
             style={{

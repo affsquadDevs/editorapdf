@@ -143,7 +143,7 @@ const articleSchema = {
   '@id': `${postUrl}#article`,
   headline: 'How to Convert PDF to Excel Online - Complete Guide to PDF to Spreadsheet Conversion',
   description: 'Complete guide on how to convert PDF files to Excel spreadsheets online. Learn to extract tables and data from PDF documents using free online tools. Step-by-step instructions, tips, and best practices for accurate PDF to Excel conversion.',
-  image: `${siteUrl}/blog1.png`,
+  image: `${siteUrl}/blog/How to Convert PDF to Excel Online_ Complete Guide to PDF to Spreadsheet Conversion.png`,
   author: {
     '@type': 'Organization',
     name: 'EditoraPDF',
@@ -211,7 +211,7 @@ export default function BlogPost() {
         {/* Hero Image with Title Overlay */}
         <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden bg-surface-800">
           <img
-            src="/blog1.png"
+            src="/blog/How to Convert PDF to Excel Online_ Complete Guide to PDF to Spreadsheet Conversion.png"
             alt="How to convert PDF to Excel online - Free PDF to Excel converter tool guide"
             className="w-full h-full object-cover shadow-[inset_0_0_200px_100px_rgba(0,0,0,0.8),0_0_100px_50px_rgba(0,0,0,0.6)]"
             style={{

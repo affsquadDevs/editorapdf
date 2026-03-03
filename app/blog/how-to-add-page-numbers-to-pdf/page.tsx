@@ -143,7 +143,7 @@ const articleSchema = {
   '@id': `${postUrl}#article`,
   headline: 'How to Add Page Numbers to PDF Online - Complete Guide to PDF Page Numbering',
   description: 'Complete guide on how to add page numbers to PDF documents online. Learn to number PDF pages using free online tools. Step-by-step instructions, customization options, tips, and best practices for PDF page numbering.',
-  image: `${siteUrl}/blog1.png`,
+  image: `${siteUrl}/blog/How to Add Page Numbers to PDF Online_ Complete Guide to PDF Page Numbering.png`,
   author: {
     '@type': 'Organization',
     name: 'EditoraPDF',
@@ -211,7 +211,7 @@ export default function BlogPost() {
         {/* Hero Image with Title Overlay */}
         <div className="relative w-full h-[400px] md:h-[500px] overflow-hidden bg-surface-800">
           <img
-            src="/blog1.png"
+            src="/blog/How to Add Page Numbers to PDF Online_ Complete Guide to PDF Page Numbering.png"
             alt="How to add page numbers to PDF online - Free PDF page numbering tool guide"
             className="w-full h-full object-cover shadow-[inset_0_0_200px_100px_rgba(0,0,0,0.8),0_0_100px_50px_rgba(0,0,0,0.6)]"
             style={{
