@@ -7,26 +7,29 @@ const siteUrl = 'https://editorapdf.com'
 const postUrl = `${siteUrl}/blog/how-to-split-pdf-files-online`
 
 export const metadata: Metadata = {
-  title: 'How to Split PDF Files Online - Free PDF Splitter Tool Guide | 2026',
-  description: 'Learn how to split PDF files into multiple documents online. Free, secure, and easy-to-use PDF splitter tool. Divide PDFs by pages, size, or bookmarks without software installation. Step-by-step guide.',
+  title: 'How to Split PDF Files Online: Complete Guide to Dividing PDF Documents',
+  description: 'Learn how to split PDF files online in seconds. Extract specific pages, divide large PDFs into smaller documents, and download separate files securely.',
   openGraph: {
-    title: 'How to Split PDF Files Online - Free PDF Splitter Tool Guide',
-    description: 'Learn how to split PDF files into multiple documents online. Free, secure, and easy-to-use PDF splitter tool. Divide PDFs by pages, size, or bookmarks without software installation.',
+    type: 'article',
+    title: 'How to Split PDF Files Online: Complete Guide to Dividing PDF Documents',
+    description: 'Learn how to split PDF files online in seconds. Extract specific pages, divide large PDFs into smaller documents, and download separate files securely.',
     url: postUrl,
+    siteName: 'EditoraPDF',
     images: [
       {
-        url: `${siteUrl}/blog1.png`,
+        url: `${siteUrl}/images/blog/how-to-split-pdf-files-online-hero.png`,
         width: 1200,
         height: 630,
-        alt: 'How to split PDF files online - Free PDF splitter tool',
+        alt: 'Illustration showing a PDF file being split into two separate documents with scissors and a SPLIT button',
       },
     ],
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'How to Split PDF Files Online - Free PDF Splitter Tool Guide',
-    description: 'Learn how to split PDF files into multiple documents online. Free, secure, and easy-to-use PDF splitter tool.',
-    images: [`${siteUrl}/blog1.png`],
+    title: 'How to Split PDF Files Online: Complete Guide to Dividing PDF Documents',
+    description: 'Learn how to split PDF files online in seconds. Extract specific pages, divide large PDFs into smaller documents, and download separate files securely.',
+    images: [`${siteUrl}/images/blog/how-to-split-pdf-files-online-hero.png`],
   },
   alternates: {
     canonical: postUrl,

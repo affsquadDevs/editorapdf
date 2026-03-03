@@ -7,26 +7,29 @@ const siteUrl = 'https://editorapdf.com'
 const postUrl = `${siteUrl}/blog/digital-signature`
 
 export const metadata: Metadata = {
-  title: 'How to Add Digital Signatures to PDFs Online - Free E-Signature Tool Guide | 2026',
-  description: 'Learn how to add digital signatures to PDF documents online. Free, secure, and easy-to-use e-signature tool. Sign PDFs electronically without software installation. Step-by-step guide for digital signing.',
+  title: 'How to Add Digital Signatures to PDFs Online: Complete Guide to E-Signing Documents',
+  description: 'Learn how to add digital signatures to PDF documents online. Securely e-sign contracts, agreements, and forms in minutes without installing software.',
   openGraph: {
-    title: 'How to Add Digital Signatures to PDFs Online - Free E-Signature Tool Guide',
-    description: 'Learn how to add digital signatures to PDF documents online. Free, secure, and easy-to-use e-signature tool. Sign PDFs electronically without software installation.',
+    type: 'article',
+    title: 'How to Add Digital Signatures to PDFs Online: Complete Guide to E-Signing Documents',
+    description: 'Learn how to add digital signatures to PDF documents online. Securely e-sign contracts, agreements, and forms in minutes without installing software.',
     url: postUrl,
+    siteName: 'EditoraPDF',
     images: [
       {
-        url: `${siteUrl}/blog1.png`,
+        url: `${siteUrl}/images/blog/digital-signature-hero.png`,
         width: 1200,
         height: 630,
-        alt: 'How to add digital signatures to PDFs online - Free e-signature tool',
+        alt: 'Illustration of a PDF document being digitally signed with a stylus and confirmation checkmark',
       },
     ],
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'How to Add Digital Signatures to PDFs Online - Free E-Signature Tool Guide',
-    description: 'Learn how to add digital signatures to PDF documents online. Free, secure, and easy-to-use e-signature tool.',
-    images: [`${siteUrl}/blog1.png`],
+    title: 'How to Add Digital Signatures to PDFs Online: Complete Guide to E-Signing Documents',
+    description: 'Learn how to add digital signatures to PDF documents online. Securely e-sign contracts, agreements, and forms in minutes without installing software.',
+    images: [`${siteUrl}/images/blog/digital-signature-hero.png`],
   },
   alternates: {
     canonical: postUrl,

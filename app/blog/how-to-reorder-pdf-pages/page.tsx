@@ -7,26 +7,29 @@ const siteUrl = 'https://editorapdf.com'
 const postUrl = `${siteUrl}/blog/how-to-reorder-pdf-pages`
 
 export const metadata: Metadata = {
-  title: 'How to Reorder PDF Pages Online - Free PDF Page Organizer Guide | 2026',
-  description: 'Learn how to reorder PDF pages online for free. Drag and drop pages to rearrange your PDF document. No software installation required. Step-by-step guide to organizing PDF pages.',
+  title: 'How to Reorder PDF Pages Online (Step-by-Step Guide)',
+  description: 'Rearrange PDF pages online using drag-and-drop. Quickly change page order and download your updated document securely.',
   openGraph: {
-    title: 'How to Reorder PDF Pages Online - Free PDF Page Organizer Guide',
-    description: 'Learn how to reorder PDF pages online for free. Drag and drop pages to rearrange your PDF document. No software installation required.',
+    type: 'article',
+    title: 'How to Reorder PDF Pages Online (Step-by-Step Guide)',
+    description: 'Rearrange PDF pages online using drag-and-drop. Quickly change page order and download your updated document securely.',
     url: postUrl,
+    siteName: 'EditoraPDF',
     images: [
       {
-        url: `${siteUrl}/blog1.png`,
+        url: `${siteUrl}/images/blog/how-to-reorder-pdf-pages-hero.png`,
         width: 1200,
         height: 630,
-        alt: 'How to reorder PDF pages online - Free PDF page organizer',
+        alt: 'Banner showing PDF pages being rearranged with arrows and drag and drop interface',
       },
     ],
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'How to Reorder PDF Pages Online - Free PDF Page Organizer Guide',
-    description: 'Learn how to reorder PDF pages online for free. Drag and drop pages to rearrange your PDF document.',
-    images: [`${siteUrl}/blog1.png`],
+    title: 'How to Reorder PDF Pages Online (Step-by-Step Guide)',
+    description: 'Rearrange PDF pages online using drag-and-drop. Quickly change page order and download your updated document securely.',
+    images: [`${siteUrl}/images/blog/how-to-reorder-pdf-pages-hero.png`],
   },
   alternates: {
     canonical: postUrl,

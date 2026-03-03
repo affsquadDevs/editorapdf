@@ -7,26 +7,29 @@ const siteUrl = 'https://editorapdf.com'
 const postUrl = `${siteUrl}/blog/how-to-convert-pdf-to-word-online`
 
 export const metadata: Metadata = {
-  title: 'How to Convert PDF to Word Online - Free PDF to DOCX Converter | 2026',
-  description: 'Learn how to convert PDF files to Word documents online. Free, secure PDF to DOCX converter. Convert PDF to Word without software installation. Preserve formatting and text. Step-by-step guide.',
+  title: 'How to Convert PDF to Word Online: Complete Guide to PDF to DOCX Conversion',
+  description: 'Learn how to convert PDF to Word (DOCX) online in minutes. Turn PDF text into an editable document while preserving layout and formatting.',
   openGraph: {
-    title: 'How to Convert PDF to Word Online - Free PDF to DOCX Converter',
-    description: 'Learn how to convert PDF files to Word documents online. Free, secure PDF to DOCX converter. Convert PDF to Word without software installation. Preserve formatting and text.',
+    type: 'article',
+    title: 'How to Convert PDF to Word Online: Complete Guide to PDF to DOCX Conversion',
+    description: 'Learn how to convert PDF to Word (DOCX) online in minutes. Turn PDF text into an editable document while preserving layout and formatting.',
     url: postUrl,
+    siteName: 'EditoraPDF',
     images: [
       {
-        url: `${siteUrl}/blog1.png`,
+        url: `${siteUrl}/images/blog/how-to-convert-pdf-to-word-online-hero.png`,
         width: 1200,
         height: 630,
-        alt: 'How to convert PDF to Word online - Free PDF to DOCX converter',
+        alt: 'Banner showing PDF to Word conversion with an arrow from a PDF document to a Word document and a Convert to Word button',
       },
     ],
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'How to Convert PDF to Word Online - Free PDF to DOCX Converter',
-    description: 'Learn how to convert PDF files to Word documents online. Free, secure PDF to DOCX converter. Convert PDF to Word without software installation.',
-    images: [`${siteUrl}/blog1.png`],
+    title: 'How to Convert PDF to Word Online: Complete Guide to PDF to DOCX Conversion',
+    description: 'Learn how to convert PDF to Word (DOCX) online in minutes. Turn PDF text into an editable document while preserving layout and formatting.',
+    images: [`${siteUrl}/images/blog/how-to-convert-pdf-to-word-online-hero.png`],
   },
   alternates: {
     canonical: postUrl,

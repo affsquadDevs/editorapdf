@@ -7,26 +7,29 @@ const siteUrl = 'https://editorapdf.com'
 const postUrl = `${siteUrl}/blog/how-to-insert-blank-pages-in-pdf`
 
 export const metadata: Metadata = {
-  title: 'How to Insert Blank Pages in PDF - Add Empty Pages Online Free | 2026',
-  description: 'Learn how to insert blank pages into PDF documents online. Free, secure tool to add empty pages anywhere in your PDF. Step-by-step guide for inserting blank pages before, after, or between existing pages.',
+  title: 'How to Insert Blank Pages in PDF Online (Step-by-Step Guide)',
+  description: 'Add blank pages to your PDF file online. Choose the position, insert empty pages instantly, and download your updated document securely.',
   openGraph: {
-    title: 'How to Insert Blank Pages in PDF - Add Empty Pages Online Free',
-    description: 'Learn how to insert blank pages into PDF documents online. Free, secure tool to add empty pages anywhere in your PDF. Step-by-step guide for inserting blank pages.',
+    type: 'article',
+    title: 'How to Insert Blank Pages in PDF Online (Step-by-Step Guide)',
+    description: 'Add blank pages to your PDF file online. Choose the position, insert empty pages instantly, and download your updated document securely.',
     url: postUrl,
+    siteName: 'EditoraPDF',
     images: [
       {
-        url: `${siteUrl}/blog1.png`,
+        url: `${siteUrl}/images/blog/how-to-insert-blank-pages-in-pdf-hero.png`,
         width: 1200,
         height: 630,
-        alt: 'How to insert blank pages in PDF - Add empty pages online',
+        alt: 'Banner showing a blank page being inserted into a PDF document with insert blank page button',
       },
     ],
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'How to Insert Blank Pages in PDF - Add Empty Pages Online Free',
-    description: 'Learn how to insert blank pages into PDF documents online. Free, secure tool to add empty pages anywhere in your PDF.',
-    images: [`${siteUrl}/blog1.png`],
+    title: 'How to Insert Blank Pages in PDF Online (Step-by-Step Guide)',
+    description: 'Add blank pages to your PDF file online. Choose the position, insert empty pages instantly, and download your updated document securely.',
+    images: [`${siteUrl}/images/blog/how-to-insert-blank-pages-in-pdf-hero.png`],
   },
   alternates: {
     canonical: postUrl,

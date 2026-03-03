@@ -7,26 +7,29 @@ const siteUrl = 'https://editorapdf.com'
 const postUrl = `${siteUrl}/blog/how-to-insert-duplicate-pages-in-pdf`
 
 export const metadata: Metadata = {
-  title: 'How to Insert Duplicate Pages in PDF - Copy Pages Online Free | 2026',
-  description: 'Learn how to insert duplicate pages in PDF files online. Free, secure tool to copy and duplicate PDF pages. Create multiple copies of pages without software installation. Step-by-step guide.',
+  title: 'How to Insert Duplicate Pages in PDF: Complete Guide to Copying PDF Pages',
+  description: 'Learn how to duplicate pages in a PDF online. Copy single or multiple pages, control placement, and create updated PDF documents in minutes.',
   openGraph: {
-    title: 'How to Insert Duplicate Pages in PDF - Copy Pages Online Free',
-    description: 'Learn how to insert duplicate pages in PDF files online. Free, secure tool to copy and duplicate PDF pages. Create multiple copies of pages without software installation.',
+    type: 'article',
+    title: 'How to Insert Duplicate Pages in PDF: Complete Guide to Copying PDF Pages',
+    description: 'Learn how to duplicate pages in a PDF online. Copy single or multiple pages, control placement, and create updated PDF documents in minutes.',
     url: postUrl,
+    siteName: 'EditoraPDF',
     images: [
       {
-        url: `${siteUrl}/blog1.png`,
+        url: `${siteUrl}/images/blog/how-to-insert-duplicate-pages-in-pdf-hero.png`,
         width: 1200,
         height: 630,
-        alt: 'How to insert duplicate pages in PDF - Free online tool',
+        alt: 'Illustration showing a PDF page being duplicated into multiple copies with a COPY button',
       },
     ],
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'How to Insert Duplicate Pages in PDF - Copy Pages Online Free',
-    description: 'Learn how to insert duplicate pages in PDF files online. Free, secure tool to copy and duplicate PDF pages.',
-    images: [`${siteUrl}/blog1.png`],
+    title: 'How to Insert Duplicate Pages in PDF: Complete Guide to Copying PDF Pages',
+    description: 'Learn how to duplicate pages in a PDF online. Copy single or multiple pages, control placement, and create updated PDF documents in minutes.',
+    images: [`${siteUrl}/images/blog/how-to-insert-duplicate-pages-in-pdf-hero.png`],
   },
   alternates: {
     canonical: postUrl,

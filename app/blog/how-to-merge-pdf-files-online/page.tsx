@@ -7,26 +7,29 @@ const siteUrl = 'https://editorapdf.com'
 const postUrl = `${siteUrl}/blog/how-to-merge-pdf-files-online`
 
 export const metadata: Metadata = {
-  title: 'How to Merge PDF Files Online - Free PDF Merger Tool Guide | 2024',
-  description: 'Learn how to merge multiple PDF files into one document online. Free, secure, and easy-to-use PDF merger tool. Combine PDFs without software installation. Step-by-step guide.',
+  title: 'How to Merge PDF Files Online: Complete Guide to Combining PDF Documents',
+  description: 'Learn how to merge PDF files online in minutes. Combine multiple PDFs into one document, control page order, and download a single merged file securely.',
   openGraph: {
-    title: 'How to Merge PDF Files Online - Free PDF Merger Tool Guide',
-    description: 'Learn how to merge multiple PDF files into one document online. Free, secure, and easy-to-use PDF merger tool. Combine PDFs without software installation.',
+    type: 'article',
+    title: 'How to Merge PDF Files Online: Complete Guide to Combining PDF Documents',
+    description: 'Learn how to merge PDF files online in minutes. Combine multiple PDFs into one document, control page order, and download a single merged file securely.',
     url: postUrl,
+    siteName: 'EditoraPDF',
     images: [
       {
-        url: `${siteUrl}/blog1.png`,
+        url: `${siteUrl}/images/blog/how-to-merge-pdf-files-online-hero.png`,
         width: 1200,
         height: 630,
-        alt: 'How to merge PDF files online - Free PDF merger tool',
+        alt: 'Hero banner showing two PDF files merging into one with a MERGE button',
       },
     ],
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'How to Merge PDF Files Online - Free PDF Merger Tool Guide',
-    description: 'Learn how to merge multiple PDF files into one document online. Free, secure, and easy-to-use PDF merger tool.',
-    images: [`${siteUrl}/blog1.png`],
+    title: 'How to Merge PDF Files Online: Complete Guide to Combining PDF Documents',
+    description: 'Learn how to merge PDF files online in minutes. Combine multiple PDFs into one document, control page order, and download a single merged file securely.',
+    images: [`${siteUrl}/images/blog/how-to-merge-pdf-files-online-hero.png`],
   },
   alternates: {
     canonical: postUrl,

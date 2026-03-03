@@ -7,26 +7,29 @@ const siteUrl = 'https://editorapdf.com'
 const postUrl = `${siteUrl}/blog/how-to-compress-pdf-online`
 
 export const metadata: Metadata = {
-  title: 'How to Compress PDF Files Online - Free PDF Compression Tool Guide | 2026',
-  description: 'Learn how to compress PDF files to reduce file size online. Free, secure, and easy-to-use PDF compression tool. Shrink PDFs without losing quality. No software installation required. Step-by-step guide.',
+  title: 'How to Compress PDF Files Online: Complete Guide to Reducing PDF File Size',
+  description: 'Learn how to compress PDF files online and reduce file size without losing quality. Optimize PDFs for email, web uploads, and faster sharing.',
   openGraph: {
-    title: 'How to Compress PDF Files Online - Free PDF Compression Tool Guide',
-    description: 'Learn how to compress PDF files to reduce file size online. Free, secure, and easy-to-use PDF compression tool. Shrink PDFs without losing quality.',
+    type: 'article',
+    title: 'How to Compress PDF Files Online: Complete Guide to Reducing PDF File Size',
+    description: 'Learn how to compress PDF files online and reduce file size without losing quality. Optimize PDFs for email, web uploads, and faster sharing.',
     url: postUrl,
+    siteName: 'EditoraPDF',
     images: [
       {
-        url: `${siteUrl}/blog1.png`,
+        url: `${siteUrl}/images/blog/compress-pdf-online-hero.png`,
         width: 1200,
         height: 630,
-        alt: 'How to compress PDF files online - Free PDF compression tool',
+        alt: 'Illustration showing a PDF file being compressed and reduced in file size',
       },
     ],
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'How to Compress PDF Files Online - Free PDF Compression Tool Guide',
-    description: 'Learn how to compress PDF files to reduce file size online. Free, secure, and easy-to-use PDF compression tool.',
-    images: [`${siteUrl}/blog1.png`],
+    title: 'How to Compress PDF Files Online: Complete Guide to Reducing PDF File Size',
+    description: 'Learn how to compress PDF files online and reduce file size without losing quality. Optimize PDFs for email, web uploads, and faster sharing.',
+    images: [`${siteUrl}/images/blog/compress-pdf-online-hero.png`],
   },
   alternates: {
     canonical: postUrl,

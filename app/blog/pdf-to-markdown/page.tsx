@@ -7,26 +7,29 @@ const siteUrl = 'https://editorapdf.com'
 const postUrl = `${siteUrl}/blog/pdf-to-markdown`
 
 export const metadata: Metadata = {
-  title: 'PDF to Markdown Converter - Convert PDF to Markdown Online Free | 2026',
-  description: 'Convert PDF to Markdown online for free. Transform PDF documents into Markdown format instantly with our secure PDF to Markdown converter. Perfect for documentation, blogs, and version control. No software installation required.',
+  title: 'PDF to Markdown Converter: Complete Guide to Transforming PDF Documents into Markdown Format',
+  description: 'Learn how to convert PDF documents into Markdown format for developers, writers, and content creators. Extract structured text, headings, and content cleanly.',
   openGraph: {
-    title: 'PDF to Markdown Converter - Convert PDF to Markdown Online Free',
-    description: 'Convert PDF to Markdown online for free. Transform PDF documents into Markdown format instantly with our secure PDF to Markdown converter. Perfect for documentation, blogs, and version control.',
+    type: 'article',
+    title: 'PDF to Markdown Converter: Complete Guide to Transforming PDF Documents into Markdown Format',
+    description: 'Learn how to convert PDF documents into Markdown format for developers, writers, and content creators. Extract structured text, headings, and content cleanly.',
     url: postUrl,
+    siteName: 'EditoraPDF',
     images: [
       {
-        url: `${siteUrl}/blog1.png`,
+        url: `${siteUrl}/images/blog/pdf-to-markdown-hero.png`,
         width: 1200,
         height: 630,
-        alt: 'PDF to Markdown Converter - Convert PDF files to Markdown format online',
+        alt: 'Illustration showing a PDF document being converted into Markdown format with headings and code blocks',
       },
     ],
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'PDF to Markdown Converter - Convert PDF to Markdown Online Free',
-    description: 'Convert PDF to Markdown online for free. Transform PDF documents into Markdown format instantly with our secure PDF to Markdown converter.',
-    images: [`${siteUrl}/blog1.png`],
+    title: 'PDF to Markdown Converter: Complete Guide to Transforming PDF Documents into Markdown Format',
+    description: 'Learn how to convert PDF documents into Markdown format for developers, writers, and content creators. Extract structured text, headings, and content cleanly.',
+    images: [`${siteUrl}/images/blog/pdf-to-markdown-hero.png`],
   },
   alternates: {
     canonical: postUrl,

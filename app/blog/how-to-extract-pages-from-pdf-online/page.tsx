@@ -7,26 +7,29 @@ const siteUrl = 'https://editorapdf.com'
 const postUrl = `${siteUrl}/blog/how-to-extract-pages-from-pdf-online`
 
 export const metadata: Metadata = {
-  title: 'How to Extract Pages from PDF Online - Free PDF Page Extractor Guide | 2026',
-  description: 'Learn how to extract pages from PDF files online. Free, secure, and easy-to-use PDF page extractor tool. Pull specific pages from large documents without software installation. Step-by-step guide.',
+  title: 'How to Extract Pages from PDF Online (Step-by-Step Guide)',
+  description: 'Extract selected pages from your PDF file online. Create a new PDF with chosen pages and download instantly — no installation required.',
   openGraph: {
-    title: 'How to Extract Pages from PDF Online - Free PDF Page Extractor Guide',
-    description: 'Learn how to extract pages from PDF files online. Free, secure, and easy-to-use PDF page extractor tool. Pull specific pages from large documents without software installation.',
+    type: 'article',
+    title: 'How to Extract Pages from PDF Online (Step-by-Step Guide)',
+    description: 'Extract selected pages from your PDF file online. Create a new PDF with chosen pages and download instantly — no installation required.',
     url: postUrl,
+    siteName: 'EditoraPDF',
     images: [
       {
-        url: `${siteUrl}/blog1.png`,
+        url: `${siteUrl}/images/blog/how-to-extract-pages-from-pdf-online-hero.png`,
         width: 1200,
         height: 630,
-        alt: 'How to extract pages from PDF online - Free PDF page extractor tool',
+        alt: 'Banner showing extraction of selected pages from a PDF into a new document with extract button',
       },
     ],
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'How to Extract Pages from PDF Online - Free PDF Page Extractor Guide',
-    description: 'Learn how to extract pages from PDF files online. Free, secure, and easy-to-use PDF page extractor tool.',
-    images: [`${siteUrl}/blog1.png`],
+    title: 'How to Extract Pages from PDF Online (Step-by-Step Guide)',
+    description: 'Extract selected pages from your PDF file online. Create a new PDF with chosen pages and download instantly — no installation required.',
+    images: [`${siteUrl}/images/blog/how-to-extract-pages-from-pdf-online-hero.png`],
   },
   alternates: {
     canonical: postUrl,

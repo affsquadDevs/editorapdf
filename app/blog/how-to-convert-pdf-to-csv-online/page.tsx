@@ -7,26 +7,29 @@ const siteUrl = 'https://editorapdf.com'
 const postUrl = `${siteUrl}/blog/how-to-convert-pdf-to-csv-online`
 
 export const metadata: Metadata = {
-  title: 'How to Convert PDF to CSV Online - Free PDF to CSV Converter Guide | 2026',
-  description: 'Learn how to convert PDF to CSV online for free. Extract tables and data from PDF files to CSV format. Secure, fast, and easy-to-use PDF to CSV converter. Step-by-step guide with tips and best practices.',
+  title: 'How to Convert PDF to CSV Online (Step-by-Step Guide)',
+  description: 'Extract tables from PDF files and convert them to CSV format instantly. Turn PDF data into editable spreadsheet-ready files in minutes.',
   openGraph: {
-    title: 'How to Convert PDF to CSV Online - Free PDF to CSV Converter Guide',
-    description: 'Learn how to convert PDF to CSV online for free. Extract tables and data from PDF files to CSV format. Secure, fast, and easy-to-use PDF to CSV converter.',
+    type: 'article',
+    title: 'How to Convert PDF to CSV Online (Step-by-Step Guide)',
+    description: 'Extract tables from PDF files and convert them to CSV format instantly. Turn PDF data into editable spreadsheet-ready files in minutes.',
     url: postUrl,
+    siteName: 'EditoraPDF',
     images: [
       {
-        url: `${siteUrl}/blog1.png`,
+        url: `${siteUrl}/images/blog/how-to-convert-pdf-to-csv-online-hero.png`,
         width: 1200,
         height: 630,
-        alt: 'How to convert PDF to CSV online - Free PDF to CSV converter tool',
+        alt: 'Banner showing PDF document converting into CSV spreadsheet with data table extraction',
       },
     ],
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'How to Convert PDF to CSV Online - Free PDF to CSV Converter Guide',
-    description: 'Learn how to convert PDF to CSV online for free. Extract tables and data from PDF files to CSV format.',
-    images: [`${siteUrl}/blog1.png`],
+    title: 'How to Convert PDF to CSV Online (Step-by-Step Guide)',
+    description: 'Extract tables from PDF files and convert them to CSV format instantly. Turn PDF data into editable spreadsheet-ready files in minutes.',
+    images: [`${siteUrl}/images/blog/how-to-convert-pdf-to-csv-online-hero.png`],
   },
   alternates: {
     canonical: postUrl,

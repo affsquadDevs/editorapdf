@@ -7,26 +7,29 @@ const siteUrl = 'https://editorapdf.com'
 const postUrl = `${siteUrl}/blog/how-to-sanitize-pdf`
 
 export const metadata: Metadata = {
-  title: 'How to Sanitize PDF Files Online - Remove Hidden Data & Metadata | 2026',
-  description: 'Learn how to sanitize PDF files online to remove hidden data, metadata, JavaScript, embedded files, and sensitive information. Free, secure PDF sanitization tool. Step-by-step guide.',
+  title: 'How to Sanitize PDF Files Online (Remove Hidden Data & Metadata)',
+  description: 'Remove hidden data and metadata from PDF files online. Sanitize documents securely and download a clean, privacy-safe PDF instantly.',
   openGraph: {
-    title: 'How to Sanitize PDF Files Online - Remove Hidden Data & Metadata',
-    description: 'Learn how to sanitize PDF files online to remove hidden data, metadata, JavaScript, embedded files, and sensitive information. Free, secure PDF sanitization tool.',
+    type: 'article',
+    title: 'How to Sanitize PDF Files Online (Remove Hidden Data & Metadata)',
+    description: 'Remove hidden data and metadata from PDF files online. Sanitize documents securely and download a clean, privacy-safe PDF instantly.',
     url: postUrl,
+    siteName: 'EditoraPDF',
     images: [
       {
-        url: `${siteUrl}/blog1.png`,
+        url: `${siteUrl}/images/blog/how-to-sanitize-pdf-hero.png`,
         width: 1200,
         height: 630,
-        alt: 'How to sanitize PDF files online - Remove hidden data and metadata',
+        alt: 'Banner showing PDF file being cleaned of hidden metadata and sensitive data with shield icon',
       },
     ],
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'How to Sanitize PDF Files Online - Remove Hidden Data & Metadata',
-    description: 'Learn how to sanitize PDF files online to remove hidden data, metadata, JavaScript, and sensitive information.',
-    images: [`${siteUrl}/blog1.png`],
+    title: 'How to Sanitize PDF Files Online (Remove Hidden Data & Metadata)',
+    description: 'Remove hidden data and metadata from PDF files online. Sanitize documents securely and download a clean, privacy-safe PDF instantly.',
+    images: [`${siteUrl}/images/blog/how-to-sanitize-pdf-hero.png`],
   },
   alternates: {
     canonical: postUrl,

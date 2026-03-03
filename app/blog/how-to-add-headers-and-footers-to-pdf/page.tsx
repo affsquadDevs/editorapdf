@@ -7,26 +7,29 @@ const siteUrl = 'https://editorapdf.com'
 const postUrl = `${siteUrl}/blog/how-to-add-headers-and-footers-to-pdf`
 
 export const metadata: Metadata = {
-  title: 'How to Add Headers and Footers to PDF - Free Online Tool Guide | 2026',
-  description: 'Learn how to add headers and footers to PDF documents online. Free, secure, and easy-to-use PDF header footer tool. Add page numbers, dates, text, and custom content to PDFs without software installation. Step-by-step guide.',
+  title: 'How to Add Headers and Footers to PDF: Complete Guide to Customizing PDF Documents',
+  description: 'Learn how to add custom headers and footers to PDF documents online. Insert page numbers, titles, dates, and branding elements in minutes.',
   openGraph: {
-    title: 'How to Add Headers and Footers to PDF - Free Online Tool Guide',
-    description: 'Learn how to add headers and footers to PDF documents online. Free, secure, and easy-to-use PDF header footer tool. Add page numbers, dates, text, and custom content to PDFs without software installation.',
+    type: 'article',
+    title: 'How to Add Headers and Footers to PDF: Complete Guide to Customizing PDF Documents',
+    description: 'Learn how to add custom headers and footers to PDF documents online. Insert page numbers, titles, dates, and branding elements in minutes.',
     url: postUrl,
+    siteName: 'EditoraPDF',
     images: [
       {
-        url: `${siteUrl}/blog1.png`,
+        url: `${siteUrl}/images/blog/add-headers-footers-pdf-hero.png`,
         width: 1200,
         height: 630,
-        alt: 'How to add headers and footers to PDF - Free online tool guide',
+        alt: 'Illustration showing a PDF document being enhanced with headers and footers including page numbers and document title',
       },
     ],
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'How to Add Headers and Footers to PDF - Free Online Tool Guide',
-    description: 'Learn how to add headers and footers to PDF documents online. Free, secure, and easy-to-use PDF header footer tool.',
-    images: [`${siteUrl}/blog1.png`],
+    title: 'How to Add Headers and Footers to PDF: Complete Guide to Customizing PDF Documents',
+    description: 'Learn how to add custom headers and footers to PDF documents online. Insert page numbers, titles, dates, and branding elements in minutes.',
+    images: [`${siteUrl}/images/blog/add-headers-footers-pdf-hero.png`],
   },
   alternates: {
     canonical: postUrl,

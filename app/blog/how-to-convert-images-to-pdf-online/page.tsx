@@ -7,26 +7,29 @@ const siteUrl = 'https://editorapdf.com'
 const postUrl = `${siteUrl}/blog/how-to-convert-images-to-pdf-online`
 
 export const metadata: Metadata = {
-  title: 'How to Convert Images to PDF Online - Free Image to PDF Converter Guide | 2026',
-  description: 'Learn how to convert images to PDF online for free. Combine multiple JPG, PNG, or WebP images into a single PDF document. Secure, fast, and easy-to-use image to PDF converter. Step-by-step guide with tips and best practices.',
+  title: 'How to Convert Images to PDF Online (Step-by-Step Guide)',
+  description: 'Convert JPG and PNG images to PDF instantly. Combine photos into one PDF document and download securely — no installation required.',
   openGraph: {
-    title: 'How to Convert Images to PDF Online - Free Image to PDF Converter Guide',
-    description: 'Learn how to convert images to PDF online for free. Combine multiple JPG, PNG, or WebP images into a single PDF document. Secure, fast, and easy-to-use image to PDF converter.',
+    type: 'article',
+    title: 'How to Convert Images to PDF Online (Step-by-Step Guide)',
+    description: 'Convert JPG and PNG images to PDF instantly. Combine photos into one PDF document and download securely — no installation required.',
     url: postUrl,
+    siteName: 'EditoraPDF',
     images: [
       {
-        url: `${siteUrl}/blog1.png`,
+        url: `${siteUrl}/images/blog/how-to-convert-images-to-pdf-online-hero.png`,
         width: 1200,
         height: 630,
-        alt: 'How to convert images to PDF online - Free image to PDF converter',
+        alt: 'Banner showing image file converting into a PDF document with a convert to PDF button',
       },
     ],
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'How to Convert Images to PDF Online - Free Image to PDF Converter Guide',
-    description: 'Learn how to convert images to PDF online for free. Combine multiple JPG, PNG, or WebP images into a single PDF document.',
-    images: [`${siteUrl}/blog1.png`],
+    title: 'How to Convert Images to PDF Online (Step-by-Step Guide)',
+    description: 'Convert JPG and PNG images to PDF instantly. Combine photos into one PDF document and download securely — no installation required.',
+    images: [`${siteUrl}/images/blog/how-to-convert-images-to-pdf-online-hero.png`],
   },
   alternates: {
     canonical: postUrl,
