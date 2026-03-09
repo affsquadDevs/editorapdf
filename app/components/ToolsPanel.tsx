@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import ToolView from './ToolView';
 import {
@@ -171,19 +171,19 @@ const toolCategories: ToolCategory[] = [
         icon: <Hash size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'pdf-to-pptx', title: 'PDF to PowerPoint', description: 'Convert PDF pages to PPTX presentation', color: 'warning', comingSoon: true,
+        id: 'pdf-to-pptx', title: 'PDF to PowerPoint', description: 'Convert PDF pages to PPTX presentation', color: 'warning',
         icon: <Presentation size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'html-to-pdf', title: 'HTML to PDF', description: 'Convert any webpage or HTML file to PDF', color: 'error', comingSoon: true,
+        id: 'html-to-pdf', title: 'HTML to PDF', description: 'Convert any webpage or HTML file to PDF', color: 'error',
         icon: <Globe size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'word-to-pdf', title: 'Word to PDF', description: 'Convert DOCX / DOC documents to PDF', color: 'info', comingSoon: true,
+        id: 'word-to-pdf', title: 'Word to PDF', description: 'Convert DOCX / DOC documents to PDF', color: 'info',
         icon: <FileUp size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'excel-to-pdf', title: 'Excel to PDF', description: 'Convert XLSX spreadsheets to PDF', color: 'success', comingSoon: true,
+        id: 'excel-to-pdf', title: 'Excel to PDF', description: 'Convert XLSX spreadsheets to PDF', color: 'success',
         icon: <Sheet size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
     ],
@@ -198,39 +198,39 @@ const toolCategories: ToolCategory[] = [
     icon: <PenLine size={20} strokeWidth={1.5} />,
     tools: [
       {
-        id: 'compress', title: 'Compress PDF', description: 'Reduce file size while maintaining quality', color: 'success', comingSoon: true,
+        id: 'compress', title: 'Compress PDF', description: 'Reduce file size while maintaining quality', color: 'success',
         icon: <Minimize2 size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'add-watermark', title: 'Add Watermark', description: 'Overlay text or image watermark on pages', color: 'info', comingSoon: true,
+        id: 'add-watermark', title: 'Add Watermark', description: 'Overlay text or image watermark on pages', color: 'info',
         icon: <Droplets size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'page-numbers', title: 'Add Page Numbers', description: 'Insert page numbers with custom positioning', color: 'primary', comingSoon: true,
+        id: 'page-numbers', title: 'Add Page Numbers', description: 'Insert page numbers with custom positioning', color: 'primary',
         icon: <ListOrdered size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'crop', title: 'Crop Pages', description: 'Crop or trim PDF page margins', color: 'error', comingSoon: true,
+        id: 'crop', title: 'Crop Pages', description: 'Crop or trim PDF page margins', color: 'error',
         icon: <Crop size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'resize', title: 'Resize Pages', description: 'Change page size (A4, Letter, custom)', color: 'info', comingSoon: true,
+        id: 'resize', title: 'Resize Pages', description: 'Change page size (A4, Letter, custom)', color: 'info',
         icon: <Maximize2 size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'grayscale', title: 'Grayscale PDF', description: 'Convert colored PDF to black & white', color: 'primary', comingSoon: true,
+        id: 'grayscale', title: 'Grayscale PDF', description: 'Convert colored PDF to black & white', color: 'primary',
         icon: <Contrast size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'invert-colors', title: 'Invert Colors', description: 'Invert PDF colors for dark mode reading', color: 'accent', comingSoon: true,
+        id: 'invert-colors', title: 'Invert Colors', description: 'Invert PDF colors for dark mode reading', color: 'accent',
         icon: <Moon size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'flatten', title: 'Flatten PDF', description: 'Flatten form fields and annotations into content', color: 'warning', comingSoon: true,
+        id: 'flatten', title: 'Flatten PDF', description: 'Flatten form fields and annotations into content', color: 'warning',
         icon: <Layers size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'remove-annotations', title: 'Remove Annotations', description: 'Strip all comments, highlights, and notes', color: 'error', comingSoon: true,
+        id: 'remove-annotations', title: 'Remove Annotations', description: 'Strip all comments, highlights, and notes', color: 'error',
         icon: <MessageSquareX size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
     ],
@@ -380,6 +380,10 @@ const toolCategories: ToolCategory[] = [
 // Flatten all tools for lookup
 export const allTools = toolCategories.flatMap(c => c.tools);
 
+// Calculate tool counts at module level to ensure consistency between server and client
+export const totalToolsCount = allTools.length;
+export const availableToolsCount = allTools.filter(t => !t.comingSoon).length;
+
 // Export toolCategories for use in routes
 export { toolCategories };
 
@@ -395,12 +399,16 @@ const colorMap: Record<string, { bg: string; border: string; text: string; iconB
 export default function ToolsPanel() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  const visibleCategories = activeCategory
-    ? toolCategories.filter(c => c.id === activeCategory)
-    : toolCategories;
+  const visibleCategories = useMemo(() => 
+    activeCategory
+      ? toolCategories.filter(c => c.id === activeCategory)
+      : toolCategories,
+    [activeCategory]
+  );
 
-  const totalTools = allTools.length;
-  const availableTools = allTools.filter(t => !t.comingSoon).length;
+  // Use pre-calculated values from module level to ensure SSR/client consistency
+  const totalTools = totalToolsCount;
+  const availableTools = availableToolsCount;
 
   return (
     <div className="w-full max-w-5xl mx-auto animate-fade-in">

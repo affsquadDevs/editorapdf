@@ -217,6 +217,8 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
   const [imageScale, setImageScale] = useState<number>(2); // For pdf-to-images: scale factor
   const [imageResults, setImageResults] = useState<ImageResult[] | null>(null); // For pdf-to-images: converted images
   const [compressionLevel, setCompressionLevel] = useState<'low' | 'medium' | 'high'>('medium'); // For compress: compression level
+  const [pageNumberPosition, setPageNumberPosition] = useState<'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'>('bottom-center'); // For page-numbers: position
+  const [pageNumberStart, setPageNumberStart] = useState<number>(1); // For page-numbers: starting number
   // Load watermarks from localStorage on mount or when tool changes
   const [watermarks, setWatermarks] = useState<WatermarkConfig[]>([]);
   
@@ -1471,9 +1473,9 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       try {
         const file = files[0];
         const pdfBytes = await addPageNumbers(file, {
-          position: 'bottom-center',
+          position: pageNumberPosition,
           format: '{page}',
-          startNumber: 1,
+          startNumber: pageNumberStart,
           pageRange: pageRange || undefined,
         });
         setProcessedPdfBytes(pdfBytes);
@@ -3834,16 +3836,34 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
 
               {/* Page numbers options */}
               {tool.id === 'page-numbers' && (
-                <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
+                <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4 relative z-10">
                   <div>
                     <p className="text-sm font-medium text-surface-200 mb-2">Position</p>
-                    <div className="grid grid-cols-3 gap-2">
-                      {['Top Left', 'Top Center', 'Top Right', 'Bottom Left', 'Bottom Center', 'Bottom Right'].map((pos) => (
+                    <div className="grid grid-cols-3 gap-2 relative z-10">
+                      {[
+                        { label: 'Top Left', value: 'top-left' as const },
+                        { label: 'Top Center', value: 'top-center' as const },
+                        { label: 'Top Right', value: 'top-right' as const },
+                        { label: 'Bottom Left', value: 'bottom-left' as const },
+                        { label: 'Bottom Center', value: 'bottom-center' as const },
+                        { label: 'Bottom Right', value: 'bottom-right' as const }
+                      ].map((pos) => (
                         <button
-                          key={pos}
-                          className={`px-3 py-2 rounded-lg text-xs font-medium transition-all ${pos === 'Bottom Center' ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300' : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'}`}
+                          key={pos.value}
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            console.log('Setting page number position to:', pos.value);
+                            setPageNumberPosition(pos.value);
+                          }}
+                          className={`px-3 py-2 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                            pageNumberPosition === pos.value
+                              ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300'
+                              : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'
+                          }`}
                         >
-                          {pos}
+                          {pos.label}
                         </button>
                       ))}
                     </div>
@@ -3852,7 +3872,21 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                     <p className="text-sm font-medium text-surface-200 mb-2">Start From</p>
                     <input
                       type="number"
-                      defaultValue={1}
+                      value={pageNumberStart}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value);
+                        if (!isNaN(val) && val >= 1) {
+                          setPageNumberStart(val);
+                        } else if (e.target.value === '') {
+                          setPageNumberStart(1);
+                        }
+                      }}
+                      onBlur={(e) => {
+                        const val = parseInt(e.target.value);
+                        if (isNaN(val) || val < 1) {
+                          setPageNumberStart(1);
+                        }
+                      }}
                       min={1}
                       className="w-24 px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all"
                     />
