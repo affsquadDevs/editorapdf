@@ -23,7 +23,12 @@ export async function pdfToPptx(
   let PptxGenJS: any;
   try {
     const pptxModule = await import('pptxgenjs');
-    PptxGenJS = pptxModule.default || pptxModule;
+    // Handle both default export and named export
+    PptxGenJS = pptxModule.default || (pptxModule as any).pptxgen || pptxModule;
+    // If it's a function/class, use it directly
+    if (typeof PptxGenJS !== 'function' && PptxGenJS.default) {
+      PptxGenJS = PptxGenJS.default;
+    }
   } catch (err) {
     throw new Error('pptxgenjs library is not installed. Please run: npm install pptxgenjs');
   }
@@ -80,8 +85,11 @@ export async function pdfToPptx(
   // Convert each page to a slide
   for (const pageNumber of pagesToConvert) {
     try {
-      // Render PDF page as image
+      // Render PDF page as image with higher resolution for better quality
       const imageDataUrl = await renderPageToDataUrl(pdfDoc, pageNumber, 1920, 0);
+      
+      // pptxgenjs accepts data URLs directly (format: data:image/png;base64,...)
+      const imageData = imageDataUrl;
       
       // Create slide
       const slide = pptx.addSlide();
@@ -89,7 +97,7 @@ export async function pdfToPptx(
       if (slideLayout === 'full') {
         // Full page image
         slide.addImage({
-          data: imageDataUrl,
+          data: imageData,
           x: 0,
           y: 0,
           w: '100%',
@@ -107,7 +115,7 @@ export async function pdfToPptx(
         });
         
         slide.addImage({
-          data: imageDataUrl,
+          data: imageData,
           x: 0.5,
           y: 1,
           w: 9,
@@ -130,8 +138,25 @@ export async function pdfToPptx(
   }
 
   // Generate PPTX file
-  const pptxBuffer = await pptx.write({ outputType: 'array' });
-  return new Uint8Array(pptxBuffer);
+  // pptxgenjs v3+ write() may return a Promise or a value directly
+  try {
+    const writeResult = pptx.write({ outputType: 'array' });
+    
+    // Handle both Promise and direct value
+    const pptxBuffer = writeResult instanceof Promise ? await writeResult : writeResult;
+    
+    // Ensure we have a proper array buffer
+    if (pptxBuffer instanceof ArrayBuffer) {
+      return new Uint8Array(pptxBuffer);
+    } else if (Array.isArray(pptxBuffer) || pptxBuffer instanceof Uint8Array) {
+      return new Uint8Array(pptxBuffer);
+    } else {
+      // Try to convert to Uint8Array
+      return new Uint8Array(pptxBuffer as ArrayLike<number>);
+    }
+  } catch (writeErr) {
+    throw new Error(`Failed to generate PPTX file: ${writeErr instanceof Error ? writeErr.message : String(writeErr)}`);
+  }
 }
 
 /**
