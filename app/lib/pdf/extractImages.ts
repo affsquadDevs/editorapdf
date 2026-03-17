@@ -1,6 +1,5 @@
+import * as pdfjsLib from 'pdfjs-dist';
 import { loadPdfDocument } from './pdfRender';
-import { extractImagesFromPage } from './pdfExtract';
-import { renderPageToDataUrl } from './pdfRender';
 
 export interface ExtractImagesOptions {
   pageRange?: string;
@@ -16,7 +15,8 @@ export interface ExtractedImageFile {
 }
 
 /**
- * Extract images from PDF
+ * Extract embedded images from PDF
+ * This function extracts actual embedded images from PDF pages, not page renders
  */
 export async function extractImages(
   file: File,
@@ -65,21 +65,112 @@ export async function extractImages(
   const extractedImages: ExtractedImageFile[] = [];
   let imageIndex = 0;
 
-  // Extract images from each page
+  // Extract embedded images from each page
   for (const pageNumber of pagesToExtract) {
     try {
-      // Render page as image (simplified - extracts whole page)
-      const pageImage = await renderPageToDataUrl(pdfDoc, pageNumber, 1920, 0);
+      const page = await pdfDoc.getPage(pageNumber);
+      const operatorList = await page.getOperatorList();
+      const pageResources = page.resources;
       
-      extractedImages.push({
-        dataUrl: pageImage,
-        pageNumber,
-        index: imageIndex++,
-        format: format,
-      });
+      // Track which images we've already extracted to avoid duplicates
+      const extractedImageNames = new Set<string>();
+      
+      // Look for image operations in the operator list
+      for (let i = 0; i < operatorList.fnArray.length; i++) {
+        const fn = operatorList.fnArray[i];
+        
+        // Check for image operations
+        if (fn === pdfjsLib.OPS.paintImageXObject || fn === pdfjsLib.OPS.paintInlineImageXObject) {
+          try {
+            const args = operatorList.argsArray[i];
+            const imageName = args[0];
+            
+            // Skip if we've already extracted this image
+            if (extractedImageNames.has(imageName)) {
+              continue;
+            }
+            
+            // Try to get the image from page resources
+            if (pageResources && typeof pageResources.get === 'function') {
+              try {
+                const xObject = await pageResources.get('XObject');
+                
+                if (xObject && typeof xObject.get === 'function') {
+                  const imageObj = await xObject.get(imageName);
+                  
+                  if (imageObj) {
+                    // Create canvas to render the image
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    if (ctx) {
+                      // Get image dimensions
+                      const width = imageObj.width || 100;
+                      const height = imageObj.height || 100;
+                      
+                      canvas.width = width;
+                      canvas.height = height;
+                      
+                      // Create viewport for rendering
+                      const viewport = {
+                        width: width,
+                        height: height,
+                        scale: 1,
+                        rotation: 0,
+                        offsetX: 0,
+                        offsetY: 0,
+                      };
+                      
+                      // Render the image object to canvas
+                      const renderContext = {
+                        canvasContext: ctx,
+                        viewport: viewport,
+                      };
+                      
+                      try {
+                        // Try to render the image
+                        await imageObj.startRendering(renderContext);
+                        
+                        // Convert canvas to data URL
+                        const dataUrl = canvas.toDataURL(
+                          format === 'JPEG' ? `image/jpeg` : `image/png`,
+                          format === 'JPEG' ? quality : undefined
+                        );
+                        
+                        if (dataUrl && dataUrl !== 'data:,') {
+                          extractedImages.push({
+                            dataUrl,
+                            pageNumber,
+                            index: imageIndex++,
+                            format: format,
+                          });
+                          extractedImageNames.add(imageName);
+                        }
+                      } catch (renderErr) {
+                        console.debug(`Could not render image ${imageName} from page ${pageNumber}:`, renderErr);
+                      }
+                    }
+                  }
+                }
+              } catch (xObjectErr) {
+                console.debug(`Could not access XObject for image ${imageName}:`, xObjectErr);
+              }
+            }
+          } catch (imgErr) {
+            console.debug(`Error processing image operation:`, imgErr);
+          }
+        }
+      }
     } catch (err) {
       console.error(`Error extracting images from page ${pageNumber}:`, err);
+      // Continue with next page instead of failing completely
     }
+  }
+
+  // If no embedded images were found, return empty array
+  // (Don't fall back to rendering pages as images - that's not what extract images should do)
+  if (extractedImages.length === 0) {
+    console.warn('No embedded images found in the specified pages. The PDF may not contain extractable embedded images.');
   }
 
   return extractedImages;

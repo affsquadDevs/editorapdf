@@ -216,6 +216,8 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
   const [imageQuality, setImageQuality] = useState<number>(0.92); // For pdf-to-images: image quality (0-1)
   const [imageScale, setImageScale] = useState<number>(2); // For pdf-to-images: scale factor
   const [imageResults, setImageResults] = useState<ImageResult[] | null>(null); // For pdf-to-images: converted images
+  const [extractedImages, setExtractedImages] = useState<Array<{ dataUrl: string; pageNumber: number; index: number; format: string }> | null>(null); // For extract-images: extracted images
+  const [extractImageFormat, setExtractImageFormat] = useState<'PNG' | 'JPEG'>('PNG'); // For extract-images: output format
   const [compressionLevel, setCompressionLevel] = useState<'low' | 'medium' | 'high'>('medium'); // For compress: compression level
   const [pageNumberPosition, setPageNumberPosition] = useState<'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'>('bottom-center'); // For page-numbers: position
   const [pageNumberStart, setPageNumberStart] = useState<number>(1); // For page-numbers: starting number
@@ -1137,6 +1139,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
         setError(err instanceof Error ? err.message : 'Failed to convert PDF to images. Please try again.');
         setIsComplete(false);
         setImageResults(null);
+        setExtractedImages(null);
       } finally {
         setIsProcessing(false);
       }
@@ -1591,12 +1594,13 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
         const file = files[0];
         const images = await extractImages(file, {
           pageRange: pageRange || undefined,
-          format: 'PNG',
+          format: extractImageFormat,
         });
+        setExtractedImages(images);
         setImageResults(images.map(img => ({ 
           dataUrl: img.dataUrl, 
           pageNumber: img.pageNumber,
-          filename: `page_${img.pageNumber}_${img.index}.${img.format.toLowerCase()}`,
+          filename: `image_${img.pageNumber}_${img.index}.${img.format.toLowerCase()}`,
         })));
         setIsComplete(true);
         setError(null);
@@ -1604,6 +1608,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
         setError(err instanceof Error ? err.message : 'Failed to extract images. Please try again.');
         setIsComplete(false);
         setImageResults(null);
+        setExtractedImages(null);
       } finally {
         setIsProcessing(false);
       }
@@ -2678,17 +2683,59 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
         downloadMetadataPdf(processedPdfBytes, `${baseName}${suffix}.pdf`);
       }
     } else if (tool.id === 'extract-images') {
-      if (!imageResults || imageResults.length === 0) {
+      if (!extractedImages || extractedImages.length === 0) {
         setError('No images extracted. Please try extracting again.');
         return;
       }
       const baseName = files.length > 0 ? files[0].name.replace(/\.pdf$/i, '') : 'extracted';
-      // Re-extract to get proper format
-      const extractedImages = await extractImages(files[0], {
-        pageRange: pageRange || undefined,
-        format: 'PNG',
-      });
-      await downloadExtractedImages(extractedImages, baseName);
+      
+      try {
+        // Convert images to the selected format if needed
+        const imagesToDownload = await Promise.all(
+          extractedImages.map(async (img) => {
+            // If format matches, use as is
+            if (img.format === extractImageFormat) {
+              return img;
+            }
+            
+            // Otherwise, convert the image to the selected format
+            const imgElement = document.createElement('img');
+            imgElement.src = img.dataUrl;
+            
+            await new Promise((resolve, reject) => {
+              imgElement.onload = resolve;
+              imgElement.onerror = reject;
+            });
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = imgElement.width;
+            canvas.height = imgElement.height;
+            const ctx = canvas.getContext('2d');
+            
+            if (!ctx) {
+              throw new Error('Could not get canvas context');
+            }
+            
+            ctx.drawImage(imgElement, 0, 0);
+            
+            const convertedDataUrl = canvas.toDataURL(
+              extractImageFormat === 'JPEG' ? 'image/jpeg' : 'image/png',
+              extractImageFormat === 'JPEG' ? 0.92 : undefined
+            );
+            
+            return {
+              dataUrl: convertedDataUrl,
+              pageNumber: img.pageNumber,
+              index: img.index,
+              format: extractImageFormat,
+            };
+          })
+        );
+        
+        await downloadExtractedImages(imagesToDownload, baseName);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to download images. Please try again.');
+      }
     } else if (tool.id === 'remove-images' || tool.id === 'optimize-images' || tool.id === 'add-qr-code' ||
                tool.id === 'add-barcode' || tool.id === 'add-bookmarks' || tool.id === 'add-hyperlinks' ||
                tool.id === 'add-attachments' || tool.id === 'stamp' || tool.id === 'bates-numbering' ||
@@ -4562,8 +4609,18 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50">
                   <p className="text-sm font-medium text-surface-200 mb-3">Output Format</p>
                   <div className="flex gap-2">
-                    {['Original', 'PNG', 'JPEG'].map((f) => (
-                      <button key={f} className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${f === 'Original' ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300' : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'}`}>{f}</button>
+                    {(['PNG', 'JPEG'] as const).map((f) => (
+                      <button
+                        key={f}
+                        onClick={() => setExtractImageFormat(f)}
+                        className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                          extractImageFormat === f
+                            ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300'
+                            : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'
+                        }`}
+                      >
+                        {f}
+                      </button>
                     ))}
                   </div>
                 </div>

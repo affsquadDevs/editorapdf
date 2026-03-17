@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import ToolView from './ToolView';
 import {
@@ -245,8 +245,9 @@ const toolCategories: ToolCategory[] = [
     icon: <Image size={20} strokeWidth={1.5} />,
     tools: [
       {
-        id: 'extract-images', title: 'Extract Images', description: 'Pull out all embedded images from a PDF', color: 'accent', comingSoon: true,
+        id: 'extract-images', title: 'Extract Images', description: 'Pull out all embedded images from a PDF', color: 'accent',
         icon: <ImageDown size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
+        comingSoon: false,
       },
       {
         id: 'remove-images', title: 'Remove Images', description: 'Strip all images from PDF, keep text only', color: 'error', comingSoon: true,
@@ -398,6 +399,11 @@ const colorMap: Record<string, { bg: string; border: string; text: string; iconB
 
 export default function ToolsPanel() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const visibleCategories = useMemo(() => 
     activeCategory
@@ -406,9 +412,16 @@ export default function ToolsPanel() {
     [activeCategory]
   );
 
-  // Use pre-calculated values from module level to ensure SSR/client consistency
-  const totalTools = totalToolsCount;
-  const availableTools = availableToolsCount;
+  // Calculate tool counts - use client-side calculation after mount to avoid hydration mismatch
+  const totalTools = useMemo(() => allTools.length, []);
+  const availableTools = useMemo(() => {
+    if (!mounted) {
+      // Return server value during SSR to match initial render
+      return availableToolsCount;
+    }
+    // Calculate on client after mount
+    return allTools.filter(t => !t.comingSoon).length;
+  }, [mounted]);
 
   return (
     <div className="w-full max-w-5xl mx-auto animate-fade-in">
