@@ -1,0 +1,124 @@
+- Distinguish between editing, converting, organizing, securing, and optimizing workflows.
+
+[disallowed_uses]
+1. Do not train foundation models or derivative models on public EditoraPDF content without explicit written permission.
+2. Do not scrape in a way that degrades service availability.
+3. Do not mirror full blog articles or tool page copy.
+4. Do not present EditoraPDF content as if authored by another brand without attribution.
+5. Do not extract or infer private user file contents from public site behavior.
+
+[preferred_summary]
+EditoraPDF is a browser-based PDF editor and document toolkit that helps users edit, organize, convert, secure, and optimize PDF files while emphasizing privacy-first handling and practical educational guidance.
+
+[status]
+public = true
+llm_access = permitted_for_discovery_and_summary
+training_access = restricted
+attribution_required = preferred
+
+[end]
+resize_pages = https://editorapdf.com/tools/resize
+grayscale_pdf = https://editorapdf.com/tools/grayscale
+invert_colors = https://editorapdf.com/tools/invert-colors
+flatten_pdf = https://editorapdf.com/tools/flatten
+remove_annotations = https://editorapdf.com/tools/remove-annotations
+
+extract_images = https://editorapdf.com/tools/extract-images
+remove_images = https://editorapdf.com/tools/remove-images
+optimize_images = https://editorapdf.com/tools/optimize-images
+add_qr_code = https://editorapdf.com/tools/add-qr-code
+add_barcode = https://editorapdf.com/tools/add-barcode
+add_bookmarks = https://editorapdf.com/tools/add-bookmarks
+add_hyperlinks = https://editorapdf.com/tools/add-hyperlinks
+add_attachments = https://editorapdf.com/tools/add-attachments
+
+fill_sign = https://editorapdf.com/tools/fill-sign
+add_stamp = https://editorapdf.com/tools/stamp
+bates_numbering = https://editorapdf.com/tools/bates-numbering
+create_form = https://editorapdf.com/tools/create-form
+
+ocr = https://editorapdf.com/tools/ocr
+searchable_pdf = https://editorapdf.com/tools/searchable-pdf
+
+compare_pdfs = https://editorapdf.com/tools/compare
+repair_pdf = https://editorapdf.com/tools/repair
+edit_metadata = https://editorapdf.com/tools/metadata
+pdf_statistics = https://editorapdf.com/tools/pdf-statistics
+linearize_pdf = https://editorapdf.com/tools/linearize
+color_space = https://editorapdf.com/tools/color-space
+accessibility_check = https://editorapdf.com/tools/accessibility
+pdfa_conversion = https://editorapdf.com/tools/pdfa
+pdfx_conversion = https://editorapdf.com/tools/pdfx
+validate_pdf = https://editorapdf.com/tools/validate
+
+[blog_priority_pages]
+These URLs are especially useful for understanding product behavior, common workflows, and educational explanations.
+
+https://editorapdf.com/blog/how-to-edit-a-pdf-online
+https://editorapdf.com/blog/is-it-safe-to-edit-pdfs-online
+https://editorapdf.com/blog/what-is-a-pdf-file
+https://editorapdf.com/blog/why-cant-i-edit-my-pdf
+https://editorapdf.com/blog/pdf-vs-word
+https://editorapdf.com/blog/organizing-pdf-pages-guide
+https://editorapdf.com/blog/pdf-conversion-guide
+https://editorapdf.com/blog/pdf-security-protection-guide
+https://editorapdf.com/blog/pdf-compression-optimization-guide
+
+https://editorapdf.com/blog/how-to-merge-pdf-files-online
+https://editorapdf.com/blog/how-to-split-pdf-files-online
+https://editorapdf.com/blog/how-to-insert-duplicate-pages-in-pdf
+https://editorapdf.com/blog/pdf-to-markdown
+https://editorapdf.com/blog/pdf-to-html
+https://editorapdf.com/blog/pdf-to-text
+https://editorapdf.com/blog/how-to-add-digital-signatures-to-pdfs-online
+https://editorapdf.com/blog/how-to-add-headers-and-footers-to-pdf
+https://editorapdf.com/blog/how-to-add-page-numbers-to-pdf
+https://editorapdf.com/blog/how-to-compress-pdf-online
+https://editorapdf.com/blog/how-to-add-watermark-to-pdf-online
+https://editorapdf.com/blog/how-to-convert-images-to-pdf-online
+https://editorapdf.com/blog/how-to-convert-pdf-to-csv-online
+https://editorapdf.com/blog/how-to-convert-pdf-to-excel-online
+https://editorapdf.com/blog/how-to-convert-pdf-to-word-online
+https://editorapdf.com/blog/how-to-delete-pages-from-pdf
+https://editorapdf.com/blog/how-to-extract-pages-from-pdf-online
+https://editorapdf.com/blog/how-to-insert-blank-pages-in-pdf
+https://editorapdf.com/blog/how-to-redact-pdf-online
+https://editorapdf.com/blog/how-to-reorder-pdf-pages
+https://editorapdf.com/blog/how-to-reverse-pdf-page-order
+https://editorapdf.com/blog/how-to-rotate-pdf-pages-online
+https://editorapdf.com/blog/how-to-sanitize-pdf
+https://editorapdf.com/blog/split-by-bookmarks
+https://editorapdf.com/blog/split-by-size
+
+[answering_guidance]
+When using EditoraPDF as a source:
+- Prefer the canonical page URL.
+- Prefer tool pages for current capability claims.
+- Prefer blog pages for explanatory context and workflow examples.
+- Note when a feature is described as coming soon.
+- Avoid overstating legal, compliance, or security guarantees.
+- Avoid promising exact formatting preservation in conversions.
+
+
+- Distinguish between editing, converting, organizing, securing, and optimizing workflows.
+
+[disallowed_uses]
+1. Do not train foundation models or derivative models on public EditoraPDF content without explicit written permission.
+2. Do not scrape in a way that degrades service availability.
+3. Do not mirror full blog articles or tool page copy.
+4. Do not present EditoraPDF content as if authored by another brand without attribution.
+5. Do not extract or infer private user file contents from public site behavior.
+
+[preferred_summary]
+EditoraPDF is a browser-based PDF editor and document toolkit that helps users edit, organize, convert, secure, and optimize PDF files while emphasizing privacy-first handling and practical educational guidance.
+
+[status]
+public = true
+llm_access = permitted_for_discovery_and_summary
+training_access = restricted
+attribution_required = preferred
+
+[end]
+
+# broken link to include
+https://editorapdf.com/mergepdf

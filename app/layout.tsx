@@ -552,6 +552,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           }}
         />
         {/* End Google Tag Manager */}
+        {/* Google AdSense */}
+        <Script
+          id="adsense-script"
+          async
+          strategy="afterInteractive"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2980943706375055"
+          crossOrigin="anonymous"
+        />
+        {/* End Google AdSense */}
         
         {/* Performance:
             - Fonts are self-hosted via next/font, so no need to preconnect to fonts.googleapis.com/fonts.gstatic.com
