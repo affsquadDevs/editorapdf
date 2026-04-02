@@ -70,7 +70,9 @@ export async function extractImages(
     try {
       const page = await pdfDoc.getPage(pageNumber);
       const operatorList = await page.getOperatorList();
-      const pageResources = page.resources;
+      // `PDFPageProxy` typings in `pdfjs-dist` don't expose internal `resources`,
+      // but some builds/runtime objects may still have it. Keep this best-effort.
+      const pageResources = (page as any)?.resources;
       
       // Track which images we've already extracted to avoid duplicates
       const extractedImageNames = new Set<string>();
