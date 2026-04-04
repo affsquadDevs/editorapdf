@@ -10,7 +10,7 @@ interface SignaturePositionSelectorProps {
   pdfFile: File | null;
   signatureData: string;
   signatureType: 'draw' | 'type' | 'image';
-  onPositionSelected: (pageNumber: number, x: number, y: number) => void;
+  onPositionSelected: (pageNumber: number, x: number, y: number, widthPts?: number, heightPts?: number) => void;
 }
 
 export default function SignaturePositionSelector({
@@ -30,9 +30,31 @@ export default function SignaturePositionSelector({
   const [renderScale, setRenderScale] = useState<number | null>(null);
   const [signaturePreview, setSignaturePreview] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
+  const [draggingOverlay, setDraggingOverlay] = useState(false);
+  const draggingOverlayRef = useRef<boolean>(false);
   const [signaturePos, setSignaturePos] = useState<{ x: number; y: number } | null>(null);
   const [signaturePixelPos, setSignaturePixelPos] = useState<{ x: number; y: number } | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  // Resizable box size in displayed pixels (initialized after image load)
+  const [boxSizePx, setBoxSizePx] = useState<{ width: number; height: number } | null>(null);
+  const [resizing, setResizing] = useState(false);
+  const resizingRef = useRef<boolean>(false);
+  const [activeHandle, setActiveHandle] = useState<'nw' | 'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w' | null>(null);
+  const startResizeRef = useRef<{
+    startX: number;
+    startY: number;
+    startWidth: number;
+    startHeight: number;
+    startCenterX: number;
+    startCenterY: number;
+    aspect: number;
+    shiftKey: boolean;
+  } | null>(null);
+  const [signatureNatural, setSignatureNatural] = useState<{ width: number; height: number } | null>(null);
+  // rAF throttle for resize to avoid jank
+  const resizeRafIdRef = useRef<number | null>(null);
+  const pendingSizeRef = useRef<{ width: number; height: number } | null>(null);
+  const pendingCenterRef = useRef<{ x: number; y: number } | null>(null);
 
   // Load signature preview
   useEffect(() => {
@@ -41,6 +63,12 @@ export default function SignaturePositionSelector({
       return;
     }
     setSignaturePreview(signatureData);
+    // Measure natural size (for aspect ratio lock)
+    const img = new Image();
+    img.onload = () => {
+      setSignatureNatural({ width: img.naturalWidth, height: img.naturalHeight });
+    };
+    img.src = signatureData;
   }, [signatureData]);
 
   // Load and render PDF page
@@ -75,6 +103,7 @@ export default function SignaturePositionSelector({
         const dataUrl = await renderPageToDataUrl(pdfDoc, currentPage, maxWidth, 0);
         setPageImage(dataUrl);
         setSignaturePos(null);
+        setBoxSizePx(null);
       } catch (error) {
         console.error('Error loading/rendering PDF:', error);
         setLoadError(error instanceof Error ? error.message : 'Failed to load PDF');
@@ -190,6 +219,27 @@ export default function SignaturePositionSelector({
     return { x: pixelX, y: pixelY };
   };
 
+  // Convert displayed pixel center back to normalized coordinates
+  const pixelToNormalized = (pixel: { x: number; y: number }): { x: number; y: number } | null => {
+    const img = imageRef.current;
+    if (!img || !img.complete || !pdfPageSize || !renderScale || img.naturalWidth === 0) {
+      return null;
+    }
+    const rect = img.getBoundingClientRect();
+    const display = getDisplayArea(img, rect);
+    const relX = pixel.x - display.offsetX;
+    const relY = pixel.y - display.offsetY;
+    const displayToRenderedX = img.naturalWidth / display.width;
+    const displayToRenderedY = img.naturalHeight / display.height;
+    const renderedX = relX * displayToRenderedX;
+    const renderedY = relY * displayToRenderedY;
+    const pdfX = renderedX / renderScale;
+    const pdfY = renderedY / renderScale;
+    const x = Math.max(0, Math.min(1, pdfX / pdfPageSize.width));
+    const y = Math.max(0, Math.min(1, pdfY / pdfPageSize.height));
+    return { x, y };
+  };
+
   // Update signature preview position
   useEffect(() => {
     if (!signaturePos || !imageRef.current) {
@@ -201,6 +251,21 @@ export default function SignaturePositionSelector({
       const pixelPos = normalizedToPixel(signaturePos);
       if (pixelPos) {
         setSignaturePixelPos(pixelPos);
+      }
+      // Initialize default box size (200x80 pt) mapped to displayed pixels once we can measure image
+      if (imageRef.current && !boxSizePx && pdfPageSize && renderScale) {
+        const rect = imageRef.current.getBoundingClientRect();
+        const display = getDisplayArea(imageRef.current, rect);
+        const renderedToDisplayX = display.width / imageRef.current.naturalWidth;
+        const renderedToDisplayY = display.height / imageRef.current.naturalHeight;
+        const defaultWidthPts = 200;
+        const defaultHeightPts = 80;
+        const displayedWidth = defaultWidthPts * renderScale * renderedToDisplayX;
+        const displayedHeight = defaultHeightPts * renderScale * renderedToDisplayY;
+        setBoxSizePx({
+          width: Math.max(40, displayedWidth),
+          height: Math.max(20, displayedHeight),
+        });
       }
     };
 
@@ -217,7 +282,7 @@ export default function SignaturePositionSelector({
         imageRef.current.removeEventListener('load', updatePosition);
       }
     };
-  }, [signaturePos, pageImage, pdfPageSize, renderScale]);
+  }, [signaturePos, pageImage, pdfPageSize, renderScale, boxSizePx]);
 
   // Handle image click
   const handleImageClick = (e: React.MouseEvent<HTMLImageElement>) => {
@@ -229,8 +294,24 @@ export default function SignaturePositionSelector({
 
   // Handle drag
   const handleMouseDown = (e: React.MouseEvent<HTMLImageElement>) => {
+    if (resizingRef.current) return;
     setDragging(true);
     handleImageClick(e);
+    // Track drag on window to allow moving while holding even if cursor leaves image
+    const onMove = (ev: MouseEvent) => {
+      if (!dragging) return;
+      const normalized = clickToNormalized(ev.clientX, ev.clientY);
+      if (normalized) {
+        setSignaturePos(normalized);
+      }
+    };
+    const onUp = () => {
+      setDragging(false);
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('mouseup', onUp);
+    };
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('mouseup', onUp);
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLImageElement>) => {
@@ -244,11 +325,28 @@ export default function SignaturePositionSelector({
 
   const handleMouseUp = () => {
     setDragging(false);
+    setResizing(false);
+    resizingRef.current = false;
+    setDraggingOverlay(false);
+    draggingOverlayRef.current = false;
   };
 
   const handleConfirm = () => {
     if (signaturePos) {
-      onPositionSelected(currentPage, signaturePos.x, signaturePos.y);
+      // Convert displayed px box size back to PDF points
+      let widthPts: number | undefined;
+      let heightPts: number | undefined;
+      if (imageRef.current && boxSizePx && pdfPageSize && renderScale) {
+        const rect = imageRef.current.getBoundingClientRect();
+        const display = getDisplayArea(imageRef.current, rect);
+        const renderedToDisplayX = display.width / imageRef.current.naturalWidth;
+        const renderedToDisplayY = display.height / imageRef.current.naturalHeight;
+        const renderedWidth = boxSizePx.width / renderedToDisplayX;
+        const renderedHeight = boxSizePx.height / renderedToDisplayY;
+        widthPts = renderedWidth / renderScale;
+        heightPts = renderedHeight / renderScale;
+      }
+      onPositionSelected(currentPage, signaturePos.x, signaturePos.y, widthPts, heightPts);
       onClose();
     }
   };
@@ -352,28 +450,214 @@ export default function SignaturePositionSelector({
                     left: `${signaturePixelPos.x}px`,
                     top: `${signaturePixelPos.y}px`,
                     transform: 'translate(-50%, -50%)',
-                    pointerEvents: 'none',
+                    pointerEvents: 'auto',
                     zIndex: 10,
                   }}
+                  onMouseDown={(e) => {
+                    // Start dragging the overlay (move)
+                    if (resizing) return;
+                    e.stopPropagation();
+                    setDraggingOverlay(true);
+                    draggingOverlayRef.current = true;
+                    const onMove = (ev: MouseEvent) => {
+                      if (!draggingOverlayRef.current) return;
+                      const normalized = clickToNormalized(ev.clientX, ev.clientY);
+                      if (normalized) {
+                        setSignaturePos(normalized);
+                      }
+                    };
+                    const onUp = () => {
+                      setDraggingOverlay(false);
+                      draggingOverlayRef.current = false;
+                      window.removeEventListener('mousemove', onMove);
+                      window.removeEventListener('mouseup', onUp);
+                    };
+                    window.addEventListener('mousemove', onMove);
+                    window.addEventListener('mouseup', onUp);
+                  }}
                 >
-                  <img
-                    src={signaturePreview}
-                    alt="Signature preview"
-                    className="opacity-80"
+                  <div
                     style={{
-                      width: '200px',
-                      height: '80px',
-                      objectFit: 'contain',
-                      display: 'block',
+                      position: 'relative',
+                      width: `${boxSizePx?.width || 200}px`,
+                      height: `${boxSizePx?.height || 80}px`,
+                      border: '1px dashed rgba(168, 85, 247, 0.6)',
+                      background: 'transparent',
+                      borderRadius: '4px',
+                      cursor: draggingOverlay ? 'grabbing' : 'move',
                     }}
-                  />
+                  >
+                    <img
+                      src={signaturePreview}
+                      alt="Signature preview"
+                      className="opacity-80"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'contain',
+                        display: 'block',
+                        pointerEvents: 'none',
+                        userSelect: 'none',
+                      }}
+                      draggable={false}
+                    />
+                    {/* Resize handles (8) */}
+                    {(['nw','n','ne','e','se','s','sw','w'] as const).map((h) => {
+                      const styles: Record<string, React.CSSProperties> = {
+                        nw: { left: -6, top: -6, cursor: 'nwse-resize' },
+                        n:  { left: '50%', top: -6, transform: 'translateX(-50%)', cursor: 'ns-resize' },
+                        ne: { right: -6, top: -6, cursor: 'nesw-resize' },
+                        e:  { right: -6, top: '50%', transform: 'translateY(-50%)', cursor: 'ew-resize' },
+                        se: { right: -6, bottom: -6, cursor: 'nwse-resize' },
+                        s:  { left: '50%', bottom: -6, transform: 'translateX(-50%)', cursor: 'ns-resize' },
+                        sw: { left: -6, bottom: -6, cursor: 'nesw-resize' },
+                        w:  { left: -6, top: '50%', transform: 'translateY(-50%)', cursor: 'ew-resize' },
+                      };
+                      return (
+                        <div
+                          key={h}
+                          onMouseDown={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            setResizing(true);
+                            resizingRef.current = true;
+                            setActiveHandle(h);
+                            const startX = e.clientX;
+                            const startY = e.clientY;
+                            const startSize = { ...(boxSizePx || { width: 200, height: 80 }) };
+                            const center = signaturePixelPos || { x: 0, y: 0 };
+                            const aspect = signatureNatural && signatureNatural.height !== 0
+                              ? signatureNatural.width / signatureNatural.height
+                              : startSize.width / Math.max(1, startSize.height);
+                            startResizeRef.current = {
+                              startX,
+                              startY,
+                              startWidth: startSize.width,
+                              startHeight: startSize.height,
+                              startCenterX: center.x,
+                              startCenterY: center.y,
+                              aspect,
+                              shiftKey: e.shiftKey,
+                            };
+                            // Try to capture pointer so we don't lose move events
+                            try {
+                              (e.currentTarget as any).setPointerCapture?.((e as any).pointerId);
+                            } catch {}
+                            const onMove = (ev: MouseEvent) => {
+                              ev.preventDefault();
+                              if (!resizingRef.current || !startResizeRef.current) return;
+                              const { startX, startY, startWidth, startHeight, startCenterX, startCenterY, aspect, shiftKey } = startResizeRef.current;
+                              const dx = ev.clientX - startX;
+                              const dy = ev.clientY - startY;
+                              // Compute proposed size change per handle
+                              let newW = startWidth;
+                              let newH = startHeight;
+                              let centerX = startCenterX;
+                              let centerY = startCenterY;
+                              const lockAspect = !shiftKey;
+                              const applyAspect = (w: number, h: number, handle: string) => {
+                                if (!lockAspect) return { w, h };
+                                // Fit to aspect based on the dominant delta
+                                if (Math.abs(w - startWidth) > Math.abs(h - startHeight)) {
+                                  h = w / aspect;
+                                } else {
+                                  w = h * aspect;
+                                }
+                                return { w, h };
+                              };
+                              const adjustCenter = (handle: string, dW: number, dH: number) => {
+                                // Opposite side fixed: move center by half the delta in that axis
+                                switch (handle) {
+                                  case 'e':  centerX = startCenterX + dW / 2; break;
+                                  case 'w':  centerX = startCenterX - dW / 2; break;
+                                  case 's':  centerY = startCenterY + dH / 2; break;
+                                  case 'n':  centerY = startCenterY - dH / 2; break;
+                                  case 'se': centerX = startCenterX + dW / 2; centerY = startCenterY + dH / 2; break;
+                                  case 'ne': centerX = startCenterX + dW / 2; centerY = startCenterY - dH / 2; break;
+                                  case 'sw': centerX = startCenterX - dW / 2; centerY = startCenterY + dH / 2; break;
+                                  case 'nw': centerX = startCenterX - dW / 2; centerY = startCenterY - dH / 2; break;
+                                }
+                              };
+                              // Derive tentative dimensions based on handle
+                              switch (h) {
+                                case 'e':  newW = startWidth + dx; break;
+                                case 'w':  newW = startWidth - dx; break;
+                                case 's':  newH = startHeight + dy; break;
+                                case 'n':  newH = startHeight - dy; break;
+                                case 'se': newW = startWidth + dx; newH = startHeight + dy; break;
+                                case 'ne': newW = startWidth + dx; newH = startHeight - dy; break;
+                                case 'sw': newW = startWidth - dx; newH = startHeight + dy; break;
+                                case 'nw': newW = startWidth - dx; newH = startHeight - dy; break;
+                              }
+                              // Enforce minimums
+                              newW = Math.max(40, newW);
+                              newH = Math.max(20, newH);
+                              // Apply aspect lock if needed
+                              const sized = applyAspect(newW, newH, h);
+                              newW = sized.w;
+                              newH = sized.h;
+                              adjustCenter(h, newW - startWidth, newH - startHeight);
+                              // Contain within displayed image bounds
+                              if (imageRef.current) {
+                                const rect = imageRef.current.getBoundingClientRect();
+                                const display = getDisplayArea(imageRef.current, rect);
+                                const halfW = newW / 2;
+                                const halfH = newH / 2;
+                                // Clamp center so the box stays inside
+                                centerX = Math.max(display.offsetX + halfW, Math.min(display.offsetX + display.width - halfW, centerX));
+                                centerY = Math.max(display.offsetY + halfH, Math.min(display.offsetY + display.height - halfH, centerY));
+                              }
+                              // Throttle state updates via rAF
+                              pendingSizeRef.current = { width: newW, height: newH };
+                              pendingCenterRef.current = { x: centerX, y: centerY };
+                              if (resizeRafIdRef.current == null) {
+                                resizeRafIdRef.current = requestAnimationFrame(() => {
+                                  resizeRafIdRef.current = null;
+                                  const ps = pendingSizeRef.current;
+                                  const pc = pendingCenterRef.current;
+                                  if (ps) setBoxSizePx(ps);
+                                  if (pc) {
+                                    const norm = pixelToNormalized(pc);
+                                    if (norm) setSignaturePos(norm);
+                                  }
+                                });
+                              }
+                            };
+                            const cancel = () => {
+                              setResizing(false);
+                              resizingRef.current = false;
+                              setActiveHandle(null);
+                              startResizeRef.current = null;
+                              if (resizeRafIdRef.current != null) {
+                                cancelAnimationFrame(resizeRafIdRef.current);
+                                resizeRafIdRef.current = null;
+                              }
+                              document.removeEventListener('mousemove', onMove);
+                              document.removeEventListener('mouseup', cancel);
+                              window.removeEventListener('blur', cancel);
+                              document.removeEventListener('mouseleave', cancel);
+                            };
+                            document.addEventListener('mousemove', onMove, { passive: false });
+                            document.addEventListener('mouseup', cancel);
+                            window.addEventListener('blur', cancel);
+                            document.addEventListener('mouseleave', cancel);
+                          }}
+                          style={{
+                            position: 'absolute',
+                            width: '12px',
+                            height: '12px',
+                            background: 'rgba(168,85,247,0.95)',
+                            borderRadius: '3px',
+                            ...styles[h],
+                          }}
+                          title="Drag to resize"
+                        />
+                      );
+                    })}
+                  </div>
                 </div>
               )}
-              {signaturePos && (
-                <div className="absolute top-2 left-2 px-3 py-1.5 rounded-lg bg-primary-500/20 border border-primary-500/40 text-primary-300 text-xs font-medium z-10">
-                  Position: X={signaturePos.x.toFixed(3)}, Y={signaturePos.y.toFixed(3)}
-                </div>
-              )}
+              {/* Position hint removed for cleaner UI */}
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-20">

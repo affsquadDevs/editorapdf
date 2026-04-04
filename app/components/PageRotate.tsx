@@ -31,6 +31,8 @@ export default function PageRotate({
   const [pages, setPages] = useState<PageRotation[]>([]);
   const [thumbnails, setThumbnails] = useState<{ [pageNumber: number]: string }>({});
   const [isLoadingThumbnails, setIsLoadingThumbnails] = useState(false);
+  // Cache for rotated thumbnails to avoid CSS-rotate clipping. Key: `${pageNumber}-${rotation}`
+  const [rotatedThumbs, setRotatedThumbs] = useState<{ [key: string]: string }>({});
   const [fullSizeImages, setFullSizeImages] = useState<{ [key: string]: string }>({});
   const [isLoadingFullSize, setIsLoadingFullSize] = useState<{ [key: string]: boolean }>({});
   const [selectedPage, setSelectedPage] = useState<number | null>(null);
@@ -83,6 +85,38 @@ export default function PageRotate({
 
     generateThumbnails();
   }, [pdfFile, totalPages]);
+
+  // Generate rotated thumbnails on-demand whenever a page's rotation changes
+  useEffect(() => {
+    if (!pdfFile || totalPages === 0) return;
+    const load = async () => {
+      try {
+        const pdfDoc = await loadPdfDocument(pdfFile);
+        const tasks: Promise<void>[] = [];
+        pages.forEach((p) => {
+          if (p.rotation !== 0) {
+            const key = `${p.pageNumber}-${p.rotation}`;
+            if (!rotatedThumbs[key]) {
+              tasks.push(
+                renderPageToDataUrl(pdfDoc, p.pageNumber, 120, p.rotation).then((dataUrl) => {
+                  setRotatedThumbs((prev) => ({ ...prev, [key]: dataUrl }));
+                }).catch((err) => {
+                  console.error(`Error generating rotated thumbnail for page ${p.pageNumber}:`, err);
+                })
+              );
+            }
+          }
+        });
+        if (tasks.length > 0) {
+          await Promise.allSettled(tasks);
+        }
+      } catch (e) {
+        // Best-effort; fallback is CSS rotation (may clip), but we try to avoid it.
+        console.error('Error preparing rotated thumbnails:', e);
+      }
+    };
+    load();
+  }, [pdfFile, totalPages, pages, rotatedThumbs]);
 
   // Notify parent of rotation changes
   useEffect(() => {
@@ -277,10 +311,13 @@ export default function PageRotate({
                 ) : thumbnails[page.pageNumber] ? (
                   <>
                     <img
-                      src={thumbnails[page.pageNumber]}
+                      src={
+                        page.rotation === 0
+                          ? thumbnails[page.pageNumber]
+                          : rotatedThumbs[`${page.pageNumber}-${page.rotation}`] || thumbnails[page.pageNumber]
+                      }
                       alt={`Page ${page.pageNumber}`}
                       className="w-full h-full object-contain"
-                      style={{ transform: `rotate(${page.rotation}deg)` }}
                       draggable={false}
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">

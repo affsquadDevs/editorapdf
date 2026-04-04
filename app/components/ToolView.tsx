@@ -204,6 +204,8 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
   const [signatureY, setSignatureY] = useState<number>(0.5); // For sign: Y position (0-1)
   const [typedSignature, setTypedSignature] = useState<string>(''); // For sign: typed signature text
   const [signatureFontSize, setSignatureFontSize] = useState<number>(24); // For sign: font size for typed signature
+  const [signatureWidthPts, setSignatureWidthPts] = useState<number>(200); // For sign: width in PDF points
+  const [signatureHeightPts, setSignatureHeightPts] = useState<number>(80); // For sign: height in PDF points
   const [isSignaturePadOpen, setIsSignaturePadOpen] = useState<boolean>(false);
   const [isPositionSelectorOpen, setIsPositionSelectorOpen] = useState<boolean>(false);
   const [isRedactSelectorOpen, setIsRedactSelectorOpen] = useState<boolean>(false);
@@ -905,6 +907,8 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
           pageNumber: signaturePage,
           x: signatureX,
           y: signatureY,
+          width: signatureWidthPts,
+          height: signatureHeightPts,
           fontSize: signatureType === 'type' ? signatureFontSize : undefined,
         });
         
@@ -2232,6 +2236,8 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
     setSignatureY(0.5);
     setTypedSignature('');
     setSignatureFontSize(24);
+    setSignatureWidthPts(200);
+    setSignatureHeightPts(80);
     setIsSignaturePadOpen(false);
     setIsPositionSelectorOpen(false);
     setIsRedactSelectorOpen(false);
@@ -4976,10 +4982,14 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               : signatureData
           }
           signatureType={signatureType}
-          onPositionSelected={(pageNumber, x, y) => {
+          onPositionSelected={(pageNumber, x, y, widthPts, heightPts) => {
             setSignaturePage(pageNumber);
             setSignatureX(x);
             setSignatureY(y);
+            if (widthPts && heightPts) {
+              setSignatureWidthPts(Math.max(40, Math.min(1000, Math.round(widthPts))));
+              setSignatureHeightPts(Math.max(20, Math.min(600, Math.round(heightPts))));
+            }
             setIsPositionSelectorOpen(false);
           }}
         />
