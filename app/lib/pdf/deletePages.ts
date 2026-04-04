@@ -75,8 +75,11 @@ export function downloadPdf(pdfBytes: Uint8Array, filename: string): void {
     link.style.display = 'none';
     document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
-    setTimeout(() => URL.revokeObjectURL(url), 100);
+    // Clean up after a short delay to ensure the download has started
+    setTimeout(() => {
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }, 100);
   } catch (error) {
     console.error('Error downloading PDF:', error);
     throw error;
