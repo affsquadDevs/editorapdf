@@ -1,13 +1,19 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import type { AppLocale } from '../../i18n/config';
 
-export default function Footer() {
+export default function Footer({ locale = 'en' as AppLocale }: { locale?: AppLocale }) {
+  // Load messages on the server; Footer doesn't need client context
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const messages = locale === 'uk' ? require('../../i18n/locales/uk.json') : require('../../i18n/locales/en.json');
+  const t = (k: string) => (messages[k] as string) ?? k;
+  const withLocale = (path: string) => `/${locale}${path}`;
   return (
     <footer className="mt-auto py-6 px-6 border-t border-surface-800/50" role="contentinfo">
       <div className="max-w-5xl mx-auto space-y-6">
         {/* Logo */}
         <div className="flex justify-center">
-          <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
+          <Link href={withLocale('/')} className="flex items-center hover:opacity-80 transition-opacity">
             <Image 
               src="/logo.svg" 
               alt="EditoraPDF Logo" 
@@ -22,39 +28,39 @@ export default function Footer() {
         {/* Disclaimer */}
         <div className="p-3 rounded-lg bg-surface-800/30 border border-surface-700/50">
           <p className="text-xs text-surface-400 leading-relaxed">
-            <strong className="text-surface-300">Disclaimer:</strong> EditoraPDF provides online PDF editing tools for general use only. We make no guarantees regarding accuracy, completeness, or suitability for any specific purpose. Users are responsible for reviewing all documents before use. By using this website, you agree to our{' '}
-            <Link href="/terms" className="text-primary-400 hover:text-primary-300 underline">
-              Terms
+            <strong className="text-surface-300">{t('footer.disclaimer.title')}</strong> {t('footer.disclaimer.text')}{' '}
+            <Link href={withLocale('/terms')} className="text-primary-400 hover:text-primary-300 underline">
+              {t('footer.terms')}
             </Link>
             {' '}and{' '}
-            <Link href="/privacy-policy" className="text-primary-400 hover:text-primary-300 underline">
-              Privacy Policy
+            <Link href={withLocale('/privacy-policy')} className="text-primary-400 hover:text-primary-300 underline">
+              {t('footer.privacy')}
             </Link>.
           </p>
         </div>
 
         {/* Navigation Links */}
         <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2" aria-label="Footer navigation">
-          <Link href="/" className="text-sm text-surface-400 hover:text-primary-400 transition-colors">
-            Home
+          <Link href={withLocale('/')} className="text-sm text-surface-400 hover:text-primary-400 transition-colors">
+            {t('footer.home')}
           </Link>
-          <Link href="/how-it-works" className="text-sm font-semibold text-primary-400 hover:text-primary-300 transition-colors">
-            How It Works
+          <Link href={withLocale('/how-it-works')} className="text-sm font-semibold text-primary-400 hover:text-primary-300 transition-colors">
+            {t('footer.how')}
           </Link>
-          <Link href="/about" className="text-sm text-surface-400 hover:text-primary-400 transition-colors">
-            About
+          <Link href={withLocale('/about')} className="text-sm text-surface-400 hover:text-primary-400 transition-colors">
+            {t('footer.about')}
           </Link>
-          <Link href="/privacy-policy" className="text-sm text-surface-400 hover:text-primary-400 transition-colors">
-            Privacy Policy
+          <Link href={withLocale('/privacy-policy')} className="text-sm text-surface-400 hover:text-primary-400 transition-colors">
+            {t('footer.privacyLink')}
           </Link>
-          <Link href="/terms" className="text-sm text-surface-400 hover:text-primary-400 transition-colors">
-            Terms of Service
+          <Link href={withLocale('/terms')} className="text-sm text-surface-400 hover:text-primary-400 transition-colors">
+            {t('footer.termsLink')}
           </Link>
-          <Link href="/contact" className="text-sm text-surface-400 hover:text-primary-400 transition-colors">
-            Contact
+          <Link href={withLocale('/contact')} className="text-sm text-surface-400 hover:text-primary-400 transition-colors">
+            {t('footer.contact')}
           </Link>
-          <Link href="/blog" className="text-sm text-surface-400 hover:text-primary-400 transition-colors">
-            Blog
+          <Link href={withLocale('/blog')} className="text-sm text-surface-400 hover:text-primary-400 transition-colors">
+            {t('footer.blog')}
           </Link>
         </nav>
 
@@ -109,7 +115,7 @@ export default function Footer() {
         {/* Copyright */}
         <div className="text-center">
           <p className="text-sm text-surface-500">
-            © 2026 EditoraPDF. All rights reserved.
+            © 2026 EditoraPDF. {t('footer.copyright')}
           </p>
         </div>
       </div>

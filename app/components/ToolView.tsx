@@ -48,6 +48,7 @@ import { addWatermark, downloadWatermarkedPdf, type WatermarkConfig } from '../l
 import WatermarkPreview from './WatermarkPreview';
 import { addPageNumbers, downloadNumberedPdf } from '../lib/pdf/addPageNumbers';
 import { cropPages, downloadCroppedPdf } from '../lib/pdf/cropPages';
+import { useAppTranslations } from '../i18n/TranslationProvider';
 import { resizePages, downloadResizedPdf } from '../lib/pdf/resizePages';
 import { flattenPdf, downloadFlattenedPdf } from '../lib/pdf/flattenPdf';
 import { editMetadata, downloadMetadataPdf } from '../lib/pdf/editMetadata';
@@ -170,6 +171,8 @@ const toolConfigs: Record<string, {
 };
 
 export default function ToolView({ tool, onBack }: ToolViewProps) {
+  const { t } = useAppTranslations();
+  const tr = (key: string, fallback: string) => (t(key) === key ? fallback : t(key));
   const [files, setFiles] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -992,7 +995,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       }
 
       if (redactions.length === 0) {
-        setError('Please select areas to redact by clicking "Select Areas to Redact"');
+        setError(tr('tools.view.redact.validation.selectAreas', 'Please select areas to redact by clicking "Select Areas to Redact"'));
         return;
       }
 
@@ -2803,7 +2806,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
           className="flex items-center gap-2 text-surface-400 hover:text-surface-200 transition-colors mb-4 group"
         >
           <ArrowLeft size={20} strokeWidth={2} className="transition-transform group-hover:-translate-x-1" />
-          <span className="text-sm font-medium">Back to Tools</span>
+          <span className="text-sm font-medium">{tr('tools.view.back', 'Back to Tools')}</span>
         </button>
 
         <div className="flex items-center gap-4">
@@ -2811,8 +2814,8 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
             {tool.icon}
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-white">{tool.title}</h2>
-            <p className="text-surface-400 text-sm">{tool.description}</p>
+            <h2 className="text-2xl font-bold text-white">{tr(`tools.items.${tool.id}.title`, tool.title)}</h2>
+            <p className="text-surface-400 text-sm">{tr(`tools.items.${tool.id}.desc`, tool.description)}</p>
           </div>
         </div>
       </div>
@@ -2822,7 +2825,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
         <div className="flex items-start gap-3">
           <CheckCircle size={20} strokeWidth={2} className="text-primary-400 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
-            <p className="text-sm font-medium text-surface-200 mb-2">How it works:</p>
+            <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.view.howItWorks', 'How it works:')}</p>
             <ol className="space-y-1">
               {config.steps.map((step, idx) => (
                 <li key={idx} className="flex items-center gap-2 text-sm text-surface-400">
@@ -2846,7 +2849,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                       ? 'text-success-400 line-through'
                       : ''
                   }>
-                    {step}
+                    {tr(`tools.view.${tool.id}.steps.${idx + 1}`, step)}
                   </span>
                 </li>
               ))}
@@ -3006,14 +3009,14 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
 
                 <div className="space-y-1">
                   <p className="text-base font-medium text-surface-200">
-                    {isDragging ? 'Drop here!' : config.uploadLabel}
+                    {isDragging ? tr('tools.view.dropHere', 'Drop here!') : tr(`tools.view.${tool.id}.uploadLabel`, config.uploadLabel)}
                   </p>
-                  <p className="text-sm text-surface-500">{config.uploadDescription}</p>
+                  <p className="text-sm text-surface-500">{tr(`tools.view.${tool.id}.uploadDescription`, config.uploadDescription)}</p>
                 </div>
 
                 <span className="btn btn-md btn-primary inline-flex font-semibold">
                   <Upload size={16} strokeWidth={2} />
-                  Choose {config.acceptMultiple ? 'Files' : 'File'}
+                  {config.acceptMultiple ? tr('tools.view.chooseFiles', 'Choose Files') : tr('tools.view.chooseFile', 'Choose File')}
                 </span>
               </div>
             </label>
@@ -3026,7 +3029,14 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
           {files.length > 0 && (
             <div className="mb-6 space-y-2 animate-fade-in">
               <p className="text-sm font-medium text-surface-300 mb-2">
-                {files.length} file{files.length > 1 ? 's' : ''} selected:
+                {(() => {
+                  const key = 'tools.view.filesSelected';
+                  const msg = t(key);
+                  if (msg && msg !== key) {
+                    return msg.replace('{n}', String(files.length));
+                  }
+                  return `${files.length} file${files.length > 1 ? 's' : ''} selected:`;
+                })()}
               </p>
               {files.map((file, idx) => (
                 <div
@@ -3069,7 +3079,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                   className="flex items-center justify-center gap-2 p-3 rounded-xl border-2 border-dashed border-surface-700/50 hover:border-primary-500/30 text-surface-500 hover:text-primary-400 cursor-pointer transition-colors"
                 >
                   <Plus size={16} strokeWidth={2} />
-                  <span className="text-sm font-medium">Add More Files</span>
+                  <span className="text-sm font-medium">{tr('tools.view.addMoreFiles', 'Add More Files')}</span>
                 </label>
               )}
             </div>
@@ -3082,10 +3092,10 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {tool.id === 'reorder' && totalPages !== null && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50">
                   <p className="text-sm font-medium text-surface-200 mb-2">
-                    Reorder Pages
+                    {tr('tools.view.reorder.title', 'Reorder Pages')}
                   </p>
                   <p className="text-xs text-surface-400 mb-3">
-                    Drag pages to reorder or use position selectors to set the order
+                    {tr('tools.view.reorder.hint', 'Drag pages to reorder or use position selectors to set the order')}
                   </p>
                   <PageReorder
                     totalPages={totalPages}
@@ -3098,7 +3108,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {/* Compression level */}
               {tool.id === 'compress' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50">
-                  <p className="text-sm font-medium text-surface-200 mb-3">Compression Level</p>
+                  <p className="text-sm font-medium text-surface-200 mb-3">{tr('tools.view.compress.level', 'Compression Level')}</p>
                   <div className="flex gap-2">
                     {(['Low', 'Medium', 'High'] as const).map((level) => {
                       const levelKey = level.toLowerCase() as 'low' | 'medium' | 'high';
@@ -3113,7 +3123,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                               : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'
                           }`}
                         >
-                          {level}
+                          {tr(`tools.view.compress.${levelKey}`, level)}
                         </button>
                       );
                     })}
@@ -3264,18 +3274,22 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-3">
                   <div>
                     <p className="text-sm font-medium text-surface-200 mb-2">
-                      {tool.id === 'split' ? 'Pages to Split Into Separate Files' : tool.id === 'extract-pages' ? 'Pages to Extract' : 'Pages to Delete'}
+                      {tool.id === 'split' 
+                        ? tr('tools.split.heading', 'Pages to Split Into Separate Files') 
+                        : tool.id === 'extract-pages' 
+                          ? tr('tools.extract.heading', 'Pages to Extract') 
+                          : tr('tools.delete.heading', 'Pages to Delete')}
                     </p>
                     {tool.id === 'split' && (
                       <p className="text-xs text-surface-400 mb-3">
-                        Select which pages should be split into separate PDF files. Each range will create a new file.
+                        {tr('tools.split.section.desc', 'Select which pages should be split into separate PDF files. Each range will create a new file.')}
                       </p>
                     )}
                     {(tool.id === 'extract-pages' || tool.id === 'delete-pages') && (
                       <p className="text-xs text-surface-400 mb-3">
                         {tool.id === 'extract-pages' 
-                          ? 'Click on pages to select which ones to extract into a new PDF file.'
-                          : 'Click on pages to select which ones to delete from the PDF.'}
+                          ? tr('tools.extract.section.desc', 'Click on pages to select which ones to extract into a new PDF file.')
+                          : tr('tools.delete.section.desc', 'Click on pages to select which ones to delete from the PDF.')}
                       </p>
                     )}
                     
@@ -3301,33 +3315,33 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                     )}
                     {totalPages && !pageRangeWarning && pageRange.trim() && (
                       <p className="text-xs text-success-400 mt-2">
-                        ✓ PDF has {totalPages} page{totalPages !== 1 ? 's' : ''}. Your selection looks good!
+                        {tr('tools.pages.ok', `✓ PDF has ${totalPages} page${totalPages !== 1 ? 's' : ''}. Your selection looks good!`)}
                       </p>
                     )}
                   </div>
                   
                   {tool.id === 'split' && (
                     <div className="p-3 rounded-lg bg-primary-500/10 border border-primary-500/20">
-                      <p className="text-xs font-semibold text-primary-300 mb-2">📋 How it works:</p>
+                      <p className="text-xs font-semibold text-primary-300 mb-2">📋 {tr('tools.view.howItWorks', 'How it works:')}</p>
                       <ul className="text-xs text-surface-400 space-y-1.5 list-disc list-inside">
-                        <li>Each range you add creates a separate PDF file</li>
-                        <li>Use "From page" and "To page" to select a range (e.g., pages 1-5)</li>
-                        <li>If "From" and "To" are the same, it creates a file with a single page</li>
-                        <li>You can add multiple ranges to split the PDF into multiple files</li>
+                        <li>{tr('tools.split.tips.1', 'Each range you add creates a separate PDF file')}</li>
+                        <li>{tr('tools.split.tips.2', 'Use "From page" and "To page" to select a range (e.g., pages 1-5)')}</li>
+                        <li>{tr('tools.split.tips.3', 'If "From" and "To" are the same, it creates a file with a single page')}</li>
+                        <li>{tr('tools.split.tips.4', 'You can add multiple ranges to split the PDF into multiple files')}</li>
                       </ul>
                     </div>
                   )}
                   
                   {tool.id === 'split' && (
                     <p className="text-xs text-surface-500">
-                      ⚠️ Note: You cannot select all pages - split requires selecting only some pages to create separate files.
+                      {tr('tools.split.note', '⚠️ Note: You cannot select all pages - split requires selecting only some pages to create separate files.')}
                     </p>
                   )}
                   {(tool.id === 'extract-pages' || tool.id === 'delete-pages') && (
                     <p className="text-xs text-surface-500">
                       {tool.id === 'delete-pages' 
-                        ? '⚠️ Note: You cannot delete all pages - at least one page must remain.'
-                        : 'Select one or more pages to extract into a new PDF file.'}
+                        ? tr('tools.delete.note', '⚠️ Note: You cannot delete all pages - at least one page must remain.')
+                        : tr('tools.extract.note', 'Select one or more pages to extract into a new PDF file.')}
                     </p>
                   )}
                 </div>
@@ -3934,12 +3948,12 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {tool.id === 'insert-blank' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
                   <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">Insert Position</p>
+                    <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.view.insert-blank.position', 'Insert Position')}</p>
                     <div className="flex gap-2">
                       {[
-                        { label: 'Beginning', value: 'beginning' as const },
-                        { label: 'End', value: 'end' as const },
-                        { label: 'After Page...', value: 'after' as const }
+                        { label: tr('tools.view.insert-blank.beginning','Beginning'), value: 'beginning' as const },
+                        { label: tr('tools.view.insert-blank.end','End'), value: 'end' as const },
+                        { label: tr('tools.view.insert-blank.after','After Page...'), value: 'after' as const }
                       ].map((pos) => (
                         <button
                           key={pos.value}
@@ -3956,7 +3970,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                     </div>
                     {insertPosition === 'after' && totalPages && (
                       <div className="mt-3">
-                        <p className="text-xs text-surface-400 mb-1.5">After which page?</p>
+                        <p className="text-xs text-surface-400 mb-1.5">{tr('tools.view.insert-blank.afterWhich', 'After which page?')}</p>
                         <div className="flex items-center gap-2">
                           <input
                             type="number"
@@ -4046,9 +4060,9 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                       </div>
                     </div>
                     <p className="text-xs text-surface-500 mt-2">
-                      {insertPosition === 'beginning' && `Will add ${numberOfBlankPages} blank ${numberOfBlankPages === 1 ? 'page' : 'pages'} at the beginning of your PDF`}
-                      {insertPosition === 'end' && `Will add ${numberOfBlankPages} blank ${numberOfBlankPages === 1 ? 'page' : 'pages'} at the end of your PDF`}
-                      {insertPosition === 'after' && totalPages && `Will add ${numberOfBlankPages} blank ${numberOfBlankPages === 1 ? 'page' : 'pages'} after page ${afterPageNumber}`}
+                      {insertPosition === 'beginning' && tr('tools.view.insert-blank.summary.beginning', `Will add ${numberOfBlankPages} blank ${numberOfBlankPages === 1 ? 'page' : 'pages'} at the beginning of your PDF`)}
+                      {insertPosition === 'end' && tr('tools.view.insert-blank.summary.end', `Will add ${numberOfBlankPages} blank ${numberOfBlankPages === 1 ? 'page' : 'pages'} at the end of your PDF`)}
+                      {insertPosition === 'after' && totalPages && tr('tools.view.insert-blank.summary.after', `Will add ${numberOfBlankPages} blank ${numberOfBlankPages === 1 ? 'page' : 'pages'} after page ${afterPageNumber}`)}
                     </p>
                   </div>
                 </div>
@@ -4456,15 +4470,15 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {tool.id === 'redact' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
                   <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">Select Areas to Redact</p>
+                    <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.view.redact.selectTitle', 'Select Areas to Redact')}</p>
                     <p className="text-xs text-surface-400 mb-3">
-                      Click "Select Areas" to draw rectangles over sensitive information that should be permanently blacked out.
+                      {tr('tools.view.redact.selectDesc', 'Click "Select Areas" to draw rectangles over sensitive information that should be permanently blacked out.')}
                     </p>
                     <button
                       onClick={() => setIsRedactSelectorOpen(true)}
                       className="w-full px-4 py-2.5 rounded-lg bg-error-500/20 border border-error-500/40 text-error-300 hover:bg-error-500/30 transition-colors text-sm font-medium"
                     >
-                      Select Areas to Redact
+                      {tr('tools.view.redact.selectCta', 'Select Areas to Redact')}
                     </button>
                   </div>
                   {redactions.length > 0 && (
@@ -4480,7 +4494,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                       </button>
                     </div>
                   )}
-                  <p className="text-xs text-error-400/80">⚠️ Redaction is permanent and cannot be undone</p>
+                  <p className="text-xs text-error-400/80">⚠️ {tr('tools.view.redact.permanent', 'Redaction is permanent and cannot be undone')}</p>
                 </div>
               )}
 
@@ -4894,33 +4908,35 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                 {isProcessing ? (
                   <>
                     <div className="spinner-sm" />
-                    Processing...
+                    {tr('tools.view.processing', 'Processing...')}
                   </>
                 ) : (
                   <>
                     {tool.icon}
-                    {config.actionLabel}
+                    {tr(`tools.view.${tool.id}.actionLabel`, config.actionLabel)}
                   </>
                 )}
               </button>
               {config.acceptMultiple && tool.id !== 'images-to-pdf' && files.length < 2 && (
                 <p className="text-xs text-surface-500 text-center mt-2">
-                  Please add at least 2 files
+                  {tr('tools.view.validation.atLeast2Files', 'Please add at least 2 files')}
                 </p>
               )}
               {tool.id === 'images-to-pdf' && files.length < 1 && (
                 <p className="text-xs text-surface-500 text-center mt-2">
-                  Please add at least 1 image file
+                  {tr('tools.view.validation.atLeast1Image', 'Please add at least 1 image file')}
                 </p>
               )}
               {tool.id === 'split' && !pageRange.trim() && (
                 <p className="text-xs text-surface-500 text-center mt-2">
-                  Please enter page ranges (e.g., "1-3, 5, 8-10")
+                  {tr('tools.view.validation.enterPageRanges', 'Please enter page ranges (e.g., "1-3, 5, 8-10")')}
                 </p>
               )}
               {(tool.id === 'delete-pages' || tool.id === 'extract-pages') && !pageRange.trim() && (
                 <p className="text-xs text-surface-500 text-center mt-2">
-                  Please select pages to {tool.id === 'delete-pages' ? 'delete' : 'extract'}
+                  {tool.id === 'delete-pages' 
+                    ? tr('tools.view.validation.selectPagesDelete', 'Please select pages to delete')
+                    : tr('tools.view.validation.selectPagesExtract', 'Please select pages to extract')}
                 </p>
               )}
             </div>

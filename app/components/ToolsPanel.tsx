@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import ToolView from './ToolView';
+import { useAppTranslations } from '../i18n/TranslationProvider';
 import {
   // Organize & Pages
   FilePlus2, Scissors, Trash2, FileOutput, GripVertical, RotateCw,
@@ -394,6 +395,8 @@ const colorMap: Record<string, { bg: string; border: string; text: string; iconB
 
 export default function ToolsPanel() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const { t, locale } = useAppTranslations();
+  const tr = (key: string, fallback: string) => t(key) === key ? fallback : t(key);
 
   const visibleCategories = activeCategory
     ? toolCategories.filter(c => c.id === activeCategory)
@@ -406,19 +409,19 @@ export default function ToolsPanel() {
     <div className="w-full max-w-5xl mx-auto animate-fade-in">
       {/* Header */}
       <div className="text-center mb-8">
-        <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">PDF Tools</h2>
+        <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">{t('tools.page.title')}</h2>
         <p className="text-surface-400 text-base max-w-2xl mx-auto mb-4">
-          {totalTools} specialized tools for every PDF task. All processing happens locally in your browser.
+          {t('tools.page.subtitle')}
         </p>
         <div className="flex items-center justify-center gap-3 text-xs text-surface-500">
           <span className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-success-500"></span>
-            {availableTools} available
+            {availableTools} {t('tools.available')}
           </span>
           <span className="text-surface-700">•</span>
           <span className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-surface-600"></span>
-            {totalTools - availableTools} coming soon
+            {totalTools - availableTools} {t('tools.comingSoon')}
           </span>
         </div>
       </div>
@@ -429,7 +432,7 @@ export default function ToolsPanel() {
           onClick={() => setActiveCategory(null)}
           className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${!activeCategory ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300 shadow-sm' : 'bg-surface-800/40 border border-surface-700/50 text-surface-400 hover:text-surface-200 hover:border-surface-600/50'}`}
         >
-          All Tools
+          {tr('tools.all', 'All Tools')}
         </button>
         {toolCategories.map(cat => (
           <button
@@ -438,8 +441,8 @@ export default function ToolsPanel() {
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${activeCategory === cat.id ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300 shadow-sm' : 'bg-surface-800/40 border border-surface-700/50 text-surface-400 hover:text-surface-200 hover:border-surface-600/50'}`}
           >
             {cat.icon}
-            <span className="hidden sm:inline">{cat.title}</span>
-            <span className="sm:hidden">{cat.title.split(' ')[0]}</span>
+            <span className="hidden sm:inline">{tr(`tools.category.${cat.id}`, cat.title)}</span>
+            <span className="sm:hidden">{tr(`tools.category.${cat.id}`, cat.title).split(' ')[0]}</span>
           </button>
         ))}
       </div>
@@ -451,10 +454,10 @@ export default function ToolsPanel() {
             <div className="flex items-center gap-3 mb-4">
               <div className="flex items-center gap-2 text-surface-300">
                 {category.icon}
-                <h3 className="text-lg font-semibold">{category.title}</h3>
+                <h3 className="text-lg font-semibold">{tr(`tools.category.${category.id}`, category.title)}</h3>
               </div>
               <div className="flex-1 h-px bg-surface-700/50"></div>
-              <span className="text-xs text-surface-500 font-medium">{category.tools.length} tools</span>
+              <span className="text-xs text-surface-500 font-medium">{category.tools.length} {t('tools.count')}</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -468,13 +471,17 @@ export default function ToolsPanel() {
                 const content = (
                   <>
                     {tool.comingSoon && (
-                      <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-surface-700/80 border border-surface-600/50 text-[10px] font-semibold text-surface-300 uppercase tracking-wider">Soon</div>
+                      <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-surface-700/80 border border-surface-600/50 text-[10px] font-semibold text-surface-300 uppercase tracking-wider">{tr('tools.soon', 'Soon')}</div>
                     )}
                     <div className={`w-12 h-12 rounded-xl ${colors.iconBg} flex items-center justify-center mb-3 ${colors.text} transition-transform duration-200 group-hover:scale-110`}>
                       {tool.icon}
                     </div>
-                    <h3 className="text-base font-semibold text-white mb-1 group-hover:text-surface-100">{tool.title}</h3>
-                    <p className="text-sm text-surface-400 leading-relaxed">{tool.description}</p>
+                    <h3 className="text-base font-semibold text-white mb-1 group-hover:text-surface-100">
+                      {tr(`tools.items.${tool.id}.title`, tool.title)}
+                    </h3>
+                    <p className="text-sm text-surface-400 leading-relaxed">
+                      {tr(`tools.items.${tool.id}.desc`, tool.description)}
+                    </p>
                     {!tool.comingSoon && (
                       <div className={`absolute bottom-4 right-4 ${colors.text} opacity-0 group-hover:opacity-100 transition-all duration-200 translate-x-1 group-hover:translate-x-0`}>
                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
@@ -488,7 +495,7 @@ export default function ToolsPanel() {
                     {content}
                   </div>
                 ) : (
-                  <Link key={tool.id} href={`/tools/${tool.id}`} {...commonProps}>
+                  <Link key={tool.id} href={`/${locale}/tools/${tool.id}`} {...commonProps}>
                     {content}
                   </Link>
                 );
@@ -501,7 +508,7 @@ export default function ToolsPanel() {
       {/* Privacy note */}
       <div className="mt-10 flex items-center justify-center gap-2 text-xs text-surface-500">
         <Lock size={14} strokeWidth={2} />
-        <span>All tools process files locally — your documents never leave your device</span>
+        <span>{tr('tools.privacyNote', 'All tools process files locally — your documents never leave your device')}</span>
       </div>
     </div>
   );

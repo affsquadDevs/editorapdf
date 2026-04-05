@@ -718,7 +718,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         {/* Main Content */}
         <div id="main-content" className="relative min-h-screen flex flex-col">
           {children}
-          <Footer />
         </div>
       </body>
     </html>

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import type { PdfTool } from './ToolsPanel';
 import { allTools } from './ToolsPanel';
 import { ArrowRight, Sparkles } from 'lucide-react';
+import { useAppTranslations } from '../i18n/TranslationProvider';
 
 interface ToolInfoProps {
   tool: PdfTool;
@@ -112,6 +113,7 @@ const toolInfo: Record<string, {
 };
 
 export default function ToolInfo({ tool }: ToolInfoProps) {
+  const { t, locale } = useAppTranslations();
   const info = toolInfo[tool.id];
   
   if (!info) {
@@ -134,10 +136,14 @@ export default function ToolInfo({ tool }: ToolInfoProps) {
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-3">
           <Sparkles size={16} strokeWidth={2} className="text-primary-400" />
-          <h3 className="text-sm font-semibold text-surface-200">About this tool</h3>
+          <h3 className="text-sm font-semibold text-surface-200">{t('tools.info.about') ?? 'About this tool'}</h3>
         </div>
         <p className="text-sm text-surface-400 leading-relaxed">
-          {info.description}
+          {(() => {
+            const key = `tools.info.${tool.id}.description`;
+            const val = t(key);
+            return val === key ? info.description : val;
+          })()}
         </p>
       </div>
 
@@ -145,7 +151,7 @@ export default function ToolInfo({ tool }: ToolInfoProps) {
       <div className="pt-6 border-t border-surface-700/30">
         <div className="flex items-center gap-2 mb-4">
           <Sparkles size={16} strokeWidth={2} className="text-accent-400" />
-          <h3 className="text-sm font-semibold text-surface-200">You might also need</h3>
+          <h3 className="text-sm font-semibold text-surface-200">{t('tools.info.related') ?? 'You might also need'}</h3>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {relatedTools.map(relatedTool => {
@@ -162,7 +168,7 @@ export default function ToolInfo({ tool }: ToolInfoProps) {
             return (
               <Link
                 key={relatedTool.id}
-                href={`/tools/${relatedTool.id}`}
+                href={`/${locale}/tools/${relatedTool.id}`}
                 className={`group relative p-4 rounded-lg border transition-all duration-200 ${colorClass}`}
               >
                 <div className="flex items-start gap-3">
@@ -171,10 +177,10 @@ export default function ToolInfo({ tool }: ToolInfoProps) {
                   </div>
                   <div className="flex-1 min-w-0">
                     <h4 className="text-sm font-semibold mb-1 group-hover:underline">
-                      {relatedTool.title}
+                      {t(`tools.items.${relatedTool.id}.title`) ?? relatedTool.title}
                     </h4>
                     <p className="text-xs opacity-75 line-clamp-2">
-                      {relatedTool.description}
+                      {(t(`tools.items.${relatedTool.id}.desc`) ?? relatedTool.description)}
                     </p>
                   </div>
                   <ArrowRight 

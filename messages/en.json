@@ -1,0 +1,16 @@
+{
+  "common": {
+    "nav": {
+      "home": "Home",
+      "tools": "PDF Tools",
+      "how": "How It Works",
+      "about": "About",
+      "blog": "Blog",
+      "contact": "Contact",
+      "github": "GitHub"
+    },
+    "cta": {
+      "edit": "Edit PDF"
+    }
+  }
+}
