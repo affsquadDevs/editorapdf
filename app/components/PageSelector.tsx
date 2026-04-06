@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Check } from 'lucide-react';
+import { useAppTranslations } from '../i18n/TranslationProvider';
 
 interface PageSelectorProps {
   totalPages: number | null;
@@ -14,6 +15,8 @@ export default function PageSelector({
   value,
   onChange,
 }: PageSelectorProps) {
+  const { t } = useAppTranslations();
+  const tr = (key: string, fallback: string) => (t(key) === key ? fallback : t(key));
   const [selectedPages, setSelectedPages] = useState<Set<number>>(new Set());
 
   // Parse value string into selected pages
@@ -134,7 +137,7 @@ export default function PageSelector({
   if (!totalPages) {
     return (
       <div className="p-4 rounded-lg bg-surface-800/30 border border-surface-700/50">
-        <p className="text-sm text-surface-400">Upload a PDF file to select pages</p>
+        <p className="text-sm text-surface-400">{tr('pageselector.uploadToSelect', 'Upload a PDF file to select pages')}</p>
       </div>
     );
   }
@@ -148,7 +151,9 @@ export default function PageSelector({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-xs text-surface-400">
-            {selectedCount > 0 ? `${selectedCount} page${selectedCount !== 1 ? 's' : ''} selected` : 'No pages selected'}
+            {selectedCount > 0
+              ? `${selectedCount} ${selectedCount !== 1 ? tr('pageselector.pages', 'pages') : tr('pageselector.page', 'page')} ${tr('pageselector.selected', 'selected')}`
+              : tr('pageselector.none', 'No pages selected')}
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -157,7 +162,7 @@ export default function PageSelector({
             onClick={selectAll}
             className="text-xs text-primary-400 hover:text-primary-300 font-medium transition-colors"
           >
-            Select All
+            {tr('pageselector.selectAll', 'Select All')}
           </button>
           {selectedCount > 0 && (
             <>
@@ -167,7 +172,7 @@ export default function PageSelector({
                 onClick={clearAll}
                 className="text-xs text-surface-400 hover:text-surface-300 font-medium transition-colors"
               >
-                Clear
+                {tr('pageselector.clear', 'Clear')}
               </button>
             </>
           )}
@@ -206,7 +211,7 @@ export default function PageSelector({
       {selectedCount > 0 && (
         <div className="p-2 rounded-lg bg-primary-500/10 border border-primary-500/20">
           <p className="text-xs text-primary-300">
-            <strong>{selectedCount}</strong> page{selectedCount !== 1 ? 's' : ''} selected
+            <strong>{selectedCount}</strong> {selectedCount !== 1 ? tr('pageselector.pages', 'pages') : tr('pageselector.page', 'page')} {tr('pageselector.selected', 'selected')}
           </p>
         </div>
       )}

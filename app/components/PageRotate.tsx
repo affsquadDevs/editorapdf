@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { RotateCw, ChevronDown, X, Check } from 'lucide-react';
 import { loadPdfDocument, renderPageToDataUrl } from '../lib/pdf/pdfRender';
+import { useAppTranslations } from '../i18n/TranslationProvider';
 
 interface PageRotation {
   pageNumber: number;
@@ -17,10 +18,10 @@ interface PageRotateProps {
 }
 
 const ROTATION_OPTIONS = [
-  { value: 0, label: '0° (No rotation)' },
-  { value: 90, label: '90° Clockwise' },
-  { value: 180, label: '180°' },
-  { value: 270, label: '90° Counter-clockwise' },
+  { value: 0, label: 'rotation.option.0' },
+  { value: 90, label: 'rotation.option.90' },
+  { value: 180, label: 'rotation.option.180' },
+  { value: 270, label: 'rotation.option.270' },
 ];
 
 export default function PageRotate({
@@ -28,6 +29,8 @@ export default function PageRotate({
   pdfFile,
   onChange,
 }: PageRotateProps) {
+  const { t } = useAppTranslations();
+  const tr = (key: string, fallback: string) => (t(key) === key ? fallback : t(key));
   const [pages, setPages] = useState<PageRotation[]>([]);
   const [thumbnails, setThumbnails] = useState<{ [pageNumber: number]: string }>({});
   const [isLoadingThumbnails, setIsLoadingThumbnails] = useState(false);
@@ -218,7 +221,7 @@ export default function PageRotate({
   if (pages.length === 0) {
     return (
       <div className="p-4 rounded-lg bg-surface-800/30 border border-surface-700/50">
-        <p className="text-sm text-surface-400">Loading pages...</p>
+        <p className="text-sm text-surface-400">{tr('rotation.loadingPages', 'Loading pages...')}</p>
       </div>
     );
   }
@@ -229,7 +232,9 @@ export default function PageRotate({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-xs text-surface-400">
-            {selectedCount > 0 ? `${selectedCount} page${selectedCount !== 1 ? 's' : ''} selected` : 'No pages selected'}
+            {selectedCount > 0
+              ? `${selectedCount} ${selectedCount !== 1 ? tr('pageselector.pages', 'pages') : tr('pageselector.page', 'page')} ${tr('pageselector.selected', 'selected')}`
+              : tr('pageselector.none', 'No pages selected')}
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -238,7 +243,7 @@ export default function PageRotate({
             onClick={selectAll}
             className="text-xs text-primary-400 hover:text-primary-300 font-medium transition-colors"
           >
-            Select All
+            {tr('pageselector.selectAll', 'Select All')}
           </button>
           {selectedCount > 0 && (
             <>
@@ -248,7 +253,7 @@ export default function PageRotate({
                 onClick={clearSelection}
                 className="text-xs text-surface-400 hover:text-surface-300 font-medium transition-colors"
               >
-                Clear
+                {tr('pageselector.clear', 'Clear')}
               </button>
             </>
           )}
@@ -258,7 +263,7 @@ export default function PageRotate({
       {/* Apply to all */}
       {selectedCount > 0 && (
         <div className="p-3 rounded-lg bg-primary-500/10 border border-primary-500/20">
-          <p className="text-xs font-semibold text-primary-300 mb-2">Apply rotation to all selected pages:</p>
+          <p className="text-xs font-semibold text-primary-300 mb-2">{tr('rotation.applyToAll', 'Apply rotation to all selected pages:')}</p>
           <div className="flex gap-2">
             {ROTATION_OPTIONS.map(({ value, label }) => (
               <button
@@ -273,7 +278,10 @@ export default function PageRotate({
                 }}
                 className="flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-all bg-surface-800/50 border border-surface-700/50 text-surface-300 hover:border-primary-500/50 hover:bg-primary-500/10"
               >
-                {label}
+                {tr(label, 
+                  value === 0 ? '0° (No rotation)' :
+                  value === 90 ? '90° Clockwise' :
+                  value === 180 ? '180°' : '90° Counter-clockwise')}
               </button>
             ))}
           </div>
@@ -322,13 +330,13 @@ export default function PageRotate({
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
                       <span className="opacity-0 group-hover:opacity-100 text-xs text-white font-medium bg-black/60 px-2 py-1 rounded transition-opacity">
-                        Click to view
+                        {tr('rotation.clickToView', 'Click to view')}
                       </span>
                     </div>
                   </>
                 ) : (
                   <div className="text-xs text-surface-500 text-center p-2 font-medium">
-                    Page {page.pageNumber}
+                    {tr('rotation.page', 'Page')} {page.pageNumber}
                   </div>
                 )}
               </button>
@@ -337,7 +345,7 @@ export default function PageRotate({
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-surface-300">
-                    Page {page.pageNumber}
+                    {tr('rotation.page', 'Page')} {page.pageNumber}
                   </span>
                   <button
                     type="button"
@@ -394,7 +402,10 @@ export default function PageRotate({
                                 : 'text-surface-300'
                             }`}
                           >
-                            {label}
+                            {tr(label, 
+                              value === 0 ? '0° (No rotation)' :
+                              value === 90 ? '90° Clockwise' :
+                              value === 180 ? '180°' : '90° Counter-clockwise')}
                           </button>
                         ))}
                       </div>
@@ -411,7 +422,7 @@ export default function PageRotate({
       {hasRotations && (
         <div className="p-3 rounded-lg bg-warning-500/10 border border-warning-500/20">
           <p className="text-xs font-semibold text-warning-300 mb-1">
-            ⚠️ Pages with rotation applied:
+            ⚠️ {tr('rotation.summary.title', 'Pages with rotation applied:')}
           </p>
           <div className="flex flex-wrap gap-1.5">
             {pages
@@ -421,7 +432,7 @@ export default function PageRotate({
                   key={page.pageNumber}
                   className="px-2 py-1 rounded bg-surface-800/50 text-xs font-medium text-surface-300"
                 >
-                  Page {page.pageNumber}: {page.rotation}°
+                  {tr('rotation.page', 'Page')} {page.pageNumber}: {page.rotation}°
                 </span>
               ))}
           </div>
@@ -442,17 +453,17 @@ export default function PageRotate({
             <div className="flex items-center justify-between p-4 border-b border-surface-700/50 bg-surface-800/50">
               <div>
                 <h3 className="text-lg font-semibold text-surface-200">
-                  Page {selectedPage} Preview
+                  {tr('rotation.page', 'Page')} {selectedPage} {tr('rotation.preview', 'Preview')}
                 </h3>
                 <p className="text-xs text-surface-400 mt-0.5">
-                  Rotation: {pages.find(p => p.pageNumber === selectedPage)?.rotation || 0}° • Click outside or press ESC to close
+                  {tr('rotation.rotation', 'Rotation')}: {pages.find(p => p.pageNumber === selectedPage)?.rotation || 0}° • {tr('rotation.closeHint', 'Click outside or press ESC to close')}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setSelectedPage(null)}
                 className="p-2 rounded-lg hover:bg-surface-700/50 text-surface-400 hover:text-surface-200 transition-colors"
-                aria-label="Close"
+                aria-label={tr('rotation.close', 'Close')}
               >
                 <X size={20} strokeWidth={2} />
               </button>
@@ -469,18 +480,18 @@ export default function PageRotate({
                 return isLoading ? (
                   <div className="flex flex-col items-center justify-center py-20">
                     <div className="w-8 h-8 border-3 border-primary-500/30 border-t-primary-500 rounded-full animate-spin mb-4" />
-                    <p className="text-sm text-surface-400">Loading page...</p>
+                    <p className="text-sm text-surface-400">{tr('rotation.loadingPage', 'Loading page...')}</p>
                   </div>
                 ) : image ? (
                   <img
                     src={image}
-                    alt={`Page ${selectedPage} full size`}
+                    alt={`${tr('rotation.page', 'Page')} ${selectedPage} ${tr('rotation.fullSize', 'full size')}`}
                     className="max-w-full max-h-[calc(95vh-120px)] object-contain rounded-lg shadow-lg"
                     draggable={false}
                   />
                 ) : (
                   <div className="text-center py-20">
-                    <p className="text-sm text-surface-400">Failed to load page preview</p>
+                    <p className="text-sm text-surface-400">{tr('rotation.failed', 'Failed to load page preview')}</p>
                   </div>
                 );
               })()}

@@ -114,6 +114,7 @@ const toolInfo: Record<string, {
 
 export default function ToolInfo({ tool }: ToolInfoProps) {
   const { t, locale } = useAppTranslations();
+  const tr = (key: string, fallback: string) => (t(key) === key ? fallback : t(key));
   const info = toolInfo[tool.id];
   
   if (!info) {
@@ -177,10 +178,10 @@ export default function ToolInfo({ tool }: ToolInfoProps) {
                   </div>
                   <div className="flex-1 min-w-0">
                     <h4 className="text-sm font-semibold mb-1 group-hover:underline">
-                      {t(`tools.items.${relatedTool.id}.title`) ?? relatedTool.title}
+                      {tr(`tools.items.${relatedTool.id}.title`, relatedTool.title)}
                     </h4>
                     <p className="text-xs opacity-75 line-clamp-2">
-                      {(t(`tools.items.${relatedTool.id}.desc`) ?? relatedTool.description)}
+                      {tr(`tools.items.${relatedTool.id}.desc`, relatedTool.description)}
                     </p>
                   </div>
                   <ArrowRight 

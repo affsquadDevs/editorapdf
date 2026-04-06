@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Plus, X, ChevronDown } from 'lucide-react';
+import { useAppTranslations } from '../i18n/TranslationProvider';
 
 interface PageRange {
   id: string;
@@ -22,6 +23,8 @@ export default function PageRangeSelector({
   onChange,
   onWarningChange,
 }: PageRangeSelectorProps) {
+  const { t } = useAppTranslations();
+  const tr = (key: string, fallback: string) => (t(key) === key ? fallback : t(key));
   const [ranges, setRanges] = useState<PageRange[]>([]);
   const [isOpen, setIsOpen] = useState<{ [key: string]: { from: boolean; to: boolean } }>({});
 
@@ -155,7 +158,7 @@ export default function PageRangeSelector({
   if (!totalPages) {
     return (
       <div className="p-4 rounded-lg bg-surface-800/30 border border-surface-700/50">
-        <p className="text-sm text-surface-400">Upload a PDF file to select pages</p>
+        <p className="text-sm text-surface-400">{tr('pagerange.uploadToSelect', 'Upload a PDF file to select pages')}</p>
       </div>
     );
   }
@@ -166,14 +169,14 @@ export default function PageRangeSelector({
     <div className="space-y-3">
       {ranges.length === 0 && (
         <div className="p-4 rounded-lg bg-surface-800/30 border border-surface-700/50 text-center">
-          <p className="text-sm text-surface-400 mb-3">No page ranges selected</p>
+          <p className="text-sm text-surface-400 mb-3">{tr('pagerange.empty', 'No page ranges selected')}</p>
           <button
             type="button"
             onClick={addRange}
             className="btn btn-sm btn-primary"
           >
             <Plus size={16} strokeWidth={2} />
-            Add Page Range
+            {tr('pagerange.addRange', 'Add Page Range')}
           </button>
         </div>
       )}
@@ -191,19 +194,19 @@ export default function PageRangeSelector({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-semibold text-primary-400 bg-primary-500/20 px-2 py-1 rounded">
-                    File {index + 1}
+                    {tr('pagerange.file', 'File')} {index + 1}
                   </span>
                   {isSinglePage ? (
-                    <span className="text-xs text-surface-400">Single page</span>
+                    <span className="text-xs text-surface-400">{tr('pagerange.singlePage', 'Single page')}</span>
                   ) : (
-                    <span className="text-xs text-surface-400">{pageCount} pages</span>
+                    <span className="text-xs text-surface-400">{pageCount} {tr('pagerange.pages', 'pages')}</span>
                   )}
                 </div>
                 <button
                   type="button"
                   onClick={() => removeRange(range.id)}
                   className="p-1.5 rounded-lg hover:bg-error-500/10 text-surface-500 hover:text-error-400 transition-all"
-                  title="Remove range"
+                  title={tr('pagerange.remove', 'Remove range')}
                 >
                   <X size={16} strokeWidth={2} />
                 </button>
@@ -212,7 +215,7 @@ export default function PageRangeSelector({
               <div className="flex items-center gap-3">
                 {/* From Page Select */}
                 <div className="flex-1">
-                  <label className="text-xs text-surface-500 mb-1.5 block">From page</label>
+                  <label className="text-xs text-surface-500 mb-1.5 block">{tr('pagerange.from', 'From page')}</label>
                   <div className="relative">
                     <button
                       type="button"
@@ -243,7 +246,7 @@ export default function PageRangeSelector({
                                   : 'text-surface-300'
                               }`}
                             >
-                              Page {page}
+                              {tr('pagerange.page', 'Page')} {page}
                             </button>
                           ))}
                         </div>
@@ -254,7 +257,7 @@ export default function PageRangeSelector({
 
                 {/* To Page Select */}
                 <div className="flex-1">
-                  <label className="text-xs text-surface-500 mb-1.5 block">To page</label>
+                  <label className="text-xs text-surface-500 mb-1.5 block">{tr('pagerange.to', 'To page')}</label>
                   <div className="relative">
                     <button
                       type="button"
@@ -287,7 +290,7 @@ export default function PageRangeSelector({
                                     : 'text-surface-300'
                                 }`}
                               >
-                                Page {page}
+                                {tr('pagerange.page', 'Page')} {page}
                               </button>
                             ))}
                         </div>
@@ -300,9 +303,9 @@ export default function PageRangeSelector({
               {/* Preview text */}
               <div className="text-xs text-surface-500 pt-1 border-t border-surface-700/50">
                 {isSinglePage ? (
-                  <>Will create a file with <strong className="text-surface-300">page {range.fromPage}</strong></>
+                  <>{tr('pagerange.preview.single.prefix', 'Will create a file with')} <strong className="text-surface-300">{tr('pagerange.pageLower', 'page')} {range.fromPage}</strong></>
                 ) : (
-                  <>Will create a file with <strong className="text-surface-300">pages {range.fromPage} to {range.toPage}</strong> ({pageCount} pages)</>
+                  <>{tr('pagerange.preview.multi.prefix', 'Will create a file with')} <strong className="text-surface-300">{tr('pagerange.pagesLower', 'pages')} {range.fromPage} {tr('pagerange.toLower', 'to')} {range.toPage}</strong> ({pageCount} {tr('pagerange.pagesLower', 'pages')})</>
                 )}
               </div>
             </div>
@@ -317,14 +320,14 @@ export default function PageRangeSelector({
         className="w-full px-4 py-2.5 rounded-lg border-2 border-dashed border-surface-700/50 hover:border-primary-500/50 text-surface-400 hover:text-primary-400 transition-all flex items-center justify-center gap-2"
       >
         <Plus size={16} strokeWidth={2} />
-        <span className="text-sm font-medium">Add Another Range</span>
+        <span className="text-sm font-medium">{tr('pagerange.addAnother', 'Add Another Range')}</span>
       </button>
 
       {/* Summary */}
       {ranges.length > 0 && (
         <div className="p-3 rounded-lg bg-primary-500/10 border border-primary-500/20">
           <p className="text-xs font-semibold text-primary-300 mb-1">
-            📄 Summary: {ranges.length} file{ranges.length !== 1 ? 's' : ''} will be created
+            📄 {tr('pagerange.summary', 'Summary')}: {ranges.length} {ranges.length !== 1 ? tr('pagerange.files', 'files') : tr('pagerange.fileLower', 'file')} {tr('pagerange.willBeCreated', 'will be created')}
           </p>
         </div>
       )}

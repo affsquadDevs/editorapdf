@@ -3135,10 +3135,10 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {tool.id === 'rotate' && totalPages !== null && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50">
                   <p className="text-sm font-medium text-surface-200 mb-2">
-                    Rotate Pages
+                    {tr('tools.view.rotate.title', 'Rotate Pages')}
                   </p>
                   <p className="text-xs text-surface-400 mb-3">
-                    Select pages and choose rotation angle. Click on thumbnails to preview.
+                    {tr('tools.view.rotate.help', 'Select pages and choose rotation angle. Click on thumbnails to preview.')}
                   </p>
                   <PageRotate
                     totalPages={totalPages}
@@ -4073,9 +4073,11 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
                   <div>
                     <div className="flex items-center justify-between mb-3">
-                      <p className="text-sm font-medium text-surface-200">Select Pages to Duplicate</p>
+                      <p className="text-sm font-medium text-surface-200">{tr('tools.duplicate.selectTitle', 'Select Pages to Duplicate')}</p>
                       {totalPages && (
-                        <span className="text-xs text-surface-500">Total: {totalPages} pages</span>
+                        <span className="text-xs text-surface-500">
+                          {tr('tools.duplicate.total', 'Total')}: {totalPages} {tr('pageselector.pages', 'pages')}
+                        </span>
                       )}
                     </div>
                     {totalPages ? (
@@ -4085,17 +4087,21 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                         onChange={setDuplicatePageRange}
                       />
                     ) : (
-                      <p className="text-xs text-surface-400">Upload a PDF file to select pages</p>
+                      <p className="text-xs text-surface-400">{tr('pageselector.uploadToSelect', 'Upload a PDF file to select pages')}</p>
                     )}
                     <p className="text-xs text-surface-500 mt-3">
-                      Each selected page will be duplicated right after its original in the PDF.
+                      {tr('tools.duplicate.hint', 'Each selected page will be duplicated right after its original in the PDF.')}
                     </p>
                   </div>
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <p className="text-sm font-medium text-surface-200">Number of Copies</p>
+                      <p className="text-sm font-medium text-surface-200">{tr('tools.duplicate.numCopies', 'Number of Copies')}</p>
                       <span className="text-xs text-surface-500">
-                        {numberOfCopies} {numberOfCopies === 1 ? 'copy' : 'copies'} per page
+                        {numberOfCopies}{' '}
+                        {numberOfCopies === 1
+                          ? tr('tools.duplicate.copy', 'copy')
+                          : tr('tools.duplicate.copies', 'copies')}{' '}
+                        {tr('tools.duplicate.perPage', 'per page')}
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
@@ -4161,11 +4167,11 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {tool.id === 'split-by-size' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
                   <div>
-                    <p className="text-sm font-medium text-surface-200 mb-3">Max File Size Per Part</p>
+                    <p className="text-sm font-medium text-surface-200 mb-3">{tr('tools.splitBySize.maxPerPart', 'Max File Size Per Part')}</p>
                     
                     {/* Quick presets */}
                     <div className="mb-4">
-                      <p className="text-xs text-surface-400 mb-2">Quick presets:</p>
+                      <p className="text-xs text-surface-400 mb-2">{tr('tools.splitBySize.quickPresets', 'Quick presets:')}</p>
                       <div className="flex flex-wrap gap-2">
                         {['5 MB', '10 MB', '25 MB', '50 MB', '100 MB'].map((s) => (
                           <button
@@ -4189,7 +4195,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                     {/* Custom size input */}
                     <div className="mb-4">
                       <div className="flex items-center justify-between mb-2">
-                        <p className="text-xs font-medium text-surface-300">Or set custom size:</p>
+                        <p className="text-xs font-medium text-surface-300">{tr('tools.splitBySize.custom', 'Or set custom size:')}</p>
                         <button
                           onClick={() => setUseCustomSize(!useCustomSize)}
                           className={`text-xs px-3 py-1 rounded-lg transition-all ${
@@ -4198,7 +4204,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                               : 'bg-surface-700/30 text-surface-400 border border-surface-600/30 hover:bg-surface-700/50'
                           }`}
                         >
-                          {useCustomSize ? 'Using Custom' : 'Use Custom'}
+                          {useCustomSize ? tr('tools.splitBySize.usingCustom', 'Using Custom') : tr('tools.splitBySize.useCustom', 'Use Custom')}
                         </button>
                       </div>
                       
@@ -4275,7 +4281,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                     {files.length > 0 && (
                       <div className="p-3 rounded-lg bg-surface-900/50 border border-surface-700/50 space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs text-surface-400">Original file size:</span>
+                          <span className="text-xs text-surface-400">{tr('tools.splitBySize.original', 'Original file size:')}</span>
                           <span className="text-xs font-medium text-surface-200">{formatBytes(files[0].size)}</span>
                         </div>
                         
@@ -4297,9 +4303,9 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                             if (estimatedParts === 1) {
                               return (
                                 <div className="flex items-center justify-between pt-2 border-t border-surface-700/50">
-                                  <span className="text-xs text-surface-400">Result:</span>
+                                  <span className="text-xs text-surface-400">{tr('tools.splitBySize.result', 'Result:')}</span>
                                   <span className="text-xs font-medium text-success-400">
-                                    ✓ File fits in one part ({sizeToUse})
+                                    ✓ {tr('tools.splitBySize.fits', 'File fits in one part')} ({sizeToUse})
                                   </span>
                                 </div>
                               );
@@ -4321,7 +4327,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                     )}
                     
                     <p className="text-xs text-surface-500 mt-3">
-                      PDF will be split into multiple files, each not exceeding the selected size. Useful for email attachments or file size limits.
+                      {tr('tools.splitBySize.note', 'PDF will be split into multiple files, each not exceeding the selected size. Useful for email attachments or file size limits.')}
                     </p>
                   </div>
                 </div>
@@ -4331,17 +4337,17 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {tool.id === 'split-by-bookmarks' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
                   <div>
-                    <p className="text-sm font-medium text-surface-200 mb-3">Split at Bookmark Level</p>
+                    <p className="text-sm font-medium text-surface-200 mb-3">{tr('tools.splitByBookmarks.title', 'Split at Bookmark Level')}</p>
                     
                     {!bookmarkInfo && files.length > 0 && (
-                      <p className="text-xs text-surface-400 mb-3">Loading bookmark information...</p>
+                      <p className="text-xs text-surface-400 mb-3">{tr('tools.splitByBookmarks.loading', 'Loading bookmark information...')}</p>
                     )}
                     
                     {bookmarkInfo && !bookmarkInfo.hasBookmarks && (
                       <div className="p-3 rounded-lg bg-error-500/10 border border-error-500/20">
-                        <p className="text-xs text-error-400 font-medium mb-1">⚠ No bookmarks found</p>
+                        <p className="text-xs text-error-400 font-medium mb-1">⚠ {tr('tools.splitByBookmarks.none', 'No bookmarks found')}</p>
                         <p className="text-xs text-surface-400">
-                          This PDF does not have bookmarks/outline structure. Please use a PDF with bookmarks or try a different tool.
+                          {tr('tools.splitByBookmarks.noOutline', 'This PDF does not have bookmarks/outline structure. Please use a PDF with bookmarks or try a different tool.')}
                         </p>
                       </div>
                     )}
@@ -4350,21 +4356,21 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                       <>
                         <div className="mb-3">
                           <div className="flex items-center justify-between mb-2">
-                            <p className="text-xs text-surface-400">Available levels:</p>
+                            <p className="text-xs text-surface-400">{tr('tools.splitByBookmarks.available', 'Available levels:')}</p>
                             <span className="text-xs font-medium text-primary-400">
-                              {bookmarkInfo.count} {bookmarkInfo.count === 1 ? 'bookmark' : 'bookmarks'} found
+                              {bookmarkInfo.count} {bookmarkInfo.count === 1 ? tr('tools.splitByBookmarks.bookmark', 'bookmark') : tr('tools.splitByBookmarks.bookmarks', 'bookmarks')} {tr('tools.splitByBookmarks.found', 'found')}
                             </span>
                           </div>
                           <div className="flex flex-wrap gap-2">
                             {bookmarkInfo.levels.map((level) => {
                               const levelNames: { [key: number]: string } = {
-                                1: 'Level 1 (Chapters)',
-                                2: 'Level 2 (Sections)',
-                                3: 'Level 3 (Sub-sections)',
-                                4: 'Level 4',
-                                5: 'Level 5',
+                                1: tr('tools.splitByBookmarks.level1', 'Level 1 (Chapters)'),
+                                2: tr('tools.splitByBookmarks.level2', 'Level 2 (Sections)'),
+                                3: tr('tools.splitByBookmarks.level3', 'Level 3 (Sub-sections)'),
+                                4: tr('tools.splitByBookmarks.level4', 'Level 4'),
+                                5: tr('tools.splitByBookmarks.level5', 'Level 5'),
                               };
-                              const levelName = levelNames[level] || `Level ${level}`;
+                              const levelName = levelNames[level] || `${tr('tools.splitByBookmarks.level', 'Level')} ${level}`;
                               const countAtLevel = bookmarkInfo.bookmarks?.filter(b => b.level === level).length || 0;
                               
                               return (
@@ -4389,7 +4395,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                         
                         {bookmarkInfo.bookmarks && bookmarkInfo.bookmarks.length > 0 && (
                           <div className="p-3 rounded-lg bg-surface-900/50 border border-surface-700/50 max-h-48 overflow-y-auto">
-                            <p className="text-xs text-surface-400 mb-2">Bookmarks at level {bookmarkLevel}:</p>
+                            <p className="text-xs text-surface-400 mb-2">{tr('tools.splitByBookmarks.atLevel', 'Bookmarks at level')} {bookmarkLevel}:</p>
                             <div className="space-y-1">
                               {bookmarkInfo.bookmarks
                                 .filter(b => b.level === bookmarkLevel)
@@ -4398,12 +4404,12 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                                   <div key={idx} className="text-xs text-surface-300 flex items-center gap-2">
                                     <span className="w-1.5 h-1.5 rounded-full bg-primary-400"></span>
                                     <span className="truncate">{bookmark.title}</span>
-                                    <span className="text-surface-500">(page {bookmark.pageIndex + 1})</span>
+                                    <span className="text-surface-500">({tr('tools.splitByBookmarks.page', 'page')} {bookmark.pageIndex + 1})</span>
                                   </div>
                                 ))}
                               {bookmarkInfo.bookmarks.filter(b => b.level === bookmarkLevel).length > 10 && (
                                 <p className="text-xs text-surface-500 mt-1">
-                                  ... and {bookmarkInfo.bookmarks.filter(b => b.level === bookmarkLevel).length - 10} more
+                                  ... {tr('tools.splitByBookmarks.andMore', 'and')} {bookmarkInfo.bookmarks.filter(b => b.level === bookmarkLevel).length - 10} {tr('tools.splitByBookmarks.more', 'more')}
                                 </p>
                               )}
                             </div>
@@ -4411,7 +4417,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                         )}
                         
                         <p className="text-xs text-surface-500 mt-3">
-                          PDF will be split at each bookmark of level {bookmarkLevel}. Each bookmark will create a separate PDF file.
+                          {tr('tools.splitByBookmarks.summary', 'PDF will be split at each bookmark of level')} {bookmarkLevel}. {tr('tools.splitByBookmarks.eachCreates', 'Each bookmark will create a separate PDF file.')}
                         </p>
                       </>
                     )}
