@@ -1,6 +1,5 @@
 export const supportedLocales = [
-	'en', 'uk', 'es', 'fr', 'de', 'it', 'pt', 'pl', 'tr', 'nl',
-	'sv', 'cs', 'ro', 'hu', 'el', 'he', 'ar', 'hi', 'id', 'ja', 'ko', 'zh'
+	'en', 'uk', 'de', 'es', 'fr', 'it'
 ] as const;
 export type AppLocale = typeof supportedLocales[number];
 
@@ -9,26 +8,10 @@ export const defaultLocale: AppLocale = 'en';
 export const localeMeta: Record<AppLocale, { label: string; nativeLabel: string; flag: string }> = {
 	en: { label: 'English', nativeLabel: 'English', flag: '🇺🇸' },
 	uk: { label: 'Ukrainian', nativeLabel: 'Українська', flag: '🇺🇦' },
+	de: { label: 'German', nativeLabel: 'Deutsch', flag: '🇩🇪' },
 	es: { label: 'Spanish', nativeLabel: 'Español', flag: '🇪🇸' },
 	fr: { label: 'French', nativeLabel: 'Français', flag: '🇫🇷' },
-	de: { label: 'German', nativeLabel: 'Deutsch', flag: '🇩🇪' },
 	it: { label: 'Italian', nativeLabel: 'Italiano', flag: '🇮🇹' },
-	pt: { label: 'Portuguese', nativeLabel: 'Português', flag: '🇵🇹' },
-	pl: { label: 'Polish', nativeLabel: 'Polski', flag: '🇵🇱' },
-	tr: { label: 'Turkish', nativeLabel: 'Türkçe', flag: '🇹🇷' },
-	nl: { label: 'Dutch', nativeLabel: 'Nederlands', flag: '🇳🇱' },
-	sv: { label: 'Swedish', nativeLabel: 'Svenska', flag: '🇸🇪' },
-	cs: { label: 'Czech', nativeLabel: 'Čeština', flag: '🇨🇿' },
-	ro: { label: 'Romanian', nativeLabel: 'Română', flag: '🇷🇴' },
-	hu: { label: 'Hungarian', nativeLabel: 'Magyar', flag: '🇭🇺' },
-	el: { label: 'Greek', nativeLabel: 'Ελληνικά', flag: '🇬🇷' },
-	he: { label: 'Hebrew', nativeLabel: 'עברית', flag: '🇮🇱' },
-	ar: { label: 'Arabic', nativeLabel: 'العربية', flag: '🇸🇦' },
-	hi: { label: 'Hindi', nativeLabel: 'हिन्दी', flag: '🇮🇳' },
-	id: { label: 'Indonesian', nativeLabel: 'Bahasa Indonesia', flag: '🇮🇩' },
-	ja: { label: 'Japanese', nativeLabel: '日本語', flag: '🇯🇵' },
-	ko: { label: 'Korean', nativeLabel: '한국어', flag: '🇰🇷' },
-	zh: { label: 'Chinese', nativeLabel: '中文', flag: '🇨🇳' },
 };
 
 export function isSupportedLocale(input?: string | null): input is AppLocale {

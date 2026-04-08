@@ -1,12 +1,12 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import Header from '../../components/Header'
-import PrivacyPolicyPage from '../../../privacy-policy/page'
+import PrivacyPolicyPage from '../../privacy-policy/page'
 import { Shield, Mail, ExternalLink, AlertCircle } from 'lucide-react'
 
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
   if (params.locale !== 'uk') {
-    const mod = await import('../../../privacy-policy/page')
+    const mod = await import('../../privacy-policy/page')
     return mod.metadata
   }
 

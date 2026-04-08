@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import Header from '../../components/Header'
-import AboutPage from '../../../about/page'
+import AboutPage from '../../about/page'
 import {
   Shield, Zap, Globe, Users, Code, Heart, Target,
   Github, Mail, MessageSquare, Award, Rocket, Eye, FileText, ArrowRight, Sparkles
@@ -9,7 +9,7 @@ import {
 
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
   if (params.locale !== 'uk') {
-    const mod = await import('../../../about/page')
+    const mod = await import('../../about/page')
     return mod.metadata
   }
 

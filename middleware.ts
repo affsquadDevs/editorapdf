@@ -43,13 +43,18 @@ export function middleware(req: NextRequest) {
 		return NextResponse.redirect(redirectUrl);
 	}
 
-	// If URL already has locale prefix, continue.
+	// If URL already has locale prefix, forward with x-locale and x-pathname headers
+	// so server components and generateMetadata can access locale + pathname.
 	const pathLocale = pathname.split('/')[1];
-	if (isSupportedLocale(pathLocale)) {
-		return NextResponse.next();
-	}
+	const activeLocale = isSupportedLocale(pathLocale) ? pathLocale : detected;
 
-	return NextResponse.next();
+	const requestHeaders = new Headers(req.headers);
+	requestHeaders.set('x-locale', activeLocale);
+	requestHeaders.set('x-pathname', pathname);
+
+	return NextResponse.next({
+		request: { headers: requestHeaders },
+	});
 }
 
 export const config = {
@@ -64,4 +69,3 @@ export const config = {
 		'/((?!api|_next|static|.*\\..*).*)'
 	]
 };
-

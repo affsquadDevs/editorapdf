@@ -3,12 +3,27 @@
 import { useState } from 'react';
 import { faqData } from '../data/faq';
 import { faqDataUk } from '../data/faq.uk';
+import { faqDataFr } from '../data/faq.fr';
+import { faqDataDe } from '../data/faq.de';
+import { faqDataEs } from '../data/faq.es';
+import { faqDataIt } from '../data/faq.it';
 import { useAppTranslations } from '../i18n/TranslationProvider';
+import type { FAQItem } from '../data/faq';
+import type { AppLocale } from '../../i18n/config';
+
+const faqByLocale: Record<AppLocale, FAQItem[]> = {
+  en: faqData,
+  uk: faqDataUk,
+  fr: faqDataFr,
+  de: faqDataDe,
+  es: faqDataEs,
+  it: faqDataIt,
+};
 
 export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const { locale, t } = useAppTranslations();
-  const items = locale === 'uk' ? faqDataUk : faqData;
+  const items = faqByLocale[locale] ?? faqData;
 
   const toggleFAQ = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);

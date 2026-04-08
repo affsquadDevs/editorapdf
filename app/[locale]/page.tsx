@@ -13,23 +13,19 @@ import {
 } from 'lucide-react';
 
 import type { AppLocale } from '../../i18n/config';
+import { getMessages } from '../i18n/messages';
 
 const siteUrl = 'https://editorapdf.com';
 
-function loadMessages(locale: AppLocale) {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  return locale === 'uk' ? require('../../i18n/locales/uk.json') : require('../../i18n/locales/en.json');
-}
-
 export default function Home({ params }: { params: { locale: AppLocale } }) {
   const locale = params.locale;
-  const messages = loadMessages(locale) as Record<string, string>;
+  const messages = getMessages(locale) as Record<string, string>;
   const t = (k: string) => messages[k] ?? k;
   const isUk = locale === 'uk';
   const withLocale = (path: string) => `/${locale}${path}`;
 
   // FAQ Schema for SEO - Generated from reusable data
-  const faqSchema = generateFAQSchema(siteUrl, locale);
+  const faqSchema = generateFAQSchema(siteUrl, isUk ? 'uk' : 'en');
 
   // HowTo Schema for SEO
   const howToSchema = {

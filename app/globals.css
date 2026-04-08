@@ -7,6 +7,11 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :root {
+  /* Font fallbacks (so Tailwind fontFamily var(...) works even without next/font/google) */
+  --font-outfit: ui-sans-serif;
+  --font-cabinet: ui-sans-serif;
+  --font-jetbrains: ui-monospace;
+
   /* Brand Colors */
   --color-primary: 139 92 246;
   --color-primary-light: 167 139 250;

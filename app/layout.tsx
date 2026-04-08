@@ -1,33 +1,8 @@
 import type { Metadata, Viewport } from 'next'
-import { Outfit, JetBrains_Mono, Lexend } from 'next/font/google'
 import './globals.css'
 import Script from 'next/script'
 import Footer from './components/Footer'
-
-// Primary font - Modern geometric sans
-// Optimized for mobile: reduced weights for better performance
-const outfit = Outfit({
-  subsets: ['latin'],
-  display: 'swap', // Show fallback font immediately, swap when loaded
-  variable: '--font-outfit',
-  weight: ['400', '600', '700'], // Reduced weights for mobile performance
-})
-
-// Display font - Bold headlines
-const lexend = Lexend({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-cabinet',
-  weight: ['600', '700'], // Reduced weights for mobile performance
-})
-
-// Monospace font - Code & technical elements
-const jetbrains = JetBrains_Mono({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-jetbrains',
-  weight: ['400', '500'], // Reduced weights for mobile performance
-})
+import { headers } from 'next/headers'
 
 const siteUrl = 'https://editorapdf.com' // Replace with your actual domain
 const siteName = 'EditoraPDF'
@@ -536,8 +511,11 @@ export default function RootLayout({
     },
   }
 
+  const headersList = headers()
+  const locale = headersList.get('x-locale') ?? 'en'
+
   return (
-    <html lang="en-US" className={`${outfit.variable} ${lexend.variable} ${jetbrains.variable}`}>
+    <html lang={locale}>
       <head>
         {/* Google Tag Manager - Load after page is interactive to improve performance */}
         <Script
@@ -561,12 +539,20 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           crossOrigin="anonymous"
         />
         {/* End Google AdSense */}
+        {/* Trustpilot TrustBox script */}
+        <Script
+          id="trustpilot-script"
+          strategy="afterInteractive"
+          src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"
+        />
+        {/* End Trustpilot TrustBox script */}
         
         {/* Performance:
             - Fonts are self-hosted via next/font, so no need to preconnect to fonts.googleapis.com/fonts.gstatic.com
             - Avoid eager preconnect to third parties on mobile (can hurt LCP); keep only dns-prefetch */}
         <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        <link rel="dns-prefetch" href="https://widget.trustpilot.com" />
         
         {/* Preload critical resources for faster LCP */}
         <link rel="preload" href="/logo.svg" as="image" type="image/svg+xml" fetchPriority="high" />
@@ -598,7 +584,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <meta name="audience" content="all" />
         <meta name="HandheldFriendly" content="True" />
         <meta name="MobileOptimized" content="320" />
-        <meta name="apple-itunes-app" content="app-id=YOUR_APP_ID" />
+        {/* apple-itunes-app: add once App Store listing is available */}
         
         {/* OpenSearch */}
         <link rel="search" type="application/opensearchdescription+xml" title={siteName} href={`${siteUrl}/opensearch.xml`} />
@@ -691,7 +677,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           strategy="beforeInteractive"
         /> */}
       </head>
-      <body className={`${outfit.className} antialiased`}>
+      <body className="antialiased">
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe

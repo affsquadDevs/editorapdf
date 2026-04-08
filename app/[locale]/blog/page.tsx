@@ -1,6 +1,2 @@
-import { redirect } from 'next/navigation'
-
-export default function BlogLocaleRedirect() {
-	redirect('/blog')
-}
-
+export { metadata } from '../../blog/page';
+export { default } from '../../blog/page';

@@ -1,11 +1,11 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import type { AppLocale } from '../../i18n/config';
+import { getMessages } from '../i18n/messages';
 
 export default function Footer({ locale = 'en' as AppLocale }: { locale?: AppLocale }) {
   // Load messages on the server; Footer doesn't need client context
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const messages = locale === 'uk' ? require('../../i18n/locales/uk.json') : require('../../i18n/locales/en.json');
+  const messages = getMessages(locale);
   const t = (k: string) => (messages[k] as string) ?? k;
   const withLocale = (path: string) => `/${locale}${path}`;
   return (
@@ -110,6 +110,27 @@ export default function Footer({ locale = 'en' as AppLocale }: { locale?: AppLoc
               <path d="M12.186 24h-.007c-3.581-.024-6.334-1.205-8.184-3.509C2.35 18.44 1.5 15.586 1.472 12.01v-.017c.03-3.579.879-6.43 2.525-8.482C5.845 1.205 8.6.024 12.18 0h.014c2.746.02 5.043.725 6.826 2.098 1.677 1.29 2.858 3.13 3.509 5.467l-2.04.569c-1.104-3.96-3.898-5.984-8.304-6.015-2.91.022-5.11.936-6.54 2.717C4.307 6.504 3.616 8.914 3.589 12c.027 3.086.718 5.496 2.057 7.164 1.43 1.781 3.631 2.695 6.54 2.717 2.623-.02 4.358-.631 5.8-2.045 1.647-1.613 1.618-3.593 1.09-4.798-.31-.71-.873-1.3-1.634-1.75-.192 1.352-.622 2.446-1.284 3.272-.886 1.102-2.14 1.704-3.73 1.79-1.202.065-2.361-.218-3.259-.801-1.063-.689-1.685-1.74-1.752-2.964-.065-1.19.408-2.285 1.33-3.082.88-.76 2.119-1.207 3.583-1.291a13.853 13.853 0 013.02.142l-.126 1.974c-.94-.15-1.96-.185-2.935-.103-1.118.094-1.983.388-2.508.851-.473.418-.7.942-.664 1.521.033.563.331 1.035.859 1.368.549.347 1.293.479 2.093.372 1.031-.139 1.863-.567 2.476-1.275.576-.665.94-1.582 1.084-2.73l.09-.664c-1.205-.63-2.046-1.613-2.502-2.923-.414-1.189-.444-2.589-.088-4.162l1.967.381c-.272 1.145-.269 2.182.01 3.083.259.839.82 1.55 1.67 2.113.18-.194.358-.397.532-.61.827-1.008 1.487-2.415 1.96-4.19l1.973.426c-.52 1.957-1.273 3.612-2.24 4.917-.3.405-.624.791-.97 1.153.518.36.952.79 1.287 1.278.616.896 1.008 2.01 1.165 3.314.232 1.938-.006 3.98-1.928 5.96-1.72 1.766-3.977 2.633-6.85 2.653z"/>
             </svg>
           </a>
+        </div>
+
+        {/* Trustpilot Review Collector */}
+        <div className="flex justify-center">
+          <div
+            className="trustpilot-widget"
+            data-locale="en-US"
+            data-template-id="56278e9abfbbba0bdcd568bc"
+            data-businessunit-id="69d2ba9718012ef123c81cd0"
+            data-style-height="52px"
+            data-style-width="100%"
+            data-token="78f0c8ae-2473-4d02-b7ce-ef9b6dbc2523"
+          >
+            <a
+              href="https://www.trustpilot.com/review/editorapdf.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Trustpilot
+            </a>
+          </div>
         </div>
 
         {/* Copyright */}
