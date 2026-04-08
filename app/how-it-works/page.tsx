@@ -8,9 +8,27 @@ import {
   Trash2, GripVertical, Eye, Clock, Server
 } from 'lucide-react'
 
+const siteUrl = 'https://editorapdf.com'
+
 export const metadata: Metadata = {
-  title: 'How It Works - Simple PDF Editing',
-  description: 'Learn how EditoraPDF works. Simple, fast, and secure PDF editing in your browser without installation or signup.',
+  title: 'How It Works — Edit PDF Online Without Installation | EditoraPDF',
+  description: 'Learn how EditoraPDF works. Simple, fast, and secure PDF editing entirely in your browser — no installation, no signup, no file uploads to any server.',
+  openGraph: {
+    type: 'website',
+    url: `${siteUrl}/en/how-it-works`,
+    title: 'How It Works — Edit PDF Online Without Installation | EditoraPDF',
+    description: 'Learn how EditoraPDF works. Simple, fast, and secure PDF editing entirely in your browser — no installation, no signup, no file uploads.',
+    siteName: 'EditoraPDF',
+    images: [{ url: `${siteUrl}/og/og-image.png`, width: 1200, height: 630, alt: 'EditoraPDF — How It Works' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'How It Works — Edit PDF Online Without Installation | EditoraPDF',
+    description: 'Learn how EditoraPDF works. Simple, fast, and secure PDF editing entirely in your browser.',
+    images: [`${siteUrl}/og/og-image.png`],
+    creator: '@editora_pdf',
+    site: '@editora_pdf',
+  },
 }
 
 export default function HowItWorksPage() {

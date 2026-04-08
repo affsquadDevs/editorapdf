@@ -7,9 +7,27 @@ import {
   Github, Mail, MessageSquare, Award, Rocket, Eye
 } from 'lucide-react'
 
+const siteUrl = 'https://editorapdf.com'
+
 export const metadata: Metadata = {
-  title: 'About Us - Free PDF Editor',
-  description: 'Learn about EditoraPDF - a free, privacy-focused online PDF editor. Our mission is to make PDF editing accessible to everyone.',
+  title: 'About Us — Free Privacy-First PDF Editor | EditoraPDF',
+  description: 'Learn about EditoraPDF — a free, open-source, privacy-focused online PDF editor. Our mission is to make PDF editing accessible to everyone without compromising security.',
+  openGraph: {
+    type: 'website',
+    url: `${siteUrl}/en/about`,
+    title: 'About Us — Free Privacy-First PDF Editor | EditoraPDF',
+    description: 'Learn about EditoraPDF — a free, open-source, privacy-focused online PDF editor. Our mission is to make PDF editing accessible to everyone.',
+    siteName: 'EditoraPDF',
+    images: [{ url: `${siteUrl}/og/og-image.png`, width: 1200, height: 630, alt: 'EditoraPDF — About Us' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'About Us — Free Privacy-First PDF Editor | EditoraPDF',
+    description: 'Learn about EditoraPDF — a free, open-source, privacy-focused online PDF editor.',
+    images: [`${siteUrl}/og/og-image.png`],
+    creator: '@editora_pdf',
+    site: '@editora_pdf',
+  },
 }
 
 export default function AboutPage() {

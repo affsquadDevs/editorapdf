@@ -1,51 +1,64 @@
-'use client';
+import type { Metadata } from 'next';
+import { toolsMeta } from '../../../data/toolsMeta';
+import ToolPageClient from './ToolPageClient';
 
-import { useParams, useRouter } from 'next/navigation';
-import { allTools } from '../../../components/ToolsPanel';
-import ToolView from '../../../components/ToolView';
-import Header from '../../../components/Header';
-import { ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
-import { useAppTranslations } from '../../../i18n/TranslationProvider';
+const siteUrl = 'https://editorapdf.com';
 
-export default function LocalizedToolPage() {
-  const params = useParams();
-  const router = useRouter();
-  const { locale, t } = useAppTranslations();
-  const toolId = (params?.toolId as string) || '';
-
-  const tool = allTools.find(tl => tl.id === toolId);
+export function generateMetadata({
+  params,
+}: {
+  params: { locale: string; toolId: string };
+}): Metadata {
+  const tool = toolsMeta[params.toolId];
+  const locale = params.locale;
 
   if (!tool) {
-    return (
-      <main className="min-h-screen flex flex-col">
-        <Header />
-        <div className="flex-1 flex items-center justify-center p-6">
-          <div className="text-center max-w-2xl">
-            <h1 className="text-2xl md:text-3xl font-semibold text-white mb-3">{t('tools.notFound') === 'tools.notFound' ? 'Tool Not Found' : t('tools.notFound')}</h1>
-            <p className="text-lg text-surface-400 mb-8">
-              {t('tools.notFoundDesc') === 'tools.notFoundDesc' ? "The PDF tool you're looking for doesn't exist." : t('tools.notFoundDesc')}
-            </p>
-            <Link href={`/${locale}/tools`} className="btn-primary btn-lg">
-              <ArrowLeft size={20} strokeWidth={2} />
-              {t('tools.back') === 'tools.back' ? 'Back to All Tools' : t('tools.back')}
-            </Link>
-          </div>
-        </div>
-      </main>
-    );
+    return {
+      title: 'PDF Tool | EditoraPDF',
+      description: 'Free online PDF tools — no installation, no signup required.',
+    };
   }
 
-  return (
-    <main className="min-h-screen flex flex-col">
-      <Header />
-      <div className="flex-1 flex items-center justify-center px-6 pt-6 pb-6">
-        <ToolView 
-          tool={tool} 
-          onBack={() => router.push(`/${locale}/tools`)} 
-        />
-      </div>
-    </main>
-  );
+  const title = `${tool.title} Online Free — No Signup | EditoraPDF`;
+  const description = `${tool.description}. Free online PDF tool — no installation, no account required. Files processed locally in your browser. 100% private.`;
+  const url = `${siteUrl}/${locale}/tools/${tool.id}`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      type: 'website',
+      url,
+      title,
+      description,
+      siteName: 'EditoraPDF',
+      images: [
+        {
+          url: `${siteUrl}/og/og-image.png`,
+          width: 1200,
+          height: 630,
+          alt: `EditoraPDF — ${tool.title}`,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [`${siteUrl}/og/og-image.png`],
+      creator: '@editora_pdf',
+      site: '@editora_pdf',
+    },
+    alternates: {
+      canonical: url,
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+  };
 }
 
+export default function ToolPage() {
+  return <ToolPageClient />;
+}

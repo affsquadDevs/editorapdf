@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { GripVertical, ChevronDown, ArrowUp, ArrowDown, X } from 'lucide-react';
+import { useAppTranslations } from '../i18n/TranslationProvider';
 import { loadPdfDocument, renderPageToDataUrl } from '../lib/pdf/pdfRender';
 
 interface PageOrder {
@@ -20,6 +21,8 @@ export default function PageReorder({
   pdfFile,
   onChange,
 }: PageReorderProps) {
+  const { t } = useAppTranslations();
+  const tr = (key: string, fallback: string) => (t(key) === key ? fallback : t(key));
   const [pageOrder, setPageOrder] = useState<PageOrder[]>([]);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
@@ -236,7 +239,7 @@ export default function PageReorder({
   if (pageOrder.length === 0) {
     return (
       <div className="p-4 rounded-lg bg-surface-800/30 border border-surface-700/50">
-        <p className="text-sm text-surface-400">Завантаження сторінок…</p>
+        <p className="text-sm text-surface-400">{tr('tools.pageReorder.loading', 'Loading pages…')}</p>
       </div>
     );
   }
@@ -245,7 +248,7 @@ export default function PageReorder({
     <div className="space-y-3">
       <div className="flex items-center justify-between mb-3">
         <p className="text-xs text-surface-400">
-          Перетягуйте сторінки, щоб змінити порядок, або використовуйте селектори позицій
+          {tr('tools.pageReorder.hint', 'Drag pages to reorder or use position selectors to set the order')}
         </p>
         <button
           type="button"
@@ -258,7 +261,7 @@ export default function PageReorder({
           }}
           className="text-xs text-primary-400 hover:text-primary-300 font-medium transition-colors"
         >
-          Скинути порядок
+          {tr('tools.pageReorder.reset', 'Reset order')}
         </button>
       </div>
 
@@ -305,17 +308,17 @@ export default function PageReorder({
                     <>
                       <img
                         src={thumbnails[page.originalIndex]}
-                        alt={`Сторінка ${page.originalIndex}`}
+                        alt={`${tr('tools.pageReorder.page', 'Page')} ${page.originalIndex}`}
                         className="w-full h-full object-contain"
                         draggable={false}
                       />
                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
-                        <span className="opacity-0 group-hover:opacity-100 text-xs text-white font-medium bg-black/60 px-2 py-1 rounded transition-opacity">Натисніть, щоб переглянути</span>
+                        <span className="opacity-0 group-hover:opacity-100 text-xs text-white font-medium bg-black/60 px-2 py-1 rounded transition-opacity">{tr('tools.pageReorder.tapToView', 'Tap to view')}</span>
                       </div>
                     </>
                   ) : (
                     <div className="text-xs text-surface-500 text-center p-2 font-medium">
-                      Сторінка {page.originalIndex}
+                      {tr('tools.pageReorder.page', 'Page')} {page.originalIndex}
                     </div>
                   )}
                 </button>
@@ -323,7 +326,7 @@ export default function PageReorder({
                 {/* Page info */}
                 <div className="flex-1 flex items-center gap-3">
                   <div className="flex items-center gap-2 min-w-[80px]">
-                    <span className="text-xs text-surface-500">Сторінка</span>
+                    <span className="text-xs text-surface-500">{tr('tools.pageReorder.page', 'Page')}</span>
                     <span className="text-sm font-semibold text-surface-200">
                       {page.originalIndex}
                     </span>
@@ -331,7 +334,7 @@ export default function PageReorder({
 
                   <div className="flex-1 flex items-center gap-2">
                     <span className="text-xs text-surface-500">→</span>
-                    <span className="text-xs text-surface-500">Позиція</span>
+                    <span className="text-xs text-surface-500">{tr('tools.pageReorder.position', 'Position')}</span>
                     
                     {/* Position selector */}
                     <div className="relative flex-1 max-w-[120px]">
@@ -364,7 +367,7 @@ export default function PageReorder({
                                     : 'text-surface-300'
                                 }`}
                               >
-                                Позиція {pos}
+                                {tr('tools.pageReorder.position', 'Position')} {pos}
                               </button>
                             ))}
                           </div>
@@ -381,7 +384,7 @@ export default function PageReorder({
                     onClick={() => movePage(displayIndex, 'up')}
                     disabled={displayIndex === 0}
                     className="p-1.5 rounded-lg hover:bg-primary-500/10 text-surface-400 hover:text-primary-400 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                    title="Пересунути вгору"
+                    title={tr('tools.pageReorder.moveUp', 'Move up')}
                   >
                     <ArrowUp size={16} strokeWidth={2} />
                   </button>
@@ -390,7 +393,7 @@ export default function PageReorder({
                     onClick={() => movePage(displayIndex, 'down')}
                     disabled={displayIndex === sortedOrder.length - 1}
                     className="p-1.5 rounded-lg hover:bg-primary-500/10 text-surface-400 hover:text-primary-400 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-                    title="Пересунути вниз"
+                    title={tr('tools.pageReorder.moveDown', 'Move down')}
                   >
                     <ArrowDown size={16} strokeWidth={2} />
                   </button>
@@ -403,7 +406,7 @@ export default function PageReorder({
 
       {/* Preview */}
       <div className="p-3 rounded-lg bg-primary-500/10 border border-primary-500/20">
-        <p className="text-xs font-semibold text-primary-300 mb-2">Новий порядок сторінок:</p>
+        <p className="text-xs font-semibold text-primary-300 mb-2">{tr('tools.pageReorder.newOrder', 'New page order:')}</p>
         <div className="flex flex-wrap gap-1.5">
           {sortedOrder.map((page, idx) => (
             <span
@@ -433,17 +436,17 @@ export default function PageReorder({
             <div className="flex items-center justify-between p-4 border-b border-surface-700/50 bg-surface-800/50">
               <div>
                 <h3 className="text-lg font-semibold text-surface-200">
-                  Перегляд сторінки {selectedPage}
+                  {tr('tools.pageReorder.preview', 'Page preview')} {selectedPage}
                 </h3>
                 <p className="text-xs text-surface-400 mt-0.5">
-                  Натисніть поза вікном або ESC, щоб закрити
+                  {tr('tools.pageReorder.close', 'Click outside or press ESC to close')}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setSelectedPage(null)}
                 className="p-2 rounded-lg hover:bg-surface-700/50 text-surface-400 hover:text-surface-200 transition-colors"
-                aria-label="Закрити"
+                aria-label={tr('tools.pageReorder.closeBtn', 'Close')}
               >
                 <X size={20} strokeWidth={2} />
               </button>
@@ -454,18 +457,18 @@ export default function PageReorder({
               {isLoadingFullSize[selectedPage] ? (
                 <div className="flex flex-col items-center justify-center py-20">
                   <div className="w-8 h-8 border-3 border-primary-500/30 border-t-primary-500 rounded-full animate-spin mb-4" />
-                  <p className="text-sm text-surface-400">Завантаження сторінки…</p>
+                  <p className="text-sm text-surface-400">{tr('tools.pageReorder.loading', 'Loading pages…')}</p>
                 </div>
               ) : fullSizeImages[selectedPage] ? (
                 <img
                   src={fullSizeImages[selectedPage]}
-                  alt={`Сторінка ${selectedPage} у повному розмірі`}
+                  alt={`${tr('tools.pageReorder.page', 'Page')} ${selectedPage}`}
                   className="max-w-full max-h-[calc(95vh-120px)] object-contain rounded-lg shadow-lg"
                   draggable={false}
                 />
               ) : (
                 <div className="text-center py-20">
-                  <p className="text-sm text-surface-400">Не вдалося завантажити перегляд сторінки</p>
+                  <p className="text-sm text-surface-400">{tr('tools.pageReorder.error', 'Could not load page preview')}</p>
                 </div>
               )}
             </div>

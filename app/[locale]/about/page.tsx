@@ -1,66 +1,36 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import Header from '../../components/Header'
-import AboutPage from '../../about/page'
 import {
   Shield, Zap, Globe, Users, Code, Heart, Target,
   Github, Mail, MessageSquare, Award, Rocket, Eye, FileText, ArrowRight, Sparkles
 } from 'lucide-react'
+import { defaultLocale, isSupportedLocale, normalizeLocale, type AppLocale } from '../../../i18n/config'
+import { getMessages } from '../../i18n/messages'
 
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
-  if (params.locale !== 'uk') {
-    const mod = await import('../../about/page')
-    return mod.metadata
-  }
-
+  const locale = (isSupportedLocale(params.locale) ? normalizeLocale(params.locale) : defaultLocale) as AppLocale
+  const messages = getMessages(locale)
+  const t = (key: string) => messages[key] ?? key
   return {
-    title: 'Про нас - безкоштовний PDF-редактор',
-    description: 'Дізнайтеся більше про EditoraPDF — безкоштовний онлайн-редактор PDF із фокусом на приватність.',
+    title: t('nav.about') + ' | EditoraPDF',
+    description: t('about.subtitle'),
   }
 }
 
 export default function AboutLocalePage({ params }: { params: { locale: string } }) {
-  if (params.locale !== 'uk') return <AboutPage />
-
-  const withLocale = (path: string) => `/${params.locale}${path}`
+  const locale = (isSupportedLocale(params.locale) ? normalizeLocale(params.locale) : defaultLocale) as AppLocale
+  const messages = getMessages(locale)
+  const t = (key: string) => messages[key] ?? ''
+  const withLocale = (path: string) => `/${locale}${path}`
 
   const values = [
-    {
-      icon: <Shield size={28} strokeWidth={1.5} className="text-success-400" />,
-      title: 'Приватність насамперед',
-      description: 'Уся обробка відбувається на вашому пристрої. Ми не бачимо, не зберігаємо і не передаємо ваші документи.',
-      color: 'success',
-    },
-    {
-      icon: <Zap size={28} strokeWidth={1.5} className="text-primary-400" />,
-      title: 'Миттєвий доступ',
-      description: 'Без встановлення, без реєстрації, без очікування. Відкрили сайт і одразу працюєте.',
-      color: 'primary',
-    },
-    {
-      icon: <Award size={28} strokeWidth={1.5} className="text-accent-400" />,
-      title: '100% безкоштовно',
-      description: 'Без прихованих платежів, преміум-рівнів і водяних знаків. Усі основні можливості доступні одразу.',
-      color: 'accent',
-    },
-    {
-      icon: <Sparkles size={28} strokeWidth={1.5} className="text-info-400" />,
-      title: 'Потужні інструменти',
-      description: 'Редагування тексту, анотації, керування сторінками, вставка зображень та інші потрібні функції в одному місці.',
-      color: 'info',
-    },
-    {
-      icon: <Globe size={28} strokeWidth={1.5} className="text-warning-400" />,
-      title: 'Відкритий код',
-      description: 'Код доступний для перегляду, форків і внесків. Ми віримо у прозорість і розвиток через спільноту.',
-      color: 'warning',
-    },
-    {
-      icon: <Users size={28} strokeWidth={1.5} className="text-error-400" />,
-      title: 'Розвиток через фідбек',
-      description: 'Ми прислухаємося до користувачів і покращуємо продукт на основі реальних сценаріїв та пропозицій.',
-      color: 'error',
-    },
+    { icon: <Shield size={28} strokeWidth={1.5} className="text-success-400" />, title: t('about.val1.title'), description: t('about.val1.desc'), color: 'success' },
+    { icon: <Zap size={28} strokeWidth={1.5} className="text-primary-400" />, title: t('about.val2.title'), description: t('about.val2.desc'), color: 'primary' },
+    { icon: <Award size={28} strokeWidth={1.5} className="text-accent-400" />, title: t('about.val3.title'), description: t('about.val3.desc'), color: 'accent' },
+    { icon: <Sparkles size={28} strokeWidth={1.5} className="text-info-400" />, title: t('about.val4.title'), description: t('about.val4.desc'), color: 'info' },
+    { icon: <Globe size={28} strokeWidth={1.5} className="text-warning-400" />, title: t('about.val5.title'), description: t('about.val5.desc'), color: 'warning' },
+    { icon: <Users size={28} strokeWidth={1.5} className="text-error-400" />, title: t('about.val6.title'), description: t('about.val6.desc'), color: 'error' },
   ]
 
   const colorClasses: Record<string, { bg: string; border: string }> = {
@@ -78,20 +48,23 @@ export default function AboutLocalePage({ params }: { params: { locale: string }
 
       <div className="flex-1 p-6 py-12">
         <div className="max-w-5xl mx-auto">
+          {/* Hero */}
           <div className="text-center mb-16 animate-fade-in">
             <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary-500/15 border border-primary-500/30 text-primary-300 text-sm font-semibold mb-6">
               <Heart size={16} strokeWidth={2} className="text-primary-400" />
-              Створено з повагою до приватності
+              {t('about.badge')}
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 tracking-tight">
-              Про <span className="text-gradient-animated">EditoraPDF</span>
+              {t('about.h1.before')}{' '}
+              <span className="text-gradient-animated">{t('about.h1.highlight')}</span>
+              {t('about.h1.part2') ? <> {t('about.h1.part2')}</> : null}
             </h1>
             <p className="text-lg md:text-xl text-surface-400 max-w-3xl mx-auto leading-relaxed">
-              Ми робимо роботу з PDF простою, доступною та безкоштовною для всіх.
-              Приватність не повинна бути платною функцією.
+              {t('about.subtitle')}
             </p>
           </div>
 
+          {/* What is */}
           <section className="mb-16 animate-fade-in delay-100" aria-labelledby="what-is-heading">
             <div className="card p-8 md:p-10 bg-gradient-to-br from-primary-500/5 via-surface-800/60 to-accent-500/5 border-primary-500/20">
               <div className="flex items-start gap-6">
@@ -100,29 +73,29 @@ export default function AboutLocalePage({ params }: { params: { locale: string }
                 </div>
                 <div className="flex-1">
                   <h2 id="what-is-heading" className="text-2xl md:text-3xl font-bold text-white mb-4">
-                    Що таке EditoraPDF?
+                    {t('about.what.title')}
                   </h2>
                   <p className="text-surface-300 leading-relaxed mb-4 text-base md:text-lg">
-                    <strong className="text-white">EditoraPDF</strong> — це безкоштовний онлайн-редактор PDF з відкритим кодом, який повністю працює у браузері.
-                    На відміну від сервісів, що вимагають встановлення програм або завантажують файли у хмару, EditoraPDF обробляє документи локально на вашому пристрої.
+                    <strong className="text-white">EditoraPDF</strong> {t('about.what.p1').replace('EditoraPDF', '').trimStart()}
                   </p>
                   <p className="text-surface-300 leading-relaxed text-base md:text-lg">
-                    Ми поєднали зручний інтерфейс і практичні інструменти, щоб ви могли швидко редагувати PDF без реєстрації, без зайвих кроків і без ризику для конфіденційних файлів.
+                    {t('about.what.p2')}
                   </p>
                 </div>
               </div>
             </div>
           </section>
 
+          {/* Mission */}
           <section className="mb-16 animate-fade-in delay-200" aria-labelledby="mission-heading">
             <div className="card p-8 md:p-10 bg-gradient-to-br from-accent-500/5 via-surface-800/60 to-success-500/5 border-accent-500/20">
               <div className="text-center mb-8">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent-500/10 border border-accent-500/25 text-accent-300 text-xs font-bold uppercase tracking-wider mb-4">
                   <Target size={14} strokeWidth={2} />
-                  Наша місія
+                  {t('about.mission.badge')}
                 </div>
                 <h2 id="mission-heading" className="text-2xl md:text-3xl font-bold text-white mb-4">
-                  Головна ціль
+                  {t('about.mission.title')}
                 </h2>
               </div>
 
@@ -132,50 +105,42 @@ export default function AboutLocalePage({ params }: { params: { locale: string }
                     <Target size={24} strokeWidth={1.5} className="text-accent-400" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-white mb-2">Демократизувати редагування PDF</h3>
-                    <p className="text-surface-400 leading-relaxed">
-                      Ми хочемо, щоб професійні інструменти для PDF були доступні кожному незалежно від бюджету, технічного рівня чи вимог до приватності.
-                    </p>
+                    <h3 className="text-lg font-semibold text-white mb-2">{t('about.mission1.title')}</h3>
+                    <p className="text-surface-400 leading-relaxed">{t('about.mission1.desc')}</p>
                   </div>
                 </div>
-
                 <div className="flex gap-4">
                   <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-success-500/15 flex items-center justify-center">
                     <Shield size={24} strokeWidth={1.5} className="text-success-400" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-white mb-2">Приватність за дизайном</h3>
-                    <p className="text-surface-400 leading-relaxed">
-                      Сервіс побудований так, щоб файли залишалися у вас. Без акаунтів, без відправки документів на сервер, без компромісів щодо конфіденційності.
-                    </p>
+                    <h3 className="text-lg font-semibold text-white mb-2">{t('about.mission2.title')}</h3>
+                    <p className="text-surface-400 leading-relaxed">{t('about.mission2.desc')}</p>
                   </div>
                 </div>
-
                 <div className="flex gap-4">
                   <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-primary-500/15 flex items-center justify-center">
                     <Rocket size={24} strokeWidth={1.5} className="text-primary-400" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-white mb-2">Відкритий код і безкоштовність</h3>
-                    <p className="text-surface-400 leading-relaxed">
-                      Ми віримо, що якісний PDF-редактор може бути відкритим, прозорим і безкоштовним назавжди. Кожен може переглянути код або долучитися до розвитку.
-                    </p>
+                    <h3 className="text-lg font-semibold text-white mb-2">{t('about.mission3.title')}</h3>
+                    <p className="text-surface-400 leading-relaxed">{t('about.mission3.desc')}</p>
                   </div>
                 </div>
               </div>
             </div>
           </section>
 
+          {/* Values */}
           <section className="mb-16 animate-fade-in delay-300" aria-labelledby="values-heading">
             <div className="text-center mb-8">
               <h2 id="values-heading" className="text-2xl md:text-3xl font-bold text-white mb-3">
-                Наші цінності
+                {t('about.values.title')}
               </h2>
               <p className="text-surface-400 max-w-2xl mx-auto">
-                Принципи, якими ми керуємось у розвитку продукту.
+                {t('about.values.subtitle')}
               </p>
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {values.map((value, index) => {
                 const c = colorClasses[value.color] || colorClasses.primary
@@ -200,6 +165,7 @@ export default function AboutLocalePage({ params }: { params: { locale: string }
             </div>
           </section>
 
+          {/* Technology */}
           <section className="mb-16 animate-fade-in delay-500" aria-labelledby="technology-heading">
             <div className="card p-8 md:p-10 bg-gradient-to-br from-info-500/5 via-surface-800/60 to-primary-500/5 border-info-500/20">
               <div className="flex items-start gap-6 mb-6">
@@ -208,17 +174,32 @@ export default function AboutLocalePage({ params }: { params: { locale: string }
                 </div>
                 <div className="flex-1">
                   <h2 id="technology-heading" className="text-2xl md:text-3xl font-bold text-white mb-4">
-                    Сучасний технологічний стек
+                    {t('about.tech.title')}
                   </h2>
                   <p className="text-surface-300 leading-relaxed mb-4 text-base md:text-lg">
-                    EditoraPDF використовує сучасні вебтехнології для локальної обробки PDF прямо у браузері. Ми спираємось на <strong className="text-white">PDF.js</strong> для рендерингу і <strong className="text-white">pdf-lib</strong> для редагування.
+                    {t('about.tech.p1').split('PDF.js').map((part, i, arr) =>
+                      i < arr.length - 1
+                        ? <span key={i}>{part}<strong className="text-white">PDF.js</strong></span>
+                        : <span key={i}>{part.split('pdf-lib').map((p2, j, arr2) =>
+                            j < arr2.length - 1
+                              ? <span key={j}>{p2}<strong className="text-white">pdf-lib</strong></span>
+                              : <span key={j}>{p2}</span>
+                          )}</span>
+                    )}
                   </p>
                   <p className="text-surface-300 leading-relaxed text-base md:text-lg">
-                    Інтерфейс побудований на <strong className="text-white">Next.js</strong> і <strong className="text-white">React</strong>, щоб забезпечити швидку роботу на різних пристроях без участі сервера в обробці файлів.
+                    {t('about.tech.p2').split('Next.js').map((part, i, arr) =>
+                      i < arr.length - 1
+                        ? <span key={i}>{part}<strong className="text-white">Next.js</strong></span>
+                        : <span key={i}>{part.split('React').map((p2, j, arr2) =>
+                            j < arr2.length - 1
+                              ? <span key={j}>{p2}<strong className="text-white">React</strong></span>
+                              : <span key={j}>{p2}</span>
+                          )}</span>
+                    )}
                   </p>
                 </div>
               </div>
-
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-6">
                 {['Next.js', 'TypeScript', 'React', 'PDF.js', 'pdf-lib', 'Zustand', 'Tailwind CSS', 'Open Source'].map((tech) => (
                   <div key={tech} className="p-4 rounded-lg bg-surface-800/40 border border-surface-700/50 text-center">
@@ -229,6 +210,7 @@ export default function AboutLocalePage({ params }: { params: { locale: string }
             </div>
           </section>
 
+          {/* Open Source */}
           <section className="mb-16 animate-fade-in delay-700" aria-labelledby="opensource-heading">
             <div className="card p-8 md:p-10 bg-gradient-to-br from-primary-500/10 via-surface-800/60 to-accent-500/10 border-primary-500/20">
               <div className="flex flex-col md:flex-row items-center gap-8">
@@ -239,10 +221,10 @@ export default function AboutLocalePage({ params }: { params: { locale: string }
                 </div>
                 <div className="flex-1 text-center md:text-left">
                   <h2 id="opensource-heading" className="text-2xl md:text-3xl font-bold text-white mb-3">
-                    100% open source і безкоштовно назавжди
+                    {t('about.oss.title')}
                   </h2>
                   <p className="text-surface-300 text-base md:text-lg leading-relaxed mb-5">
-                    Код EditoraPDF відкритий, а сам сервіс створено як безкоштовний інструмент для щоденної роботи з PDF. Ви можете переглядати код, надсилати покращення або використовувати проєкт у власних задачах.
+                    {t('about.oss.desc')}
                   </p>
                   <div className="flex flex-wrap items-center gap-3 justify-center md:justify-start">
                     <a
@@ -252,7 +234,7 @@ export default function AboutLocalePage({ params }: { params: { locale: string }
                       className="btn-primary btn-md inline-flex items-center gap-2"
                     >
                       <Github size={18} strokeWidth={2} />
-                      GitHub
+                      {t('about.oss.github')}
                     </a>
                     <a
                       href="https://github.com/affsquadDevs/editorapdf/issues"
@@ -261,7 +243,7 @@ export default function AboutLocalePage({ params }: { params: { locale: string }
                       className="btn-secondary btn-md inline-flex items-center gap-2"
                     >
                       <MessageSquare size={18} strokeWidth={2} />
-                      Повідомити про проблему
+                      {t('about.oss.issue')}
                     </a>
                   </div>
                 </div>
@@ -269,20 +251,21 @@ export default function AboutLocalePage({ params }: { params: { locale: string }
             </div>
           </section>
 
+          {/* CTA */}
           <div className="text-center card p-8 md:p-12 bg-gradient-to-br from-primary-500/10 via-surface-800/60 to-accent-500/10 border-primary-500/20 animate-fade-in delay-800">
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">Питання або відгук?</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">{t('about.cta.title')}</h2>
             <p className="text-surface-300 mb-6 text-lg max-w-2xl mx-auto">
-              Ми будемо раді почути ваш фідбек, ідеї чи повідомлення про помилки.
+              {t('about.cta.desc')}
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4">
               <Link href={withLocale('/contact')} className="btn-primary btn-lg inline-flex items-center gap-2 group">
                 <Mail size={20} strokeWidth={2} />
-                Зв’язатися з нами
+                {t('about.cta.contact')}
                 <ArrowRight size={20} strokeWidth={2} className="transition-transform group-hover:translate-x-1" />
               </Link>
               <Link href={withLocale('/')} className="btn-secondary btn-lg inline-flex items-center gap-2">
                 <FileText size={20} strokeWidth={2} />
-                Почати редагування
+                {t('about.cta.start')}
               </Link>
             </div>
           </div>
@@ -291,4 +274,3 @@ export default function AboutLocalePage({ params }: { params: { locale: string }
     </main>
   )
 }
-
