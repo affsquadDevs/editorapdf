@@ -4490,13 +4490,13 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                   {redactions.length > 0 && (
                     <div className="p-3 rounded-lg bg-surface-900/50 border border-surface-600/50">
                       <p className="text-xs text-surface-300 mb-1">
-                        {redactions.length} redaction area{redactions.length !== 1 ? 's' : ''} selected
+                        {redactions.length} {redactions.length !== 1 ? tr('tools.view.redact.areas', 'redaction areas') : tr('tools.view.redact.area', 'redaction area')} {tr('tools.view.redact.selected', 'selected')}
                       </p>
                       <button
                         onClick={() => setRedactions([])}
                         className="text-xs text-error-400 hover:text-error-300 transition-colors"
                       >
-                        Clear all
+                        {tr('tools.view.redact.clearAll', 'Clear all')}
                       </button>
                     </div>
                   )}

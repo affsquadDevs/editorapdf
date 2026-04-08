@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { loadPdfDocument, renderPageToDataUrl } from '../lib/pdf/pdfRender';
 import { X, Trash2 } from 'lucide-react';
 import type { RedactionArea } from '../lib/pdf/redactPdf';
+import { useAppTranslations } from '../i18n/TranslationProvider';
 
 interface RedactSelectorProps {
   isOpen: boolean;
@@ -18,6 +19,8 @@ export default function RedactSelector({
   pdfFile,
   onRedactionsSelected,
 }: RedactSelectorProps) {
+  const { t } = useAppTranslations();
+  const tr = (key: string, fallback: string) => (t(key) === key ? fallback : t(key));
   const imageRef = useRef<HTMLImageElement>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(0);
@@ -427,7 +430,7 @@ export default function RedactSelector({
               disabled={currentPageRedactions.length === 0}
               className="px-3 py-1.5 rounded-lg bg-surface-700/30 hover:bg-surface-700/50 text-surface-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-xs font-medium"
             >
-              Clear Page
+              {tr('tools.view.redactSelector.clearPage', 'Clear Page')}
             </button>
             <button
               type="button"
@@ -435,10 +438,10 @@ export default function RedactSelector({
               disabled={redactions.length === 0}
               className="px-3 py-1.5 rounded-lg bg-surface-700/30 hover:bg-surface-700/50 text-surface-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-xs font-medium"
             >
-              Clear All
+              {tr('tools.view.redactSelector.clearAll', 'Clear All')}
             </button>
             <span className="text-xs text-surface-400">
-              Total: {redactions.length} redaction{redactions.length !== 1 ? 's' : ''}
+              {tr('tools.view.redactSelector.total', 'Total')}: {redactions.length} {redactions.length !== 1 ? tr('tools.view.redactSelector.redactions', 'redactions') : tr('tools.view.redactSelector.redaction', 'redaction')}
             </span>
           </div>
           <div className="flex gap-3">
@@ -447,7 +450,7 @@ export default function RedactSelector({
               onClick={onClose}
               className="px-4 py-2 rounded-lg bg-surface-700/30 hover:bg-surface-700/50 text-surface-300 transition-colors text-sm font-medium"
             >
-              Cancel
+              {tr('tools.view.redactSelector.cancel', 'Cancel')}
             </button>
             <button
               type="button"
@@ -455,7 +458,7 @@ export default function RedactSelector({
               disabled={redactions.length === 0}
               className="px-4 py-2 rounded-lg bg-error-500 hover:bg-error-600 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
             >
-              Apply Redaction ({redactions.length})
+              {tr('tools.view.redactSelector.apply', 'Apply Redaction')} ({redactions.length})
             </button>
           </div>
         </div>
