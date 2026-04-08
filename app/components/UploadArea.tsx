@@ -5,10 +5,13 @@ import { usePdfStore } from '../store/pdfStore';
 import { loadPdfDocument, getPdfPagesInfo } from '../lib/pdf/pdfRender';
 import { extractTextFromPage } from '../lib/pdf/pdfExtract';
 import type { PdfPage, TextOverlay } from '../store/pdfStore';
+import { useAppTranslations } from '../i18n/TranslationProvider';
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
 
 export default function UploadArea() {
+  const { t } = useAppTranslations();
+  const tr = (key: string, fallback: string) => (t(key) === key ? fallback : t(key));
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -20,13 +23,13 @@ export default function UploadArea() {
       
       // Validate file type
       if (file.type !== 'application/pdf') {
-        setError('Please upload a PDF file');
+        setError(tr('edit.upload.error.invalidType', 'Please upload a PDF file'));
         return;
       }
       
       // Validate file size
       if (file.size > MAX_FILE_SIZE) {
-        setError(`File size exceeds 25MB limit (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
+        setError(`${tr('edit.upload.error.maxSize', 'File size exceeds 25MB limit')} (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
         return;
       }
       
@@ -98,7 +101,7 @@ export default function UploadArea() {
         setIsLoading(false);
       } catch (err) {
         console.error('Error loading PDF:', err);
-        setError('Failed to load PDF. The file may be corrupted or encrypted.');
+        setError(tr('edit.upload.error.loadFailed', 'Failed to load PDF. The file may be corrupted or encrypted.'));
         setIsLoading(false);
       }
     },
@@ -202,17 +205,19 @@ export default function UploadArea() {
             {/* Text Content */}
             {isLoading ? (
               <div className="space-y-2">
-                <p className="text-lg font-medium text-surface-200">Processing your PDF...</p>
-                <p className="text-sm text-surface-400">This may take a moment</p>
+                <p className="text-lg font-medium text-surface-200">{tr('edit.upload.processing', 'Processing your PDF...')}</p>
+                <p className="text-sm text-surface-400">{tr('edit.upload.processingHint', 'This may take a moment')}</p>
               </div>
             ) : (
               <>
                 <div className="space-y-2">
                   <p className="text-lg font-medium text-surface-200">
-                    {isDragging ? 'Drop to Edit PDF' : 'Drop PDF to Edit or Click Below'}
+                    {isDragging
+                      ? tr('edit.upload.dropActive', 'Drop to Edit PDF')
+                      : tr('edit.upload.dropIdle', 'Drop PDF to Edit or Click Below')}
                   </p>
                   <p className="text-sm text-surface-500">
-                    Maximum file size: 25MB
+                    {tr('edit.upload.maxSize', 'Maximum file size: 25MB')}
                   </p>
                 </div>
                 
@@ -228,7 +233,7 @@ export default function UploadArea() {
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
                     </svg>
-                    Edit PDF
+                    {tr('cta.edit', 'Edit PDF')}
                   </span>
                 </div>
               </>
@@ -254,7 +259,7 @@ export default function UploadArea() {
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
         </svg>
-        <span>Your files stay on your device — nothing is uploaded to any server</span>
+        <span>{tr('edit.upload.privacy', 'Your files stay on your device — nothing is uploaded to any server')}</span>
       </div>
     </div>
   );

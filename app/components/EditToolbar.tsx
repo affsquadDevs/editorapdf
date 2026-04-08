@@ -1,8 +1,11 @@
 'use client';
 
 import { usePdfStore } from '../store/pdfStore';
+import { useAppTranslations } from '../i18n/TranslationProvider';
 
 export default function EditToolbar() {
+  const { t } = useAppTranslations();
+  const tr = (key: string, fallback: string) => (t(key) === key ? fallback : t(key));
   const {
     editMode,
     setEditMode,
@@ -25,8 +28,8 @@ export default function EditToolbar() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zm-7.518-.267A8.25 8.25 0 1120.25 10.5M8.288 14.212A5.25 5.25 0 1117.25 10.5" />
         </svg>
       ),
-      label: 'Select', 
-      title: 'Select and move items' 
+      label: tr('editor.editToolbar.select', 'Select'), 
+      title: tr('editor.editToolbar.selectTitle', 'Select and move items') 
     },
     { 
       mode: 'text' as const, 
@@ -35,8 +38,8 @@ export default function EditToolbar() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
         </svg>
       ),
-      label: 'Text', 
-      title: 'Add or edit text' 
+      label: tr('editor.editToolbar.text', 'Text'), 
+      title: tr('editor.editToolbar.textTitle', 'Add or edit text') 
     },
     { 
       mode: 'image' as const, 
@@ -45,8 +48,8 @@ export default function EditToolbar() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
         </svg>
       ),
-      label: 'Image', 
-      title: 'Add images' 
+      label: tr('editor.editToolbar.image', 'Image'), 
+      title: tr('editor.editToolbar.imageTitle', 'Add images') 
     },
     { 
       mode: 'shape' as const, 
@@ -55,8 +58,8 @@ export default function EditToolbar() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 7.5A2.25 2.25 0 017.5 5.25h9a2.25 2.25 0 012.25 2.25v9a2.25 2.25 0 01-2.25 2.25h-9a2.25 2.25 0 01-2.25-2.25v-9z" />
         </svg>
       ),
-      label: 'Shape', 
-      title: 'Draw shapes' 
+      label: tr('editor.editToolbar.shape', 'Shape'), 
+      title: tr('editor.editToolbar.shapeTitle', 'Draw shapes') 
     },
   ];
 
@@ -69,7 +72,7 @@ export default function EditToolbar() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 7.5A2.25 2.25 0 017.5 5.25h9a2.25 2.25 0 012.25 2.25v9a2.25 2.25 0 01-2.25 2.25h-9a2.25 2.25 0 01-2.25-2.25v-9z" />
         </svg>
       ),
-      label: 'Rectangle' 
+      label: tr('editor.editToolbar.rectangle', 'Rectangle') 
     },
     { 
       type: 'circle' as const, 
@@ -78,7 +81,7 @@ export default function EditToolbar() {
           <circle cx="12" cy="12" r="9" />
         </svg>
       ),
-      label: 'Circle' 
+      label: tr('editor.editToolbar.circle', 'Circle') 
     },
     { 
       type: 'line' as const, 
@@ -87,7 +90,7 @@ export default function EditToolbar() {
           <path strokeLinecap="round" d="M4 20L20 4" />
         </svg>
       ),
-      label: 'Line' 
+      label: tr('editor.editToolbar.line', 'Line') 
     },
     { 
       type: 'arrow' as const, 
@@ -96,7 +99,7 @@ export default function EditToolbar() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
         </svg>
       ),
-      label: 'Arrow' 
+      label: tr('editor.editToolbar.arrow', 'Arrow') 
     },
     { 
       type: 'highlight' as const, 
@@ -105,16 +108,16 @@ export default function EditToolbar() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42" />
         </svg>
       ),
-      label: 'Highlight' 
+      label: tr('editor.editToolbar.highlight', 'Highlight') 
     },
   ];
 
   const instructions: Record<string, string> = {
-    none: 'Click to select and edit items',
-    text: 'Click on text to edit, or click empty area to add new text',
-    image: 'Click to upload and place an image',
-    shape: 'Click and drag to draw shape',
-    signature: 'Click on PDF to place signature',
+    none: tr('editor.editToolbar.instruction.none', 'Click to select and edit items'),
+    text: tr('editor.editToolbar.instruction.text', 'Click on text to edit, or click empty area to add new text'),
+    image: tr('editor.editToolbar.instruction.image', 'Click to upload and place an image'),
+    shape: tr('editor.editToolbar.instruction.shape', 'Click and drag to draw shape'),
+    signature: tr('editor.editToolbar.instruction.signature', 'Click on PDF to place signature'),
   };
 
   return (
@@ -122,7 +125,7 @@ export default function EditToolbar() {
       <div className="flex items-center gap-2 sm:gap-3 min-w-max">
         {/* Tools Label */}
         <span className="text-xs font-medium text-surface-500 uppercase tracking-wider hidden lg:block flex-shrink-0">
-          Tools
+          {tr('editor.editToolbar.tools', 'Tools')}
         </span>
         
         {/* Main Tools */}
@@ -155,12 +158,12 @@ export default function EditToolbar() {
                 : 'btn-ghost hover:bg-accent-500/20 hover:text-accent-300'
               }
             `}
-            title="Add signature"
+            title={tr('editor.editToolbar.signatureTitle', 'Add signature')}
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
             </svg>
-            <span className="hidden lg:inline">Signature</span>
+            <span className="hidden lg:inline">{tr('editor.editToolbar.signature', 'Signature')}</span>
           </button>
         </div>
 
@@ -204,12 +207,12 @@ export default function EditToolbar() {
                           ? 'bg-primary-500/20 text-primary-300 border border-primary-500/30'
                           : 'btn-ghost'
                       }`}
-                      title="Outline only (no fill)"
+                      title={tr('editor.editToolbar.outlineTitle', 'Outline only (no fill)')}
                     >
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <rect x="5" y="5" width="14" height="14" rx="2" />
                       </svg>
-                      <span className="hidden lg:inline">Outline</span>
+                      <span className="hidden lg:inline">{tr('editor.editToolbar.outline', 'Outline')}</span>
                     </button>
                     <button
                       onClick={() => setSelectedShapeStyle('filled')}
@@ -218,12 +221,12 @@ export default function EditToolbar() {
                           ? 'bg-primary-500/20 text-primary-300 border border-primary-500/30'
                           : 'btn-ghost'
                       }`}
-                      title="Filled shape"
+                      title={tr('editor.editToolbar.filledTitle', 'Filled shape')}
                     >
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                         <rect x="5" y="5" width="14" height="14" rx="2" />
                       </svg>
-                      <span className="hidden lg:inline">Filled</span>
+                      <span className="hidden lg:inline">{tr('editor.editToolbar.filled', 'Filled')}</span>
                     </button>
                   </div>
                 </>

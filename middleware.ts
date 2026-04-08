@@ -1,7 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { detectPreferredLocale, supportedLocales, defaultLocale, normalizeLocale } from './i18n/config';
+import { detectPreferredLocale, isSupportedLocale } from './i18n/config';
 
 const PUBLIC_FILE = /\.(.*)$/;
+const LOCALE_AWARE_PATHS = new Set([
+	'/',
+	'/about',
+	'/contact',
+	'/tools',
+	'/edit',
+	'/how-it-works',
+	'/blog',
+	'/faq',
+	'/terms',
+	'/privacy-policy'
+]);
 
 export function middleware(req: NextRequest) {
 	const { pathname } = req.nextUrl;
@@ -19,16 +31,25 @@ export function middleware(req: NextRequest) {
 		return;
 	}
 
-	// If path already has a supported locale, continue
-	const pathLocale = pathname.split('/')[1];
-	if (supportedLocales.includes(normalizeLocale(pathLocale))) {
-		return;
+	const cookieLocale = req.cookies.get('NEXT_LOCALE')?.value;
+	const detected = isSupportedLocale(cookieLocale)
+		? cookieLocale
+		: detectPreferredLocale(req.headers.get('accept-language'));
+
+	// Normalize locale-aware non-prefixed routes into the preferred locale path.
+	if (LOCALE_AWARE_PATHS.has(pathname)) {
+		const redirectPath = pathname === '/' ? `/${detected}` : `/${detected}${pathname}`;
+		const redirectUrl = new URL(redirectPath, req.url);
+		return NextResponse.redirect(redirectUrl);
 	}
 
-	// Otherwise, redirect to detected locale with same path
-	const detected = detectPreferredLocale(req.headers.get('accept-language'));
-	const redirectUrl = new URL(`/${detected}${pathname}`, req.url);
-	return NextResponse.redirect(redirectUrl);
+	// If URL already has locale prefix, continue.
+	const pathLocale = pathname.split('/')[1];
+	if (isSupportedLocale(pathLocale)) {
+		return NextResponse.next();
+	}
+
+	return NextResponse.next();
 }
 
 export const config = {

@@ -3,8 +3,11 @@
 import { useState } from 'react';
 import { usePdfStore } from '../store/pdfStore';
 import ConfirmDialog from './ConfirmDialog';
+import { useAppTranslations } from '../i18n/TranslationProvider';
 
 export default function Toolbar() {
+  const { t } = useAppTranslations();
+  const tr = (key: string, fallback: string) => (t(key) === key ? fallback : t(key));
   const {
     pages,
     selectedPageId,
@@ -75,7 +78,11 @@ export default function Toolbar() {
                     <div className="flex items-center gap-2 text-xs text-surface-400">
                       <span>{formatFileSize(fileSize)}</span>
                       <span className="w-1 h-1 rounded-full bg-surface-600" />
-                      <span>{activePages.length} {activePages.length === 1 ? 'page' : 'pages'}</span>
+                      <span>
+                        {activePages.length} {activePages.length === 1
+                          ? tr('editor.toolbar.pageSingular', 'page')
+                          : tr('editor.toolbar.pagePlural', 'pages')}
+                      </span>
                     </div>
                   </div>
                   {/* Mobile: Show only file name */}
@@ -98,7 +105,7 @@ export default function Toolbar() {
                   onClick={undo}
                   disabled={historyIndex <= 0}
                   className="btn-icon-sm btn-ghost"
-                  title="Undo (Ctrl+Z)"
+                  title={tr('editor.toolbar.undo', 'Undo (Ctrl+Z)')}
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
@@ -108,7 +115,7 @@ export default function Toolbar() {
                   onClick={redo}
                   disabled={historyIndex >= history.length - 1}
                   className="btn-icon-sm btn-ghost"
-                  title="Redo (Ctrl+Shift+Z)"
+                  title={tr('editor.toolbar.redo', 'Redo (Ctrl+Shift+Z)')}
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 15l6-6m0 0l-6-6m6 6H9a6 6 0 000 12h3" />
@@ -127,7 +134,7 @@ export default function Toolbar() {
                   className="checkbox"
                 />
                 <span className="text-sm text-surface-300 group-hover:text-surface-100 transition-colors">
-                  Extract text from PDF
+                  {tr('editor.toolbar.extractText', 'Extract text from PDF')}
                 </span>
               </label>
             )}
@@ -140,7 +147,7 @@ export default function Toolbar() {
                     onClick={handleZoomOut}
                     disabled={!hasPages || zoom <= 0.5}
                     className="btn-icon-sm btn-ghost"
-                    title="Zoom out"
+                    title={tr('editor.toolbar.zoomOut', 'Zoom out')}
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM13.5 10.5h-6" />
@@ -155,7 +162,7 @@ export default function Toolbar() {
                     onClick={handleZoomIn}
                     disabled={!hasPages || zoom >= 3}
                     className="btn-icon-sm btn-ghost"
-                    title="Zoom in"
+                    title={tr('editor.toolbar.zoomIn', 'Zoom in')}
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM10.5 7.5v6m3-3h-6" />
@@ -171,12 +178,12 @@ export default function Toolbar() {
                   onClick={handleRotate}
                   disabled={!selectedPageId}
                   className="btn-sm btn-secondary"
-                  title="Rotate page 90° clockwise"
+                  title={tr('editor.toolbar.rotateTitle', 'Rotate page 90° clockwise')}
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                   </svg>
-                  <span className="hidden sm:inline">Rotate</span>
+                  <span className="hidden sm:inline">{tr('editor.toolbar.rotate', 'Rotate')}</span>
                 </button>
 
                 {/* Delete */}
@@ -184,12 +191,12 @@ export default function Toolbar() {
                   onClick={handleDelete}
                   disabled={!selectedPageId || activePages.length <= 1}
                   className="btn-sm btn-danger"
-                  title="Delete page"
+                  title={tr('editor.toolbar.deleteTitle', 'Delete page')}
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
-                  <span className="hidden sm:inline">Delete</span>
+                  <span className="hidden sm:inline">{tr('editor.toolbar.delete', 'Delete')}</span>
                 </button>
               </>
             )}
@@ -199,10 +206,10 @@ export default function Toolbar() {
 
       <ConfirmDialog
         isOpen={confirmDeletePageOpen}
-        title="Delete page?"
-        message="Are you sure you want to delete this page? This action can be undone."
-        confirmText="Delete Page"
-        cancelText="Cancel"
+        title={tr('editor.toolbar.confirmDelete.title', 'Delete page?')}
+        message={tr('editor.toolbar.confirmDelete.message', 'Are you sure you want to delete this page? This action can be undone.')}
+        confirmText={tr('editor.toolbar.confirmDelete.confirm', 'Delete Page')}
+        cancelText={tr('editor.toolbar.confirmDelete.cancel', 'Cancel')}
         type="danger"
         onCancel={() => setConfirmDeletePageOpen(false)}
         onConfirm={() => {
@@ -213,9 +220,9 @@ export default function Toolbar() {
 
       <ConfirmDialog
         isOpen={cannotDeleteLastOpen}
-        title="Cannot delete page"
-        message="You can't delete the last remaining page. A document must have at least one page."
-        confirmText="Understood"
+        title={tr('editor.toolbar.cannotDelete.title', 'Cannot delete page')}
+        message={tr('editor.toolbar.cannotDelete.message', "You can't delete the last remaining page. A document must have at least one page.")}
+        confirmText={tr('editor.toolbar.cannotDelete.confirm', 'Understood')}
         type="info"
         showCancel={false}
         onCancel={() => setCannotDeleteLastOpen(false)}

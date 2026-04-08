@@ -1,5 +1,7 @@
 // SEO-optimized FAQ data - reusable across the application
 
+import { faqDataUk } from './faq.uk';
+
 export interface FAQItem {
   question: string;
   answer: string;
@@ -95,11 +97,12 @@ export const faqData: FAQItem[] = [
 ];
 
 // Generate FAQ Schema for structured data (SEO)
-export function generateFAQSchema(siteUrl: string) {
+export function generateFAQSchema(siteUrl: string, locale: 'en' | 'uk' = 'en') {
+  const items = locale === 'uk' ? faqDataUk : faqData;
   return {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    mainEntity: faqData.map((faq) => ({
+    mainEntity: items.map((faq) => ({
       '@type': 'Question',
       name: faq.question,
       acceptedAnswer: {

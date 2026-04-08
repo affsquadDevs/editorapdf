@@ -25,16 +25,20 @@ export default function Home({ params }: { params: { locale: AppLocale } }) {
   const locale = params.locale;
   const messages = loadMessages(locale) as Record<string, string>;
   const t = (k: string) => messages[k] ?? k;
+  const isUk = locale === 'uk';
+  const withLocale = (path: string) => `/${locale}${path}`;
 
   // FAQ Schema for SEO - Generated from reusable data
-  const faqSchema = generateFAQSchema(siteUrl);
+  const faqSchema = generateFAQSchema(siteUrl, locale);
 
   // HowTo Schema for SEO
   const howToSchema = {
     '@context': 'https://schema.org',
     '@type': 'HowTo',
-    name: 'How to Edit a PDF Online with EditoraPDF',
-    description: 'Step-by-step guide to editing PDFs using EditoraPDF, a free browser-based PDF editor',
+    name: isUk ? 'Як редагувати PDF онлайн з EditoraPDF' : 'How to Edit a PDF Online with EditoraPDF',
+    description: isUk
+      ? 'Покрокова інструкція з редагування PDF в EditoraPDF, безкоштовному браузерному PDF-редакторі'
+      : 'Step-by-step guide to editing PDFs using EditoraPDF, a free browser-based PDF editor',
     image: `${siteUrl}/og/og-image.png`,
     totalTime: 'PT5M',
     estimatedCost: {
@@ -46,39 +50,51 @@ export default function Home({ params }: { params: { locale: AppLocale } }) {
       {
         '@type': 'HowToStep',
         position: 1,
-        name: 'Open Your PDF',
-        text: 'Click "Edit PDF" or drag and drop your PDF file. EditoraPDF supports files up to 25MB and processes everything locally in your browser.',
+        name: isUk ? 'Відкрийте свій PDF' : 'Open Your PDF',
+        text: isUk
+          ? 'Натисніть «Редагувати PDF» або перетягніть PDF-файл. EditoraPDF підтримує файли до 25 МБ і обробляє все локально у вашому браузері.'
+          : 'Click "Edit PDF" or drag and drop your PDF file. EditoraPDF supports files up to 25MB and processes everything locally in your browser.',
         image: `${siteUrl}/screenshot-desktop.png`,
       },
       {
         '@type': 'HowToStep',
         position: 2,
-        name: 'Navigate and View',
-        text: 'Use the thumbnail sidebar to navigate between pages. Use zoom controls to adjust the view.',
+        name: isUk ? 'Навігація та перегляд' : 'Navigate and View',
+        text: isUk
+          ? 'Використовуйте панель мініатюр для переходу між сторінками. Користуйтеся масштабуванням для зміни вигляду.'
+          : 'Use the thumbnail sidebar to navigate between pages. Use zoom controls to adjust the view.',
       },
       {
         '@type': 'HowToStep',
         position: 3,
-        name: 'Edit Text',
-        text: 'Click on any existing text to edit it. You can change the content, size, color, or position. Use the Text tool to add new text anywhere on the page.',
+        name: isUk ? 'Редагуйте текст' : 'Edit Text',
+        text: isUk
+          ? 'Натисніть на наявний текст, щоб редагувати його. Можна змінювати вміст, розмір, колір і позицію. Інструмент «Текст» додає новий текст у будь-якому місці сторінки.'
+          : 'Click on any existing text to edit it. You can change the content, size, color, or position. Use the Text tool to add new text anywhere on the page.',
       },
       {
         '@type': 'HowToStep',
         position: 4,
-        name: 'Add Images and Shapes',
-        text: 'Use the Image tool to add pictures, or the Shape tool to draw rectangles, circles, lines, arrows, or highlights.',
+        name: isUk ? 'Додавайте зображення і фігури' : 'Add Images and Shapes',
+        text: isUk
+          ? 'Інструмент «Зображення» додає картинки, а інструмент «Фігура» дозволяє малювати прямокутники, кола, лінії, стрілки та виділення.'
+          : 'Use the Image tool to add pictures, or the Shape tool to draw rectangles, circles, lines, arrows, or highlights.',
       },
       {
         '@type': 'HowToStep',
         position: 5,
-        name: 'Manage Pages',
-        text: 'Rotate, delete, or reorder pages using the toolbar controls. Drag thumbnails to reorder pages.',
+        name: isUk ? 'Керуйте сторінками' : 'Manage Pages',
+        text: isUk
+          ? 'Повертайте, видаляйте та змінюйте порядок сторінок за допомогою панелі інструментів. Перетягуйте мініатюри для перевпорядкування.'
+          : 'Rotate, delete, or reorder pages using the toolbar controls. Drag thumbnails to reorder pages.',
       },
       {
         '@type': 'HowToStep',
         position: 6,
-        name: 'Export Your PDF',
-        text: 'Click the Export button to download your edited PDF with all changes applied. The file will be saved to your device.',
+        name: isUk ? 'Експортуйте PDF' : 'Export Your PDF',
+        text: isUk
+          ? 'Натисніть кнопку експорту, щоб завантажити відредагований PDF з усіма змінами. Файл буде збережено на ваш пристрій.'
+          : 'Click the Export button to download your edited PDF with all changes applied. The file will be saved to your device.',
       },
     ],
   };
@@ -87,8 +103,10 @@ export default function Home({ params }: { params: { locale: AppLocale } }) {
   const reviewSchema = {
     '@context': 'https://schema.org',
     '@type': 'Product',
-    name: 'EditoraPDF PDF Editor',
-    description: 'Free, privacy-focused PDF editor that runs entirely in your browser',
+    name: isUk ? 'PDF-редактор EditoraPDF' : 'EditoraPDF PDF Editor',
+    description: isUk
+      ? 'Безкоштовний PDF-редактор із фокусом на приватність, який повністю працює у вашому браузері'
+      : 'Free, privacy-focused PDF editor that runs entirely in your browser',
     brand: {
       '@type': 'Brand',
       name: 'EditoraPDF',
@@ -108,7 +126,9 @@ export default function Home({ params }: { params: { locale: AppLocale } }) {
           name: 'Sarah M.',
         },
         datePublished: '2024-01-15',
-        reviewBody: 'Amazing tool! I love that my files never leave my computer. The text editing feature is exactly what I needed.',
+        reviewBody: isUk
+          ? 'Чудовий інструмент! Мені подобається, що файли не залишають мій комп’ютер. Саме таке редагування тексту мені й було потрібне.'
+          : 'Amazing tool! I love that my files never leave my computer. The text editing feature is exactly what I needed.',
         reviewRating: {
           '@type': 'Rating',
           ratingValue: '5',
@@ -122,7 +142,9 @@ export default function Home({ params }: { params: { locale: AppLocale } }) {
           name: 'John D.',
         },
         datePublished: '2024-01-20',
-        reviewBody: 'Perfect for quick PDF edits. No signup required, works offline, and completely free. Highly recommend!',
+        reviewBody: isUk
+          ? 'Ідеально для швидких правок PDF. Без реєстрації, працює офлайн і повністю безкоштовно. Дуже рекомендую!'
+          : 'Perfect for quick PDF edits. No signup required, works offline, and completely free. Highly recommend!',
         reviewRating: {
           '@type': 'Rating',
           ratingValue: '5',
@@ -138,42 +160,63 @@ export default function Home({ params }: { params: { locale: AppLocale } }) {
     '@type': 'WebApplication',
     '@id': `${siteUrl}/#webapp`,
     name: 'EditoraPDF',
-    alternateName: 'EditoraPDF Online PDF Editor',
+    alternateName: isUk ? 'EditoraPDF онлайн PDF-редактор' : 'EditoraPDF Online PDF Editor',
     url: siteUrl,
-    description: 'Edit PDF documents online instantly without installing software or creating an account. Quick, powerful PDF editing directly in your browser with complete privacy.',
-    applicationCategory: 'BusinessApplication',
-    applicationSubCategory: 'PDF Editor',
+    description: isUk
+      ? 'Редагуйте PDF онлайн миттєво без встановлення програм і без створення акаунта. Швидке та потужне редагування PDF прямо у браузері з повною приватністю.'
+      : 'Edit PDF documents online instantly without installing software or creating an account. Quick, powerful PDF editing directly in your browser with complete privacy.',
+    applicationCategory: isUk ? 'BusinessApplication' : 'BusinessApplication',
+    applicationSubCategory: isUk ? 'PDF-редактор' : 'PDF Editor',
     operatingSystem: 'Any',
-    browserRequirements: 'Requires a modern browser (Chrome, Edge, Firefox, Safari). JavaScript enabled.',
+    browserRequirements: isUk
+      ? 'Потрібен сучасний браузер (Chrome, Edge, Firefox, Safari) з увімкненим JavaScript.'
+      : 'Requires a modern browser (Chrome, Edge, Firefox, Safari). JavaScript enabled.',
     softwareVersion: '1.0.0',
-    releaseNotes: 'Free online PDF editor with instant access. No installation, no signup, no downloads required. Edit PDFs directly in your browser.',
+    releaseNotes: isUk
+      ? 'Безкоштовний онлайн PDF-редактор з миттєвим доступом. Без встановлення, без реєстрації, без завантажень. Редагуйте PDF прямо у браузері.'
+      : 'Free online PDF editor with instant access. No installation, no signup, no downloads required. Edit PDFs directly in your browser.',
     isAccessibleForFree: true,
     offers: [
       {
         '@type': 'Offer',
         '@id': `${siteUrl}/#free-offer`,
-        name: 'Free PDF Editing',
+        name: isUk ? 'Безкоштовне редагування PDF' : 'Free PDF Editing',
         price: '0',
         priceCurrency: 'USD',
         availability: 'https://schema.org/InStock',
-        category: 'Free',
+        category: isUk ? 'Безкоштовно' : 'Free',
         url: siteUrl,
       },
     ],
     featureList: [
-      'Instant access - no installation or signup required',
-      'Works entirely in your browser - no downloads',
-      'Edit PDF text and content directly',
-      'Add, remove, and reorder pages',
-      'Rotate and delete pages',
-      'Annotate PDFs (highlight, draw, add notes)',
-      'Add shapes, stamps, and images',
-      'Fill forms and add text overlays',
-      'Export and download updated PDF instantly',
-      '100% private - all processing on your device',
+      ...(isUk
+        ? [
+            'Миттєвий доступ без встановлення і реєстрації',
+            'Працює повністю у браузері без завантажень',
+            'Пряме редагування тексту та вмісту PDF',
+            'Додавання, видалення та перевпорядкування сторінок',
+            'Поворот і видалення сторінок',
+            'Анотації PDF: виділення, малювання, нотатки',
+            'Додавання фігур, штампів і зображень',
+            'Заповнення форм і додавання текстових накладок',
+            'Миттєвий експорт і завантаження оновленого PDF',
+            '100% приватність: вся обробка на вашому пристрої',
+          ]
+        : [
+            'Instant access - no installation or signup required',
+            'Works entirely in your browser - no downloads',
+            'Edit PDF text and content directly',
+            'Add, remove, and reorder pages',
+            'Rotate and delete pages',
+            'Annotate PDFs (highlight, draw, add notes)',
+            'Add shapes, stamps, and images',
+            'Fill forms and add text overlays',
+            'Export and download updated PDF instantly',
+            '100% private - all processing on your device',
+          ]),
     ],
-    permissions: 'No special permissions required.',
-    inLanguage: ['en'],
+    permissions: isUk ? 'Спеціальні дозволи не потрібні.' : 'No special permissions required.',
+    inLanguage: [locale],
     publisher: {
       '@type': 'Organization',
       name: 'EditoraPDF',
@@ -199,20 +242,22 @@ export default function Home({ params }: { params: { locale: AppLocale } }) {
     ],
     softwareHelp: {
       '@type': 'CreativeWork',
-      name: 'Contact',
-      url: `${siteUrl}/contact`,
+      name: isUk ? 'Контакти' : 'Contact',
+      url: `${siteUrl}/${locale}/contact`,
     },
-    privacyPolicy: `${siteUrl}/privacy-policy`,
-    termsOfService: `${siteUrl}/terms`,
+    privacyPolicy: `${siteUrl}/${locale}/privacy-policy`,
+    termsOfService: `${siteUrl}/${locale}/terms`,
     audience: {
       '@type': 'Audience',
-      audienceType: ['Students', 'Professionals', 'Small Business', 'General Public'],
+      audienceType: isUk
+        ? ['Студенти', 'Професіонали', 'Малий бізнес', 'Широка аудиторія']
+        : ['Students', 'Professionals', 'Small Business', 'General Public'],
     },
     potentialAction: [
       {
         '@type': 'UseAction',
-        name: 'Edit a PDF',
-        target: siteUrl,
+        name: isUk ? 'Редагувати PDF' : 'Edit a PDF',
+        target: `${siteUrl}/${locale}`,
       },
     ],
   };
@@ -360,11 +405,11 @@ export default function Home({ params }: { params: { locale: AppLocale } }) {
                           <div className="flex items-center gap-2 mb-3">
                             <GripVertical size={16} strokeWidth={1.5} className="text-primary-400" />
                             <span className="text-xs font-semibold uppercase tracking-wider text-surface-400">{t('section.organize')}</span>
-                            <span className="text-[10px] text-surface-600 ml-auto">11 tools</span>
+                            <span className="text-[10px] text-surface-600 ml-auto">{t('home.count.organize')}</span>
                           </div>
                           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                             {tools.map((tool, i) => { const c = colorClasses[tool.color] || colorClasses.primary; return (
-                              <Link key={tool.title} href="/tools" className={`group flex flex-col items-center text-center p-3 rounded-xl border transition-all duration-200 hover:scale-[1.04] hover:shadow-lg active:scale-[0.97] ${c.bg} ${c.border} animate-fade-in-up`} style={{ animationDelay: `${300 + i * 50}ms` }}>
+                              <Link key={tool.title} href={withLocale('/tools')} className={`group flex flex-col items-center text-center p-3 rounded-xl border transition-all duration-200 hover:scale-[1.04] hover:shadow-lg active:scale-[0.97] ${c.bg} ${c.border} animate-fade-in-up`} style={{ animationDelay: `${300 + i * 50}ms` }}>
                                 <div className={`w-9 h-9 rounded-lg ${c.iconBg} flex items-center justify-center mb-2 ${c.text} transition-transform duration-200 group-hover:scale-110`}>{tool.icon}</div>
                                 <h3 className="text-xs font-semibold text-white mb-0.5">{tool.title}</h3>
                                 <p className="text-[10px] text-surface-500 hidden sm:block">{tool.desc}</p>
@@ -387,11 +432,11 @@ export default function Home({ params }: { params: { locale: AppLocale } }) {
                           <div className="flex items-center gap-2 mb-3">
                             <Shield size={16} strokeWidth={1.5} className="text-success-400" />
                             <span className="text-xs font-semibold uppercase tracking-wider text-surface-400">{t('section.security')}</span>
-                            <span className="text-[10px] text-surface-600 ml-auto">7 tools</span>
+                            <span className="text-[10px] text-surface-600 ml-auto">{t('home.count.security')}</span>
                           </div>
                           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                             {tools.map((tool, i) => { const c = colorClasses[tool.color] || colorClasses.primary; return (
-                              <Link key={tool.title} href="/edit?tab=tools" className={`group flex flex-col items-center text-center p-3 rounded-xl border transition-all duration-200 hover:scale-[1.04] hover:shadow-lg active:scale-[0.97] ${c.bg} ${c.border} animate-fade-in-up`} style={{ animationDelay: `${500 + i * 50}ms` }}>
+                              <Link key={tool.title} href={withLocale('/edit?tab=tools')} className={`group flex flex-col items-center text-center p-3 rounded-xl border transition-all duration-200 hover:scale-[1.04] hover:shadow-lg active:scale-[0.97] ${c.bg} ${c.border} animate-fade-in-up`} style={{ animationDelay: `${500 + i * 50}ms` }}>
                                 <div className={`w-9 h-9 rounded-lg ${c.iconBg} flex items-center justify-center mb-2 ${c.text} transition-transform duration-200 group-hover:scale-110`}>{tool.icon}</div>
                                 <h3 className="text-xs font-semibold text-white mb-0.5">{tool.title}</h3>
                                 <p className="text-[10px] text-surface-500 hidden sm:block">{tool.desc}</p>
@@ -417,11 +462,11 @@ export default function Home({ params }: { params: { locale: AppLocale } }) {
                           <div className="flex items-center gap-2 mb-3">
                             <ArrowRight size={16} strokeWidth={1.5} className="text-accent-400" />
                             <span className="text-xs font-semibold uppercase tracking-wider text-surface-400">{t('section.convert')}</span>
-                            <span className="text-[10px] text-surface-600 ml-auto">12 formats</span>
+                            <span className="text-[10px] text-surface-600 ml-auto">{t('home.count.convert')}</span>
                           </div>
                           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                             {tools.map((tool, i) => { const c = colorClasses[tool.color] || colorClasses.primary; return (
-                              <Link key={tool.title} href="/edit?tab=tools" className={`group flex flex-col items-center text-center p-3 rounded-xl border transition-all duration-200 hover:scale-[1.04] hover:shadow-lg active:scale-[0.97] ${c.bg} ${c.border} animate-fade-in-up`} style={{ animationDelay: `${650 + i * 50}ms` }}>
+                              <Link key={tool.title} href={withLocale('/edit?tab=tools')} className={`group flex flex-col items-center text-center p-3 rounded-xl border transition-all duration-200 hover:scale-[1.04] hover:shadow-lg active:scale-[0.97] ${c.bg} ${c.border} animate-fade-in-up`} style={{ animationDelay: `${650 + i * 50}ms` }}>
                                 <div className={`w-9 h-9 rounded-lg ${c.iconBg} flex items-center justify-center mb-2 ${c.text} transition-transform duration-200 group-hover:scale-110`}>{tool.icon}</div>
                                 <h3 className="text-xs font-semibold text-white mb-0.5">{tool.title}</h3>
                                 <p className="text-[10px] text-surface-500 hidden sm:block">{tool.desc}</p>
@@ -447,11 +492,11 @@ export default function Home({ params }: { params: { locale: AppLocale } }) {
                           <div className="flex items-center gap-2 mb-3">
                             <Sparkles size={16} strokeWidth={1.5} className="text-info-400" />
                             <span className="text-xs font-semibold uppercase tracking-wider text-surface-400">{t('section.edit')}</span>
-                            <span className="text-[10px] text-surface-600 ml-auto">25+ tools</span>
+                            <span className="text-[10px] text-surface-600 ml-auto">{t('home.count.edit')}</span>
                           </div>
                           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                             {tools.map((tool, i) => { const c = colorClasses[tool.color] || colorClasses.primary; return (
-                              <Link key={tool.title} href="/edit?tab=tools" className={`group flex flex-col items-center text-center p-3 rounded-xl border transition-all duration-200 hover:scale-[1.04] hover:shadow-lg active:scale-[0.97] ${c.bg} ${c.border} animate-fade-in-up`} style={{ animationDelay: `${800 + i * 50}ms` }}>
+                              <Link key={tool.title} href={withLocale('/edit?tab=tools')} className={`group flex flex-col items-center text-center p-3 rounded-xl border transition-all duration-200 hover:scale-[1.04] hover:shadow-lg active:scale-[0.97] ${c.bg} ${c.border} animate-fade-in-up`} style={{ animationDelay: `${800 + i * 50}ms` }}>
                                 <div className={`w-9 h-9 rounded-lg ${c.iconBg} flex items-center justify-center mb-2 ${c.text} transition-transform duration-200 group-hover:scale-110`}>{tool.icon}</div>
                                 <h3 className="text-xs font-semibold text-white mb-0.5">{tool.title}</h3>
                                 <p className="text-[10px] text-surface-500 hidden sm:block">{tool.desc}</p>
@@ -466,7 +511,7 @@ export default function Home({ params }: { params: { locale: AppLocale } }) {
                   {/* CTA */}
                   <div className="text-center">
                     <Link
-                      href="/tools"
+                      href={withLocale('/tools')}
                       className="btn-primary btn-md inline-flex"
                     >
                       {t('hero.exploreTools')}
@@ -597,7 +642,7 @@ export default function Home({ params }: { params: { locale: AppLocale } }) {
                     
                     {/* Tech Stack Pills */}
                     <div className="flex flex-wrap items-center gap-2 mt-5 justify-center md:justify-start">
-                      <span className="text-xs text-surface-400 font-medium">Built with:</span>
+                      <span className="text-xs text-surface-400 font-medium">{t('home.builtWith')}</span>
                       {['Next.js', 'TypeScript', 'React', 'PDF.js', 'pdf-lib', 'Zustand', 'Tailwind'].map((tech) => (
                         <span
                           key={tech}

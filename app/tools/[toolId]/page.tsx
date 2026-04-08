@@ -22,13 +22,13 @@ export default function ToolPage() {
         <Header />
         <div className="flex-1 flex items-center justify-center p-6">
           <div className="text-center max-w-2xl">
-            <h1 className="text-2xl md:text-3xl font-semibold text-white mb-3">Tool Not Found</h1>
+            <h1 className="text-2xl md:text-3xl font-semibold text-white mb-3">Інструмент не знайдено</h1>
             <p className="text-lg text-surface-400 mb-8">
-              The PDF tool you&apos;re looking for doesn&apos;t exist.
+              PDF-інструмент, який ви шукаєте, не існує.
             </p>
             <Link href={`/${locale}/tools`} className="btn-primary btn-lg">
               <ArrowLeft size={20} strokeWidth={2} />
-              Back to All Tools
+              Назад до всіх інструментів
             </Link>
           </div>
         </div>

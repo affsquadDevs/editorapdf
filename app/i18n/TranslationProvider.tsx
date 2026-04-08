@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useMemo } from 'react';
 import type { AppLocale } from '../../i18n/config';
 import { normalizeLocale, supportedLocales } from '../../i18n/config';
+import { getMessages } from './messages';
 
 type Messages = Record<string, string>;
 
@@ -44,12 +45,9 @@ export function useAppTranslations() {
 			const segs = window.location.pathname.split('/').filter(Boolean);
 			const first = segs[0];
 			const n = normalizeLocale(first);
-			if (supportedLocales.includes(n)) inferred = n;
+			if (first && supportedLocales.includes(n) && n === first) inferred = n;
 		}
-		// eslint-disable-next-line @typescript-eslint/no-var-requires
-		const messages = (inferred === 'uk'
-			? require('../../i18n/locales/uk.json')
-			: require('../../i18n/locales/en.json')) as Record<string, string>;
+		const messages = getMessages(inferred);
 		return {
 			locale: inferred,
 			messages,

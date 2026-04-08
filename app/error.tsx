@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import Link from 'next/link'
+import { useAppTranslations } from './i18n/TranslationProvider'
 
 export default function Error({
   error,
@@ -10,6 +11,9 @@ export default function Error({
   error: Error & { digest?: string }
   reset: () => void
 }) {
+  const { t } = useAppTranslations()
+  const tr = (key: string, fallback: string) => (t(key) === key ? fallback : t(key))
+
   useEffect(() => {
     // Log the error to an error reporting service
     console.error('Error:', error)
@@ -43,10 +47,10 @@ export default function Error({
           500
         </h1>
         <h2 className="text-2xl md:text-3xl font-semibold text-white mb-4 animate-fade-in-up delay-100">
-          Something went wrong!
+          {tr('error.title', 'Something went wrong!')}
         </h2>
         <p className="text-lg text-surface-400 mb-8 animate-fade-in-up delay-200">
-          {error?.message || 'An unexpected error occurred. Please try again.'}
+          {error?.message || tr('error.message', 'An unexpected error occurred. Please try again.')}
         </p>
 
         {/* Actions */}
@@ -69,7 +73,7 @@ export default function Error({
                 d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
               />
             </svg>
-            Try Again
+            {tr('error.tryAgain', 'Try Again')}
           </button>
           <Link
             href="/"
@@ -89,15 +93,15 @@ export default function Error({
                 d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
               />
             </svg>
-            Go Home
+            {tr('error.home', 'Go Home')}
           </Link>
         </div>
 
         {/* Help Text */}
         <p className="text-sm text-surface-500 mt-12 animate-fade-in delay-500">
-          Need help?{' '}
+          {tr('error.helpPrefix', 'Need help?')}{' '}
           <Link href="/contact" className="text-primary-400 hover:text-primary-300 underline">
-            Contact support
+            {tr('error.contact', 'Contact support')}
           </Link>
         </p>
       </div>

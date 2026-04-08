@@ -65,7 +65,7 @@ export default function FAQ() {
 
       {/* SEO Keywords (hidden) */}
       <div className="sr-only">
-        <h3>Popular searches:</h3>
+        <h3>{locale === 'uk' ? 'Популярні запити:' : 'Popular searches:'}</h3>
         <ul>
           {items.flatMap(faq => faq.keywords || []).map((keyword, i) => (
             <li key={i}>{keyword}</li>

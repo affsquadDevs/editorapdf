@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { usePdfStore } from '../store/pdfStore';
 import { loadPdfDocument, renderPageToDataUrl } from '../lib/pdf/pdfRender';
+import { useAppTranslations } from '../i18n/TranslationProvider';
 
 interface ThumbnailData {
   pageId: string;
@@ -10,6 +11,8 @@ interface ThumbnailData {
 }
 
 export default function Thumbnails() {
+  const { t } = useAppTranslations();
+  const tr = (key: string, fallback: string) => (t(key) === key ? fallback : t(key));
   const { pages, selectedPageId, setSelectedPageId, originalFile, reorderPages } = usePdfStore();
   const [thumbnails, setThumbnails] = useState<ThumbnailData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -135,7 +138,7 @@ export default function Thumbnails() {
         <button
           onClick={() => setIsCollapsed(false)}
           className="lg:hidden fixed top-24 left-2 z-40 bg-surface-800/90 backdrop-blur-sm border border-surface-700/50 rounded-lg p-2.5 shadow-lg hover:bg-surface-700/90 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
-          aria-label="Show pages"
+          aria-label={tr('editor.thumbnails.showPages', 'Show pages')}
         >
           <svg className="w-5 h-5 text-surface-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -159,7 +162,7 @@ export default function Thumbnails() {
             <svg className="w-4 h-4 text-surface-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
             </svg>
-            Pages
+            {tr('editor.thumbnails.pages', 'Pages')}
           </h2>
           <div className="flex items-center gap-2">
             <span className="badge-primary">{visiblePages.length}</span>
@@ -167,7 +170,7 @@ export default function Thumbnails() {
             <button
               onClick={() => setIsCollapsed(true)}
               className="lg:hidden p-1 rounded hover:bg-surface-700/50 transition-colors"
-              aria-label="Close pages sidebar"
+              aria-label={tr('editor.thumbnails.closeSidebar', 'Close pages sidebar')}
             >
               <svg className="w-4 h-4 text-surface-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -181,7 +184,7 @@ export default function Thumbnails() {
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-12 gap-3">
             <div className="spinner-lg text-primary-400" />
-            <p className="text-sm text-surface-400">Loading thumbnails...</p>
+            <p className="text-sm text-surface-400">{tr('editor.thumbnails.loading', 'Loading thumbnails...')}</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -216,7 +219,7 @@ export default function Thumbnails() {
                         : 'bg-surface-700/50 text-surface-400'
                       }
                     `}>
-                      Page {index + 1}
+                      {tr('editor.thumbnails.page', 'Page')} {index + 1}
                     </span>
                     
                     {/* Rotation Badge */}
@@ -235,7 +238,7 @@ export default function Thumbnails() {
                     {thumbnail ? (
                       <img
                         src={thumbnail.dataUrl}
-                        alt={`Page ${index + 1}`}
+                        alt={`${tr('editor.thumbnails.page', 'Page')} ${index + 1}`}
                         className="w-full"
                         draggable={false}
                       />
@@ -269,7 +272,7 @@ export default function Thumbnails() {
         {/* Footer Hint */}
         <div className="px-4 py-3 border-t border-surface-700/50">
           <p className="text-xs text-surface-500 text-center">
-            Drag to reorder pages
+            {tr('editor.thumbnails.reorderHint', 'Drag to reorder pages')}
           </p>
         </div>
       </div>

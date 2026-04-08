@@ -66,7 +66,7 @@ export default function RedactSelector({
         setPageImage(dataUrl);
       } catch (error) {
         console.error('Error loading/rendering PDF:', error);
-        setLoadError(error instanceof Error ? error.message : 'Failed to load PDF');
+        setLoadError(error instanceof Error ? error.message : tr('tools.view.redactSelector.failedLoadPdf', 'Failed to load PDF'));
         setPageImage(null);
         setPdfPageSize(null);
         setRenderScale(null);
@@ -291,17 +291,17 @@ export default function RedactSelector({
         <div className="flex items-center justify-between p-4 border-b border-surface-700/50 bg-surface-800/50">
           <div>
             <h3 className="text-lg font-semibold text-surface-200">
-              Redact PDF
+              {tr('tools.view.redactSelector.title', 'Redact PDF')}
             </h3>
             <p className="text-xs text-surface-400 mt-0.5">
-              Click and drag to select areas to redact (black out)
+              {tr('tools.view.redactSelector.subtitle', 'Click and drag to select areas to redact (black out)')}
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-surface-700/50 text-surface-400 hover:text-surface-200 transition-colors"
-            aria-label="Close"
+            aria-label={tr('tools.view.redactSelector.close', 'Close')}
           >
             <X size={20} strokeWidth={2} />
           </button>
@@ -316,10 +316,10 @@ export default function RedactSelector({
               disabled={currentPage === 1}
               className="px-4 py-2 rounded-lg bg-surface-700/30 hover:bg-surface-700/50 text-surface-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
             >
-              Previous
+              {tr('tools.view.redactSelector.previous', 'Previous')}
             </button>
             <span className="text-sm text-surface-300 font-medium">
-              Page {currentPage} of {totalPages} ({currentPageRedactions.length} redactions)
+              {tr('tools.view.redactSelector.page', 'Page')} {currentPage} {tr('tools.view.redactSelector.of', 'of')} {totalPages} ({currentPageRedactions.length} {tr('tools.view.redactSelector.redactions', 'redactions')})
             </span>
             <button
               type="button"
@@ -327,7 +327,7 @@ export default function RedactSelector({
               disabled={currentPage === totalPages}
               className="px-4 py-2 rounded-lg bg-surface-700/30 hover:bg-surface-700/50 text-surface-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
             >
-              Next
+              {tr('tools.view.redactSelector.next', 'Next')}
             </button>
           </div>
         )}
@@ -337,11 +337,11 @@ export default function RedactSelector({
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-20">
               <div className="w-8 h-8 border-3 border-error-500/30 border-t-error-500 rounded-full animate-spin mb-4" />
-              <p className="text-sm text-surface-400">Loading page...</p>
+              <p className="text-sm text-surface-400">{tr('tools.view.redactSelector.loadingPage', 'Loading page...')}</p>
             </div>
           ) : loadError ? (
             <div className="flex flex-col items-center justify-center py-20">
-              <p className="text-sm text-surface-400 mb-2">Failed to load PDF</p>
+              <p className="text-sm text-surface-400 mb-2">{tr('tools.view.redactSelector.failedLoadPdf', 'Failed to load PDF')}</p>
               <p className="text-xs text-surface-500">{loadError}</p>
             </div>
           ) : pageImage ? (
@@ -349,7 +349,7 @@ export default function RedactSelector({
               <img
                 ref={imageRef}
                 src={pageImage}
-                alt={`Page ${currentPage}`}
+                alt={`${tr('tools.view.redactSelector.page', 'Page')} ${currentPage}`}
                 className="max-w-full max-h-[calc(95vh-200px)] object-contain rounded-lg shadow-lg cursor-crosshair"
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
@@ -406,7 +406,7 @@ export default function RedactSelector({
                         handleDeleteRedaction(index);
                       }}
                       className="absolute -top-2 -right-2 w-6 h-6 bg-error-500 rounded-full flex items-center justify-center text-white hover:bg-error-600 transition-colors z-30"
-                      title="Delete redaction"
+                      title={tr('tools.view.redactSelector.deleteRedaction', 'Delete redaction')}
                     >
                       <X size={12} strokeWidth={2} />
                     </button>
@@ -416,7 +416,7 @@ export default function RedactSelector({
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-20">
-              <p className="text-sm text-surface-400">No PDF loaded</p>
+              <p className="text-sm text-surface-400">{tr('tools.view.redactSelector.noPdf', 'No PDF loaded')}</p>
             </div>
           )}
         </div>

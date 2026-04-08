@@ -1,6 +1,2 @@
-import { redirect } from 'next/navigation'
-
-export default function EditLocaleRedirect() {
-	redirect('/edit')
-}
+export { default } from '../../edit/page';
 

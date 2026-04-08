@@ -13,6 +13,7 @@ import EditToolbar from '../components/EditToolbar';
 import ConfirmDialog from '../components/ConfirmDialog';
 import Header from '../components/Header';
 import ToolsPanel from '../components/ToolsPanel';
+import { useAppTranslations } from '../i18n/TranslationProvider';
 
 // Dynamic imports for PDF components - only load when needed
 const Thumbnails = dynamic(() => import('../components/Thumbnails'), {
@@ -20,18 +21,25 @@ const Thumbnails = dynamic(() => import('../components/Thumbnails'), {
   loading: () => <div className="w-64 bg-surface-800/50 animate-pulse" />,
 });
 
-const PdfViewer = dynamic(() => import('../components/PdfViewer'), {
-  ssr: false,
-  loading: () => (
+function PdfViewerLoading() {
+  const { t } = useAppTranslations();
+  const tr = (key: string, fallback: string) => (t(key) === key ? fallback : t(key));
+
+  return (
     <div className="flex-1 flex items-center justify-center bg-surface-900/30">
       <div className="text-center">
         <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-surface-800 flex items-center justify-center animate-pulse">
           <FileText size={32} strokeWidth={1.5} className="text-surface-500" />
         </div>
-        <p className="text-surface-400">Loading PDF viewer...</p>
+        <p className="text-surface-400">{tr('edit.loadingViewer', 'Loading PDF viewer...')}</p>
       </div>
     </div>
-  ),
+  );
+}
+
+const PdfViewer = dynamic(() => import('../components/PdfViewer'), {
+  ssr: false,
+  loading: () => <PdfViewerLoading />,
 });
 
 const ExportButton = dynamic(() => import('../components/ExportButton'), {
@@ -43,6 +51,8 @@ const siteUrl = 'https://editorapdf.com';
 type ActiveTab = 'editor' | 'tools';
 
 export default function EditPage() {
+  const { t } = useAppTranslations();
+  const tr = (key: string, fallback: string) => (t(key) === key ? fallback : t(key));
   const { pages, reset } = usePdfStore();
   const hasPages = pages.length > 0;
   const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
@@ -71,7 +81,7 @@ export default function EditPage() {
         <Header 
           showCloseButton={hasPages}
           onClose={() => setConfirmCloseOpen(true)}
-          closeButtonLabel="Close PDF"
+          closeButtonLabel={tr('edit.closePdf', 'Close PDF')}
         />
 
         {/* Main Content */}
@@ -94,7 +104,7 @@ export default function EditPage() {
                   >
                     <div className="flex items-center gap-2">
                       <PenSquare size={16} strokeWidth={2} />
-                      Edit PDF
+                      {tr('cta.edit', 'Edit PDF')}
                     </div>
                     {activeTab === 'editor' && (
                       <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500 rounded-full" />
@@ -112,9 +122,9 @@ export default function EditPage() {
                   >
                     <div className="flex items-center gap-2">
                       <Wrench size={16} strokeWidth={2} />
-                      PDF Tools
+                      {tr('nav.tools', 'PDF Tools')}
                       <span className="px-1.5 py-0.5 rounded-full bg-primary-500/15 text-primary-400 text-[10px] font-bold uppercase tracking-wider">
-                        New
+                        {tr('common.new', 'New')}
                       </span>
                     </div>
                     {activeTab === 'tools' && (
@@ -130,12 +140,12 @@ export default function EditPage() {
               <div className="max-w-5xl w-full">
                 {activeTab === 'editor' ? (
                   /* Upload Area */
-                  <div className="mb-16 animate-fade-in-up delay-100" role="region" aria-label="PDF Upload">
+                  <div className="mb-16 animate-fade-in-up delay-100" role="region" aria-label={tr('edit.uploadRegion', 'PDF Upload')}>
                     <UploadArea />
                   </div>
                 ) : (
                   /* PDF Tools Panel */
-                  <div className="mb-16" role="region" aria-label="PDF Tools">
+                  <div className="mb-16" role="region" aria-label={tr('edit.toolsRegion', 'PDF Tools')}>
                     <ToolsPanel />
                   </div>
                 )}
@@ -159,10 +169,10 @@ export default function EditPage() {
 
         <ConfirmDialog
           isOpen={confirmCloseOpen}
-          title="Close current PDF?"
-          message="All unsaved changes will be lost. Make sure to export your document first."
-          confirmText="Close Document"
-          cancelText="Keep Editing"
+          title={tr('edit.confirmClose.title', 'Close current PDF?')}
+          message={tr('edit.confirmClose.message', 'All unsaved changes will be lost. Make sure to export your document first.')}
+          confirmText={tr('edit.confirmClose.confirm', 'Close Document')}
+          cancelText={tr('edit.confirmClose.cancel', 'Keep Editing')}
           type="warning"
           onCancel={() => setConfirmCloseOpen(false)}
           onConfirm={() => {

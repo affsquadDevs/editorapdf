@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { loadPdfDocument, renderPageToDataUrl } from '../lib/pdf/pdfRender';
 import { X } from 'lucide-react';
+import { useAppTranslations } from '../i18n/TranslationProvider';
 
 interface SignaturePositionSelectorProps {
   isOpen: boolean;
@@ -21,6 +22,8 @@ export default function SignaturePositionSelector({
   signatureType,
   onPositionSelected,
 }: SignaturePositionSelectorProps) {
+  const { t } = useAppTranslations();
+  const tr = (key: string, fallback: string) => (t(key) === key ? fallback : t(key));
   const imageRef = useRef<HTMLImageElement>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(0);
@@ -106,7 +109,7 @@ export default function SignaturePositionSelector({
         setBoxSizePx(null);
       } catch (error) {
         console.error('Error loading/rendering PDF:', error);
-        setLoadError(error instanceof Error ? error.message : 'Failed to load PDF');
+        setLoadError(error instanceof Error ? error.message : tr('tools.sign.positionSelector.failed', 'Failed to load PDF'));
         setPageImage(null);
         setPdfPageSize(null);
         setRenderScale(null);
@@ -374,17 +377,17 @@ export default function SignaturePositionSelector({
         <div className="flex items-center justify-between p-4 border-b border-surface-700/50 bg-surface-800/50">
           <div>
             <h3 className="text-lg font-semibold text-surface-200">
-              Select Signature Position
+              {tr('tools.sign.positionSelector.title', 'Select Signature Position')}
             </h3>
             <p className="text-xs text-surface-400 mt-0.5">
-              Click on the page to place your signature, or drag to move it
+              {tr('tools.sign.positionSelector.subtitle', 'Click on the page to place your signature, or drag to move it')}
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
             className="p-2 rounded-lg hover:bg-surface-700/50 text-surface-400 hover:text-surface-200 transition-colors"
-            aria-label="Close"
+            aria-label={tr('tools.sign.positionSelector.close', 'Close')}
           >
             <X size={20} strokeWidth={2} />
           </button>
@@ -399,10 +402,10 @@ export default function SignaturePositionSelector({
               disabled={currentPage === 1}
               className="px-4 py-2 rounded-lg bg-surface-700/30 hover:bg-surface-700/50 text-surface-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
             >
-              Previous
+              {tr('tools.sign.positionSelector.previous', 'Previous')}
             </button>
             <span className="text-sm text-surface-300 font-medium">
-              Page {currentPage} of {totalPages}
+              {tr('tools.sign.positionSelector.page', 'Page')} {currentPage} {tr('tools.sign.positionSelector.of', 'of')} {totalPages}
             </span>
             <button
               type="button"
@@ -410,7 +413,7 @@ export default function SignaturePositionSelector({
               disabled={currentPage === totalPages}
               className="px-4 py-2 rounded-lg bg-surface-700/30 hover:bg-surface-700/50 text-surface-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
             >
-              Next
+              {tr('tools.sign.positionSelector.next', 'Next')}
             </button>
           </div>
         )}
@@ -420,11 +423,11 @@ export default function SignaturePositionSelector({
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-20">
               <div className="w-8 h-8 border-3 border-primary-500/30 border-t-primary-500 rounded-full animate-spin mb-4" />
-              <p className="text-sm text-surface-400">Loading page...</p>
+              <p className="text-sm text-surface-400">{tr('tools.sign.positionSelector.loading', 'Loading page...')}</p>
             </div>
           ) : loadError ? (
             <div className="flex flex-col items-center justify-center py-20">
-              <p className="text-sm text-surface-400 mb-2">Failed to load PDF</p>
+              <p className="text-sm text-surface-400 mb-2">{tr('tools.sign.positionSelector.failed', 'Failed to load PDF')}</p>
               <p className="text-xs text-surface-500">{loadError}</p>
             </div>
           ) : pageImage ? (
@@ -432,7 +435,7 @@ export default function SignaturePositionSelector({
               <img
                 ref={imageRef}
                 src={pageImage}
-                alt={`Page ${currentPage}`}
+                alt={`${tr('tools.sign.positionSelector.page', 'Page')} ${currentPage}`}
                 className="max-w-full max-h-[calc(95vh-200px)] object-contain rounded-lg shadow-lg cursor-crosshair"
                 onClick={handleImageClick}
                 onMouseDown={handleMouseDown}
@@ -489,7 +492,7 @@ export default function SignaturePositionSelector({
                   >
                     <img
                       src={signaturePreview}
-                      alt="Signature preview"
+                      alt={tr('tools.sign.positionSelector.previewAlt', 'Signature preview')}
                       className="opacity-80"
                       style={{
                         width: '100%',
@@ -650,7 +653,7 @@ export default function SignaturePositionSelector({
                             borderRadius: '3px',
                             ...styles[h],
                           }}
-                          title="Drag to resize"
+                          title={tr('tools.sign.positionSelector.resize', 'Drag to resize')}
                         />
                       );
                     })}
@@ -661,7 +664,7 @@ export default function SignaturePositionSelector({
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-20">
-              <p className="text-sm text-surface-400">No PDF loaded</p>
+              <p className="text-sm text-surface-400">{tr('tools.sign.positionSelector.noPdf', 'No PDF loaded')}</p>
             </div>
           )}
         </div>
@@ -670,8 +673,8 @@ export default function SignaturePositionSelector({
         <div className="flex items-center justify-between p-4 border-t border-surface-700/50 bg-surface-800/50">
           <p className="text-xs text-surface-400">
             {signaturePos 
-              ? 'Click "Confirm Position" to place signature here'
-              : 'Click on the page to place your signature'}
+              ? tr('tools.sign.positionSelector.confirmHint', 'Click "Confirm Position" to place signature here')
+              : tr('tools.sign.positionSelector.clickToPlace', 'Click on the page to place your signature')}
           </p>
           <div className="flex gap-3">
             <button
@@ -679,7 +682,7 @@ export default function SignaturePositionSelector({
               onClick={onClose}
               className="px-4 py-2 rounded-lg bg-surface-700/30 hover:bg-surface-700/50 text-surface-300 transition-colors text-sm font-medium"
             >
-              Cancel
+              {tr('tools.sign.positionSelector.cancel', 'Cancel')}
             </button>
             <button
               type="button"
@@ -687,7 +690,7 @@ export default function SignaturePositionSelector({
               disabled={!signaturePos}
               className="px-4 py-2 rounded-lg bg-primary-500 hover:bg-primary-600 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
             >
-              Confirm Position
+              {tr('tools.sign.positionSelector.confirm', 'Confirm Position')}
             </button>
           </div>
         </div>
