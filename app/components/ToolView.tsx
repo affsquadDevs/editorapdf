@@ -3530,7 +3530,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <p className="text-sm font-medium text-surface-200">Водяні знаки</p>
+                      <p className="text-sm font-medium text-surface-200">{tr('tools.watermark.header', 'Watermarks')}</p>
                       {watermarks.length > 0 && (
                         <button
                           onClick={() => {
@@ -3641,7 +3641,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                               <div className="space-y-3 mt-3 pt-3 border-t border-surface-700/50">
                                 {/* Type selector */}
                                 <div>
-                                  <p className="text-xs font-medium text-surface-300 mb-2">Тип</p>
+                                  <p className="text-xs font-medium text-surface-300 mb-2">{tr('tools.watermark.type', 'Type')}</p>
                                   <div className="flex gap-2">
                                     <button
                                       onClick={() => {
@@ -3678,7 +3678,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                                 {watermark.type === 'text' && (
                                   <>
                                     <div>
-                                      <p className="text-xs font-medium text-surface-300 mb-2">Текст</p>
+                                      <p className="text-xs font-medium text-surface-300 mb-2">{tr('tools.watermark.textLabel', 'Text')}</p>
                                       <input
                                         type="text"
                                         value={watermark.text || ''}
@@ -3714,7 +3714,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                                 {/* Image watermark options */}
                                 {watermark.type === 'image' && (
                                   <div>
-                                    <p className="text-xs font-medium text-surface-300 mb-2">Зображення</p>
+                                    <p className="text-xs font-medium text-surface-300 mb-2">{tr('tools.watermark.imageLabel', 'Image')}</p>
                                     <input
                                       type="file"
                                       accept="image/png,image/jpeg,image/jpg"
@@ -3766,7 +3766,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
 
                                 {/* Position selector */}
                                 <div>
-                                  <p className="text-xs font-medium text-surface-300 mb-2">Позиція</p>
+                                  <p className="text-xs font-medium text-surface-300 mb-2">{tr('tools.watermark.position', 'Position')}</p>
                                   <div className="grid grid-cols-3 gap-2">
                                     {['center', 'top-left', 'top-right', 'bottom-left', 'bottom-right', 'diagonal'].map((pos) => (
                                       <button
@@ -3866,7 +3866,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {tool.id === 'page-numbers' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
                   <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">Позиція</p>
+                    <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.pageNumbers.position', 'Position')}</p>
                     <div className="grid grid-cols-3 gap-2">
                       {['Top Left', 'Top Center', 'Top Right', 'Bottom Left', 'Bottom Center', 'Bottom Right'].map((pos) => (
                         <button
@@ -3879,7 +3879,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">Почати з</p>
+                    <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.pageNumbers.startFrom', 'Start from')}</p>
                     <input
                       type="number"
                       defaultValue={1}
@@ -3893,7 +3893,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {/* Stamp options */}
               {tool.id === 'stamp' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
-                  <p className="text-sm font-medium text-surface-200 mb-2">Тип штампа</p>
+                  <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.stamp.type', 'Stamp type')}</p>
                   <div className="flex flex-wrap gap-2">
                     {['APPROVED', 'DRAFT', 'CONFIDENTIAL', 'FINAL', 'COPY', 'VOID', 'RECEIVED', 'Custom...'].map((s) => (
                       <button
@@ -3910,7 +3910,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {/* Resize / page size */}
               {tool.id === 'resize' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50">
-                  <p className="text-sm font-medium text-surface-200 mb-3">Цільовий розмір сторінки</p>
+                  <p className="text-sm font-medium text-surface-200 mb-3">{tr('tools.resize.targetSize', 'Target page size')}</p>
                   <div className="flex flex-wrap gap-2">
                     {['A4', 'A3', 'A5', 'Letter', 'Legal', 'Tabloid', 'Custom'].map((size) => (
                       <button
@@ -3943,7 +3943,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {/* Flatten options */}
               {tool.id === 'flatten' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-3">
-                  <p className="text-sm font-medium text-surface-200 mb-3">Що об’єднати у шар</p>
+                  <p className="text-sm font-medium text-surface-200 mb-3">{tr('tools.flatten.what', 'What to flatten')}</p>
                   {['Form Fields', 'Annotations', 'Comments', 'All Layers'].map((opt) => (
                     <label key={opt} className="flex items-center gap-3 cursor-pointer group">
                       <input type="checkbox" defaultChecked={opt === 'All Layers'} className="w-4 h-4 rounded border-surface-600 bg-surface-800 text-primary-500 focus:ring-primary-500/25" />
@@ -4518,7 +4518,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {/* Invert colors */}
               {tool.id === 'invert-colors' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-3">
-                  <p className="text-sm font-medium text-surface-200 mb-3">Режим інверсії</p>
+                  <p className="text-sm font-medium text-surface-200 mb-3">{tr('tools.invert.mode', 'Inversion mode')}</p>
                   <div className="flex gap-2">
                     {['Full Invert', 'Dark Mode (Smart)', 'Sepia'].map((m) => (
                       <button key={m} className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${m === 'Dark Mode (Smart)' ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300' : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'}`}>{m}</button>
@@ -4530,7 +4530,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {/* Remove annotations options */}
               {tool.id === 'remove-annotations' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-3">
-                  <p className="text-sm font-medium text-surface-200 mb-3">Анотації для видалення</p>
+                  <p className="text-sm font-medium text-surface-200 mb-3">{tr('tools.removeAnnotations.title', 'Annotations to remove')}</p>
                   {['Highlights', 'Sticky Notes', 'Text Comments', 'Drawing Markups', 'Stamps', 'Ink (Freehand)', 'All Annotations'].map((a) => (
                     <label key={a} className="flex items-center gap-3 cursor-pointer group">
                       <input type="checkbox" defaultChecked={a === 'All Annotations'} className="w-4 h-4 rounded border-surface-600 bg-surface-800 text-primary-500 focus:ring-primary-500/25" />
@@ -4543,7 +4543,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {/* Crop page options */}
               {tool.id === 'crop' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
-                  <p className="text-sm font-medium text-surface-200 mb-2">Обрізати поля (мм)</p>
+                  <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.crop.margins', 'Crop margins (mm)')}</p>
                   <div className="grid grid-cols-2 gap-3">
                     {['Top', 'Bottom', 'Left', 'Right'].map((side) => (
                       <div key={side}>
@@ -4554,7 +4554,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                   </div>
                   <label className="flex items-center gap-3 cursor-pointer group">
                     <input type="checkbox" defaultChecked className="w-4 h-4 rounded border-surface-600 bg-surface-800 text-primary-500 focus:ring-primary-500/25" />
-                    <span className="text-sm text-surface-300 group-hover:text-surface-100 transition-colors">Застосувати до всіх сторінок</span>
+                    <span className="text-sm text-surface-300 group-hover:text-surface-100 transition-colors">{tr('tools.crop.applyAll', 'Apply to all pages')}</span>
                   </label>
                 </div>
               )}
@@ -4562,7 +4562,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {/* Extract images format */}
               {tool.id === 'extract-images' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50">
-                  <p className="text-sm font-medium text-surface-200 mb-3">Формат виходу</p>
+                  <p className="text-sm font-medium text-surface-200 mb-3">{tr('tools.extractImages.format', 'Output format')}</p>
                   <div className="flex gap-2">
                     {['Original', 'PNG', 'JPEG'].map((f) => (
                       <button key={f} className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${f === 'Original' ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300' : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'}`}>{f}</button>
@@ -4575,7 +4575,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {tool.id === 'optimize-images' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
                   <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">Цільова якість</p>
+                    <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.optimizeImages.targetQuality', 'Target quality')}</p>
                     <div className="flex gap-2">
                       {['Screen (72 DPI)', 'eBook (150 DPI)', 'Print (300 DPI)'].map((q) => (
                         <button key={q} className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-all ${q.includes('150') ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300' : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'}`}>{q}</button>
@@ -4583,9 +4583,9 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">Якість зображення</p>
+                    <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.optimizeImages.imageQuality', 'Image quality')}</p>
                     <input type="range" min="10" max="100" defaultValue="75" className="w-full" />
-                    <div className="flex justify-between text-xs text-surface-500 mt-1"><span>Низька (менший розмір)</span><span>Висока (більший розмір)</span></div>
+                    <div className="flex justify-between text-xs text-surface-500 mt-1"><span>{tr('tools.optimizeImages.qualityLow', 'Low (smaller size)')}</span><span>{tr('tools.optimizeImages.qualityHigh', 'High (larger size)')}</span></div>
                   </div>
                 </div>
               )}
@@ -4594,21 +4594,21 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {tool.id === 'add-qr-code' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
                   <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">Вміст QR</p>
+                    <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.qrCode.content', 'QR content')}</p>
                     <input type="text" placeholder="https://example.com or any text" className="w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all" />
                   </div>
                   <div className="flex gap-4">
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-surface-200 mb-2">Розмір (мм)</p>
+                      <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.qrCode.size', 'Size (mm)')}</p>
                       <input type="number" defaultValue={30} min={10} max={100} className="w-full px-3 py-2 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-surface-200 mb-2">Сторінка</p>
+                      <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.qrCode.page', 'Page')}</p>
                       <input type="text" placeholder="All or 1,3-5" className="w-full px-3 py-2 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all" />
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">Позиція</p>
+                    <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.qrCode.position', 'Position')}</p>
                     <div className="grid grid-cols-3 gap-2">
                       {['Top Left', 'Top Center', 'Top Right', 'Center Left', 'Center', 'Center Right', 'Bottom Left', 'Bottom Center', 'Bottom Right'].map((pos) => (
                         <button key={pos} className={`px-2 py-2 rounded-lg text-xs font-medium transition-all ${pos === 'Bottom Right' ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300' : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'}`}>{pos}</button>
@@ -4622,7 +4622,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {tool.id === 'add-barcode' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
                   <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">Тип штрихкоду</p>
+                    <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.barcode.type', 'Barcode type')}</p>
                     <div className="flex flex-wrap gap-2">
                       {['Code 128', 'Code 39', 'EAN-13', 'UPC-A', 'QR Code', 'DataMatrix'].map((t) => (
                         <button key={t} className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${t === 'Code 128' ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300' : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'}`}>{t}</button>
@@ -4630,7 +4630,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">Дані штрихкоду</p>
+                    <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.barcode.data', 'Barcode data')}</p>
                     <input type="text" placeholder="Enter barcode data..." className="w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all" />
                   </div>
                 </div>
@@ -4639,12 +4639,12 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {/* Bookmark editor */}
               {tool.id === 'add-bookmarks' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
-                  <p className="text-sm font-medium text-surface-200 mb-2">Додати закладки</p>
+                  <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.bookmarks.add', 'Add bookmarks')}</p>
                   <div className="space-y-2">
                     {['Chapter 1', 'Chapter 2', 'Chapter 3'].map((ch, i) => (
                       <div key={ch} className="flex items-center gap-2">
                         <input type="text" defaultValue={ch} className="flex-1 px-3 py-2 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all" />
-                        <span className="text-xs text-surface-500">→ Сторінка</span>
+                        <span className="text-xs text-surface-500">{tr('tools.bookmarks.page', '→ Page')}</span>
                         <input type="number" defaultValue={i * 5 + 1} min={1} className="w-16 px-2 py-2 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 text-sm text-center focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all" />
                       </div>
                     ))}
@@ -4659,9 +4659,9 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {/* Hyperlink options */}
               {tool.id === 'add-hyperlinks' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
-                  <p className="text-sm font-medium text-surface-200 mb-2">Додати гіперпосилання</p>
+                  <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.hyperlinks.add', 'Add hyperlinks')}</p>
                   <div>
-                    <p className="text-xs text-surface-400 mb-1">Текст посилання / область</p>
+                    <p className="text-xs text-surface-400 mb-1">{tr('tools.hyperlinks.linkText', 'Link text / area')}</p>
                     <input type="text" placeholder="Text to make clickable..." className="w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all" />
                   </div>
                   <div>
@@ -4676,34 +4676,34 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
                   <div className="flex gap-3">
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-surface-200 mb-2">Префікс</p>
+                      <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.batesNumbering.prefix', 'Prefix')}</p>
                       <input type="text" placeholder="e.g. DOC-" className="w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-surface-200 mb-2">Початковий номер</p>
+                      <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.batesNumbering.startNumber', 'Starting number')}</p>
                       <input type="number" defaultValue={1} min={1} className="w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-surface-200 mb-2">Суфікс</p>
+                      <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.batesNumbering.suffix', 'Suffix')}</p>
                       <input type="text" placeholder="(optional)" className="w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all" />
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">Кількість цифр</p>
+                    <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.batesNumbering.digits', 'Number of digits')}</p>
                     <div className="flex gap-2">
                       {['4', '5', '6', '8'].map((d) => (
                         <button key={d} className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${d === '6' ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300' : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'}`}>{d} digits</button>
                       ))}
                     </div>
                   </div>
-                  <p className="text-xs text-surface-500">Попередній перегляд: DOC-000001</p>
+                  <p className="text-xs text-surface-500">{tr('tools.batesNumbering.preview', 'Preview: DOC-000001')}</p>
                 </div>
               )}
 
               {/* Color space conversion */}
               {tool.id === 'color-space' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
-                  <p className="text-sm font-medium text-surface-200 mb-2">Конвертувати з → у</p>
+                  <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.colorSpace.convert', 'Convert from → to')}</p>
                   <div className="flex items-center gap-3">
                     <div className="flex-1 flex gap-2">
                       {['RGB → CMYK', 'CMYK → RGB'].map((conv) => (
@@ -4711,14 +4711,14 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                       ))}
                     </div>
                   </div>
-                  <p className="text-xs text-surface-500">CMYK потрібен для професійного друку. RGB — стандарт для вебу.</p>
+                  <p className="text-xs text-surface-500">{tr('tools.colorSpace.note', 'CMYK is required for professional printing. RGB is the standard for the web.')}</p>
                 </div>
               )}
 
               {/* PDF statistics info */}
               {tool.id === 'pdf-statistics' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50">
-                  <p className="text-sm font-medium text-surface-200 mb-3">Статистика для збору</p>
+                  <p className="text-sm font-medium text-surface-200 mb-3">{tr('tools.pdfStatistics.title', 'Statistics to collect')}</p>
                   <div className="grid grid-cols-2 gap-2">
                     {['Page Count', 'Word Count', 'Character Count', 'Image Count', 'Font List', 'File Size Breakdown', 'Color Profile', 'PDF Version'].map((stat) => (
                       <div key={stat} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-surface-700/20 border border-surface-700/30">
@@ -4736,8 +4736,8 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
                   <div className="flex items-start gap-3">
                     <Zap size={20} strokeWidth={2} className="text-success-400 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="text-sm font-medium text-surface-200">Швидкий веб-перегляд</p>
-                      <p className="text-xs text-surface-400 mt-1">Лінеаризація перебудовує PDF так, щоб він починав відображатися в браузері ще до повного завантаження файлу. Це ідеально для PDF, які відкриваються через інтернет.</p>
+                      <p className="text-sm font-medium text-surface-200">{tr('tools.linearize.title', 'Fast web view')}</p>
+                      <p className="text-xs text-surface-400 mt-1">{tr('tools.linearize.description', 'Linearization restructures the PDF so it starts displaying in the browser before the full file is loaded. This is ideal for PDFs opened over the internet.')}</p>
                     </div>
                   </div>
                 </div>
@@ -4746,33 +4746,33 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {/* PDF/A conformance */}
               {tool.id === 'pdfa' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50">
-                  <p className="text-sm font-medium text-surface-200 mb-3">Рівень відповідності PDF/A</p>
+                  <p className="text-sm font-medium text-surface-200 mb-3">{tr('tools.pdfA.level', 'PDF/A compliance level')}</p>
                   <div className="flex flex-wrap gap-2">
                     {['PDF/A-1b', 'PDF/A-1a', 'PDF/A-2b', 'PDF/A-2a', 'PDF/A-3b'].map((l) => (
                       <button key={l} className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${l === 'PDF/A-2b' ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300' : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'}`}>{l}</button>
                     ))}
                   </div>
-                  <p className="text-xs text-surface-500 mt-3">PDF/A-2b — найпоширеніший для архівування. PDF/A-3b підтримує вбудовані файли.</p>
+                  <p className="text-xs text-surface-500 mt-3">{tr('tools.pdfA.note', 'PDF/A-2b is the most common for archiving. PDF/A-3b supports embedded files.')}</p>
                 </div>
               )}
 
               {/* PDF/X profile */}
               {tool.id === 'pdfx' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50">
-                  <p className="text-sm font-medium text-surface-200 mb-3">Профіль PDF/X</p>
+                  <p className="text-sm font-medium text-surface-200 mb-3">{tr('tools.pdfX.profile', 'PDF/X profile')}</p>
                   <div className="flex flex-wrap gap-2">
                     {['PDF/X-1a', 'PDF/X-3', 'PDF/X-4'].map((p) => (
                       <button key={p} className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${p === 'PDF/X-4' ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300' : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'}`}>{p}</button>
                     ))}
                   </div>
-                  <p className="text-xs text-surface-500 mt-3">PDF/X-4 рекомендований для сучасних друкарських процесів. PDF/X-1a — для сумісності зі старими системами.</p>
+                  <p className="text-xs text-surface-500 mt-3">{tr('tools.pdfX.note', 'PDF/X-4 is recommended for modern print workflows. PDF/X-1a is for compatibility with older systems.')}</p>
                 </div>
               )}
 
               {/* Grayscale mode */}
               {tool.id === 'grayscale' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50">
-                  <p className="text-sm font-medium text-surface-200 mb-3">Метод відтінків сірого</p>
+                  <p className="text-sm font-medium text-surface-200 mb-3">{tr('tools.grayscale.method', 'Grayscale method')}</p>
                   <div className="flex gap-2">
                     {['Luminosity', 'Average', 'Desaturation'].map((m) => (
                       <button key={m} className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${m === 'Luminosity' ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300' : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'}`}>{m}</button>
@@ -4784,7 +4784,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {/* Fill & Sign */}
               {tool.id === 'fill-sign' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
-                  <p className="text-sm font-medium text-surface-200 mb-2">Підпис</p>
+                  <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.fillSign.signature', 'Signature')}</p>
                   <div className="flex gap-2 mb-3">
                     {['Draw', 'Type', 'Upload Image'].map((type) => (
                       <button key={type} className={`flex-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${type === 'Draw' ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300' : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'}`}>{type}</button>
@@ -4799,7 +4799,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {/* Validate profile */}
               {tool.id === 'validate' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50">
-                  <p className="text-sm font-medium text-surface-200 mb-3">Профіль валідації</p>
+                  <p className="text-sm font-medium text-surface-200 mb-3">{tr('tools.validate.profile', 'Validation profile')}</p>
                   <div className="flex flex-wrap gap-2">
                     {['PDF Structure', 'PDF/A-1b', 'PDF/A-2b', 'PDF/X-4', 'WCAG 2.1'].map((p) => (
                       <button key={p} className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${p === 'PDF Structure' ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300' : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'}`}>{p}</button>
