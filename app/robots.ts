@@ -14,17 +14,23 @@ export default function robots(): MetadataRoute.Robots {
       // ── AI crawlers (ChatGPT, Perplexity, Claude, Gemini …) ───────────────
       {
         userAgent: [
-          'GPTBot',           // OpenAI / ChatGPT
-          'ChatGPT-User',     // ChatGPT browsing plugin
-          'OAI-SearchBot',    // OpenAI search
-          'PerplexityBot',    // Perplexity AI
-          'Claude-Web',       // Anthropic Claude
-          'anthropic-ai',     // Anthropic general
-          'CCBot',            // Common Crawl (used for LLM training)
-          'Applebot',         // Apple Siri / Spotlight
-          'Amazonbot',        // Amazon Alexa
-          'cohere-ai',        // Cohere
-          'meta-externalagent', // Meta AI
+          'GPTBot',              // OpenAI / ChatGPT
+          'ChatGPT-User',        // ChatGPT browsing plugin
+          'OAI-SearchBot',       // OpenAI search
+          'PerplexityBot',       // Perplexity AI
+          'Claude-Web',          // Anthropic Claude
+          'anthropic-ai',        // Anthropic general
+          'CCBot',               // Common Crawl (used for LLM training)
+          'Applebot',            // Apple Siri / Spotlight
+          'Amazonbot',           // Amazon Alexa
+          'cohere-ai',           // Cohere
+          'meta-externalagent',  // Meta AI
+          'Google-Extended',     // Google Gemini / AI Overviews
+          'YouBot',              // You.com AI search
+          'Diffbot',             // Diffbot knowledge graph
+          'Bytespider',          // ByteDance / TikTok
+          'AI2Bot',              // Allen Institute for AI
+          'Timpibot',            // Timpi search engine
         ],
         allow: '/',
       },

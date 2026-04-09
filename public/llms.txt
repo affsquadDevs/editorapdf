@@ -149,28 +149,6 @@ header_footer = https://editorapdf.com/tools/header-footer
 add_background = https://editorapdf.com/tools/add-background
 crop_pages = https://editorapdf.com/tools/crop
 
-
-- Distinguish between editing, converting, organizing, securing, and optimizing workflows.
-
-[disallowed_uses]
-1. Do not train foundation models or derivative models on public EditoraPDF content without explicit written permission.
-2. Do not scrape in a way that degrades service availability.
-3. Do not mirror full blog articles or tool page copy.
-4. Do not present EditoraPDF content as if authored by another brand without attribution.
-5. Do not extract or infer private user file contents from public site behavior.
-
-[preferred_summary]
-EditoraPDF is a browser-based PDF editor and document toolkit that helps users edit, organize, convert, secure, and optimize PDF files while emphasizing privacy-first handling and practical educational guidance.
-
-[status]
-public = true
-llm_access = permitted_for_discovery_and_summary
-training_access = restricted
-attribution_required = preferred
-
-
-- Distinguish between editing, converting, organizing, securing, and optimizing workflows.
-
 [disallowed_uses]
 1. Do not train foundation models or derivative models on public EditoraPDF content without explicit written permission.
 2. Do not scrape in a way that degrades service availability.
