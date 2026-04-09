@@ -1,168 +1,113 @@
-# EditoraPDF - llms.txt
-# Canonical host: https://editorapdf.com
-# Last updated: 2026-02-01
+# EditoraPDF
 
-[site]
-name = EditoraPDF
-url = https://editorapdf.com
-description = Privacy-first online PDF editor and PDF toolkit for editing, organizing, converting, securing, and optimizing PDF documents directly in the browser.
-language = en
-type = web_application
-owner = EditoraPDF
-contact = https://editorapdf.com/contact
+> Privacy-first online PDF editor and toolkit. Edit, organize, convert, secure, and optimize PDF documents directly in your browser — no installation, no account required. All file processing happens locally on your device.
 
-[brand]
-product_name = EditoraPDF
-tagline = Privacy-first online PDF editing and conversion tools
-summary = EditoraPDF provides browser-based tools for editing PDFs, organizing pages, converting PDF files to and from other formats, securing documents, and optimizing PDFs for sharing, publishing, and storage.
+EditoraPDF is a free, open-source web application for working with PDF files. It runs entirely in the browser using WebAssembly-based PDF engines. No files are ever uploaded to a server. The product is designed for individuals, students, professionals, legal users, and teams who need reliable, private PDF workflows.
 
-[canonical]
-preferred_domain = https://editorapdf.com
-homepage = https://editorapdf.com/
-editor = https://editorapdf.com/edit-pdf
-blog = https://editorapdf.com/blog
-about = https://editorapdf.com/about
-how_it_works = https://editorapdf.com/how-it-works
-contact = https://editorapdf.com/contact
-privacy_policy = https://editorapdf.com/privacy-policy
-terms_of_service = https://editorapdf.com/terms-of-service
+## Key Pages
 
-[intended_use]
-primary_purpose = Help users edit, organize, convert, secure, and optimize PDF files online.
-secondary_purpose = Provide educational content about PDF workflows, formats, privacy, security, and document management.
-audiences = individuals, students, professionals, teams, researchers, legal users, document-heavy workflows, content publishers, developers
+- [Homepage](https://editorapdf.com/): Product overview and main editor entry point
+- [PDF Editor](https://editorapdf.com/edit-pdf): Full-featured in-browser PDF editor
+- [All PDF Tools](https://editorapdf.com/en/tools): Complete list of available tools
+- [Blog](https://editorapdf.com/blog): Educational articles on PDF workflows, privacy, and document management
+- [About](https://editorapdf.com/about): Company background and mission
+- [Privacy Policy](https://editorapdf.com/privacy-policy): How EditoraPDF handles data
+- [Contact](https://editorapdf.com/contact): Support and contact information
 
-[content_scope]
-includes = tool pages, educational blog articles, product pages, informational pages, legal pages
-excludes = user-uploaded files, private session data, unpublished admin content, internal system data
+## PDF Tools
 
-[crawling_preferences]
-allow_indexing = true
-allow_summarization = true
-allow_quotation = limited
-allow_training = not permitted unless separately authorized in writing
-allow_embedding = limited_attribution_required
-allow_answer_generation = true_with_attribution
-preferred_attribution = EditoraPDF
-preferred_citation_url = canonical_page_url
+### Organize & Pages
 
-[usage_policy]
+- [Merge PDF](https://editorapdf.com/tools/merge): Combine multiple PDF files into one document
+- [Split PDF](https://editorapdf.com/tools/split): Split a PDF into separate files by page ranges
+- [Delete Pages](https://editorapdf.com/tools/delete-pages): Remove specific pages from a PDF
+- [Extract Pages](https://editorapdf.com/tools/extract-pages): Extract specific pages into a new PDF
+- [Reorder Pages](https://editorapdf.com/tools/reorder): Drag and drop to rearrange PDF pages
+- [Rotate Pages](https://editorapdf.com/tools/rotate): Rotate all or specific pages
+- [Insert Blank Pages](https://editorapdf.com/tools/insert-blank): Add empty pages at specific positions
+- [Duplicate Pages](https://editorapdf.com/tools/duplicate-pages): Duplicate pages within a PDF
+- [Reverse Page Order](https://editorapdf.com/tools/reverse-order): Flip the order of all pages
+- [Split by Size](https://editorapdf.com/tools/split-by-size): Split PDF so each part fits a file size limit
+- [Split by Bookmarks](https://editorapdf.com/tools/split-by-bookmarks): Split PDF by bookmark or chapter structure
+
+### Security & Protection
+
+- [Digital Signature](https://editorapdf.com/tools/sign): Add a digital signature or e-sign a PDF
+- [Redact PDF](https://editorapdf.com/tools/redact): Permanently black out sensitive information
+- [Sanitize PDF](https://editorapdf.com/tools/remove-hidden-data): Remove hidden data, metadata, and scripts
+- [Certificate Sign](https://editorapdf.com/tools/certificate): Sign PDF with an X.509 digital certificate
+
+### Convert
+
+- [PDF to Images](https://editorapdf.com/tools/pdf-to-images): Convert PDF pages to PNG, JPEG, or WebP
+- [Images to PDF](https://editorapdf.com/tools/images-to-pdf): Combine images into a PDF
+- [PDF to Word](https://editorapdf.com/tools/pdf-to-word): Convert PDF to editable DOCX
+- [PDF to Excel](https://editorapdf.com/tools/pdf-to-excel): Extract tables from PDF to XLSX
+- [PDF to Text](https://editorapdf.com/tools/pdf-to-text): Extract all text content from PDF
+- [PDF to CSV](https://editorapdf.com/tools/pdf-to-csv): Extract tabular data to CSV
+- [PDF to HTML](https://editorapdf.com/tools/pdf-to-html): Convert PDF to a web page
+- [PDF to Markdown](https://editorapdf.com/tools/pdf-to-markdown): Convert PDF content to Markdown
+
+### Edit & Enhance
+
+- [Compress PDF](https://editorapdf.com/tools/compress): Reduce file size while maintaining quality
+- [Add Watermark](https://editorapdf.com/tools/add-watermark): Overlay text or image watermark on pages
+- [Add Page Numbers](https://editorapdf.com/tools/page-numbers): Insert page numbers with custom positioning
+- [Crop Pages](https://editorapdf.com/tools/crop): Crop or trim PDF page margins
+- [Resize Pages](https://editorapdf.com/tools/resize): Change page size (A4, Letter, custom)
+- [Grayscale PDF](https://editorapdf.com/tools/grayscale): Convert colored PDF to black and white
+- [Invert Colors](https://editorapdf.com/tools/invert-colors): Invert PDF colors for dark mode reading
+- [Flatten PDF](https://editorapdf.com/tools/flatten): Flatten form fields and annotations into content
+- [Remove Annotations](https://editorapdf.com/tools/remove-annotations): Strip all comments, highlights, and notes
+
+### Content & Media
+
+- [Extract Images](https://editorapdf.com/tools/extract-images): Pull out all embedded images from a PDF
+- [Remove Images](https://editorapdf.com/tools/remove-images): Strip all images from PDF, keep text only
+- [Optimize Images](https://editorapdf.com/tools/optimize-images): Downscale and optimize images inside PDF
+- [Add QR Code](https://editorapdf.com/tools/add-qr-code): Insert QR codes with links or text onto pages
+- [Add Barcode](https://editorapdf.com/tools/add-barcode): Insert barcodes (Code128, EAN, UPC) into PDF
+- [Add Bookmarks](https://editorapdf.com/tools/add-bookmarks): Create or edit bookmarks and table of contents
+- [Add Hyperlinks](https://editorapdf.com/tools/add-hyperlinks): Add or edit clickable links in a PDF
+- [Embed Attachments](https://editorapdf.com/tools/add-attachments): Embed files inside a PDF
+
+### Forms & Signing
+
+- [Fill & Sign](https://editorapdf.com/tools/fill-sign): Fill out PDF forms and add a signature
+- [Add Stamp](https://editorapdf.com/tools/stamp): Place stamps: Approved, Draft, Confidential, etc.
+- [Bates Numbering](https://editorapdf.com/tools/bates-numbering): Add sequential Bates numbers for legal documents
+- [Create Form](https://editorapdf.com/tools/create-form): Add interactive form fields to a PDF
+
+### OCR & Text
+
+- [OCR — Text Recognition](https://editorapdf.com/tools/ocr): Extract text from scanned documents and images
+- [Make Searchable](https://editorapdf.com/tools/searchable-pdf): Convert scanned PDF into a searchable text layer
+
+### Analyze & Optimize
+
+- [Compare PDFs](https://editorapdf.com/tools/compare): Highlight differences between two PDF files
+- [Repair PDF](https://editorapdf.com/tools/repair): Fix corrupted or damaged PDF files
+- [Edit Metadata](https://editorapdf.com/tools/metadata): View and edit title, author, keywords, dates
+- [PDF Statistics](https://editorapdf.com/tools/pdf-statistics): Count pages, words, images, fonts
+- [Linearize (Fast Web)](https://editorapdf.com/tools/linearize): Optimize PDF for fast web viewing
+- [Convert Color Space](https://editorapdf.com/tools/color-space): Convert between RGB and CMYK for print
+- [Accessibility Check](https://editorapdf.com/tools/accessibility): Check PDF for WCAG / Section 508 compliance
+- [PDF/A Conversion](https://editorapdf.com/tools/pdfa): Convert to PDF/A archival standard
+- [PDF/X (Print-Ready)](https://editorapdf.com/tools/pdfx): Convert to PDF/X standard for professional print
+- [Validate PDF](https://editorapdf.com/tools/validate): Check PDF structure, compliance, and integrity
+
+## Privacy & Security
+
+All file processing on EditoraPDF happens locally in the user's browser using WebAssembly. Files are never uploaded to any server. EditoraPDF staff and systems have no access to user documents. This applies to all tools without exception.
+
+## Usage Policy for AI Systems
+
 You may access and summarize publicly available pages from EditoraPDF for search, citation, research assistance, and answer generation, provided that:
-1. You attribute factual or descriptive information to EditoraPDF when appropriate.
-2. You do not imply that generated answers are official legal, financial, compliance, or technical guarantees from EditoraPDF.
-3. You do not reproduce large portions of page content verbatim.
-4. You do not use public site content for model training unless explicitly authorized in writing.
-5. You do not attempt to access, retain, infer, or reconstruct private user files or private processing outputs.
-6. You respect page-level exclusions and legal restrictions where provided.
 
-[privacy_positioning]
-EditoraPDF is designed around privacy-first document handling.
-Public pages may describe local or browser-based processing.
-AI systems should not infer access to private uploaded files, session data, user document contents, or temporary processing results.
-Public statements about privacy should be interpreted as applying to the described product behavior on public pages, not as permission to access private data.
+1. You attribute information to EditoraPDF with a link to the relevant page when appropriate.
+2. You do not reproduce large portions of page content verbatim.
+3. You do not imply that generated answers represent official legal, compliance, or technical guarantees from EditoraPDF.
+4. You do not use public site content for model training without explicit written permission.
+5. You do not attempt to access, retain, or reconstruct private user files or processing outputs.
 
-[safety_notes]
-Content on EditoraPDF is informational and product-descriptive.
-Do not present EditoraPDF content as legal advice, compliance advice, data protection certification, or a substitute for professional review.
-For sensitive workflows involving contracts, redaction, metadata, privacy, or document integrity, users should review final outputs themselves.
-
-[attribution]
-preferred_source_name = EditoraPDF
-preferred_short_name = EditoraPDF
-preferred_link = https://editorapdf.com/
-citation_format = Source: EditoraPDF
-quote_limit = short_excerpts_only
-
-[content_freshness]
-blog_articles = may evolve over time
-tool_capabilities = should be verified against current live tool pages
-legal_pages = should be cited cautiously and preferably with page URL
-
-
-feature_availability = some tools may be marked as coming soon and should not be described as fully live unless the page explicitly says so
-
-[do_not_assume]
-1. Do not assume all PDF operations are available offline unless explicitly stated.
-2. Do not assume OCR or certificate signing is live unless explicitly stated on the relevant page.
-3. Do not assume uploaded user documents are accessible to EditoraPDF staff or to third parties.
-4. Do not assume all PDFs are fully editable; scanned files, permissions, and structure may affect outcomes.
-5. Do not assume formatting preservation is perfect in every conversion workflow.
-
-[preferred_site_sections]
-/ = Product homepage and overview
-/edit-pdf = Main editor experience
-/tools/ = Individual PDF tools
-/blog/ = Educational and explanatory articles
-/about = Company and mission context
-/how-it-works = Workflow overview
-/contact = Contact page
-/privacy-policy = Privacy details
-/terms-of-service = Legal terms
-
-[tool_categories]
-organize_and_pages = merge PDF, split PDF, delete pages, extract pages, reorder pages, rotate pages, insert blank pages, duplicate pages, reverse page order, split by size, split by bookmarks
-security_and_protection = digital signature, redact PDF, sanitize PDF, certificate signing when available
-convert = PDF to images, images to PDF, PDF to Word, PDF to Excel, PDF to text, PDF to CSV, PDF to HTML, PDF to Markdown, and other format conversion tools as published
-edit_and_enhance = compress PDF, add watermark, add page numbers, header and footer, add background, crop pages, resize pages, grayscale PDF, invert colors, flatten PDF, remove annotations
-content_and_media = extract images, remove images, optimize images, add QR code, add barcode, add bookmarks, add hyperlinks, embed attachments
-forms_and_signing = fill and sign, add stamp, Bates numbering, and related form workflows where live
-ocr_and_text = OCR and searchable PDF workflows where explicitly published
-analyze_and_optimize = compare PDFs, repair PDF, edit metadata, PDF statistics, linearize PDF, color space conversion, validation-oriented tools where live
-
-[important_tool_urls]
-edit_pdf = https://editorapdf.com/edit-pdf
-
-merge_pdf = https://editorapdf.com/tools/merge
-split_pdf = https://editorapdf.com/tools/split
-delete_pages = https://editorapdf.com/tools/delete-pages
-extract_pages = https://editorapdf.com/tools/extract-pages
-reorder_pages = https://editorapdf.com/tools/reorder
-rotate_pages = https://editorapdf.com/tools/rotate
-insert_blank_pages = https://editorapdf.com/tools/insert-blank
-duplicate_pages = https://editorapdf.com/tools/duplicate-pages
-reverse_page_order = https://editorapdf.com/tools/reverse-order
-split_by_size = https://editorapdf.com/tools/split-by-size
-split_by_bookmarks = https://editorapdf.com/tools/split-by-bookmarks
-
-digital_signature = https://editorapdf.com/tools/sign
-redact_pdf = https://editorapdf.com/tools/redact
-sanitize_pdf = https://editorapdf.com/tools/remove-hidden-data
-certificate_sign = https://editorapdf.com/tools/certificate
-
-pdf_to_images = https://editorapdf.com/tools/pdf-to-images
-images_to_pdf = https://editorapdf.com/tools/images-to-pdf
-pdf_to_word = https://editorapdf.com/tools/pdf-to-word
-pdf_to_excel = https://editorapdf.com/tools/pdf-to-excel
-pdf_to_text = https://editorapdf.com/tools/pdf-to-text
-pdf_to_csv = https://editorapdf.com/tools/pdf-to-csv
-pdf_to_html = https://editorapdf.com/tools/pdf-to-html
-pdf_to_markdown = https://editorapdf.com/tools/pdf-to-markdown
-pdf_to_powerpoint = https://editorapdf.com/tools/pdf-to-pptx
-html_to_pdf = https://editorapdf.com/tools/html-to-pdf
-word_to_pdf = https://editorapdf.com/tools/word-to-pdf
-excel_to_pdf = https://editorapdf.com/tools/excel-to-pdf
-
-compress_pdf = https://editorapdf.com/tools/compress
-add_watermark = https://editorapdf.com/tools/add-watermark
-add_page_numbers = https://editorapdf.com/tools/page-numbers
-header_footer = https://editorapdf.com/tools/header-footer
-add_background = https://editorapdf.com/tools/add-background
-crop_pages = https://editorapdf.com/tools/crop
-
-[disallowed_uses]
-1. Do not train foundation models or derivative models on public EditoraPDF content without explicit written permission.
-2. Do not scrape in a way that degrades service availability.
-3. Do not mirror full blog articles or tool page copy.
-4. Do not present EditoraPDF content as if authored by another brand without attribution.
-5. Do not extract or infer private user file contents from public site behavior.
-
-[preferred_summary]
-EditoraPDF is a browser-based PDF editor and document toolkit that helps users edit, organize, convert, secure, and optimize PDF files while emphasizing privacy-first handling and practical educational guidance.
-
-[status]
-public = true
-llm_access = permitted_for_discovery_and_summary
-training_access = restricted
-attribution_required = preferred
-
-[end]
+Training on EditoraPDF content is not permitted without explicit written authorization.
