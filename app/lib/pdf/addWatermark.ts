@@ -134,7 +134,7 @@ export async function addWatermark(
   if (!options.pageRange || options.pageRange.trim() === '' || options.pageRange.toLowerCase() === 'all') {
     pagesToWatermark = Array.from({ length: totalPages }, (_, i) => i);
   } else {
-    pagesToWatermark = parsePageRange(options.pageRange, totalPages).map(p => p - 1); // Convert to 0-based
+    pagesToWatermark = parsePageRange(options.pageRange, totalPages);
   }
 
   // Embed fonts and images once

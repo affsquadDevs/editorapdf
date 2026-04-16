@@ -40,7 +40,7 @@ export async function cropPages(
   if (!pageRange || pageRange.trim() === '' || pageRange.toLowerCase() === 'all') {
     pagesToCrop = Array.from({ length: totalPages }, (_, i) => i);
   } else {
-    pagesToCrop = parsePageRange(pageRange, totalPages).map(p => p - 1);
+    pagesToCrop = parsePageRange(pageRange, totalPages);
   }
 
   // Apply cropping to each page

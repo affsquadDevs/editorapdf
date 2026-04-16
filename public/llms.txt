@@ -71,31 +71,6 @@ EditoraPDF is a free, open-source web application for working with PDF files. It
 - [Add Hyperlinks](https://editorapdf.com/tools/add-hyperlinks): Add or edit clickable links in a PDF
 - [Embed Attachments](https://editorapdf.com/tools/add-attachments): Embed files inside a PDF
 
-### Forms & Signing
-
-- [Fill & Sign](https://editorapdf.com/tools/fill-sign): Fill out PDF forms and add a signature
-- [Add Stamp](https://editorapdf.com/tools/stamp): Place stamps: Approved, Draft, Confidential, etc.
-- [Bates Numbering](https://editorapdf.com/tools/bates-numbering): Add sequential Bates numbers for legal documents
-- [Create Form](https://editorapdf.com/tools/create-form): Add interactive form fields to a PDF
-
-### OCR & Text
-
-- [OCR — Text Recognition](https://editorapdf.com/tools/ocr): Extract text from scanned documents and images
-- [Make Searchable](https://editorapdf.com/tools/searchable-pdf): Convert scanned PDF into a searchable text layer
-
-### Analyze & Optimize
-
-- [Compare PDFs](https://editorapdf.com/tools/compare): Highlight differences between two PDF files
-- [Repair PDF](https://editorapdf.com/tools/repair): Fix corrupted or damaged PDF files
-- [Edit Metadata](https://editorapdf.com/tools/metadata): View and edit title, author, keywords, dates
-- [PDF Statistics](https://editorapdf.com/tools/pdf-statistics): Count pages, words, images, fonts
-- [Linearize (Fast Web)](https://editorapdf.com/tools/linearize): Optimize PDF for fast web viewing
-- [Convert Color Space](https://editorapdf.com/tools/color-space): Convert between RGB and CMYK for print
-- [Accessibility Check](https://editorapdf.com/tools/accessibility): Check PDF for WCAG / Section 508 compliance
-- [PDF/A Conversion](https://editorapdf.com/tools/pdfa): Convert to PDF/A archival standard
-- [PDF/X (Print-Ready)](https://editorapdf.com/tools/pdfx): Convert to PDF/X standard for professional print
-- [Validate PDF](https://editorapdf.com/tools/validate): Check PDF structure, compliance, and integrity
-
 ## Privacy & Security
 
 All file processing on EditoraPDF happens locally in the user's browser using WebAssembly. Files are never uploaded to any server. EditoraPDF staff and systems have no access to user documents. This applies to all tools without exception.

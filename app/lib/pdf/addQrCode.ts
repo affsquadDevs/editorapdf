@@ -1,11 +1,16 @@
-import { PDFDocument, rgb } from 'pdf-lib';
+import { PDFDocument } from 'pdf-lib';
+import QRCode from 'qrcode';
 import { parsePageRange } from './splitPdf';
+
+export { MM_TO_PT } from './pdfUnits';
 
 export interface QrCodeOptions {
   content: string; // QR code content
   pageRange?: string;
-  position?: { x: number; y: number }; // Normalized 0-1 coordinates
-  size?: number; // Size in points
+  /** Normalized center: x,y in [0,1]; y=0 top, y=1 bottom of page. */
+  position?: { x: number; y: number };
+  /** Square side length in PDF points (72 pt = 1 inch). */
+  size?: number;
   pageNumber?: number; // Specific page (1-based)
 }
 
@@ -28,18 +33,12 @@ export async function addQrCode(
     throw new Error('QR code content is required');
   }
 
-  // Try to import qrcode
-  let QRCode: any;
-  try {
-    QRCode = await import('qrcode' as any);
-  } catch (err) {
-    throw new Error('qrcode library is not installed. Please run: npm install qrcode');
-  }
+  const qrPixelSize = Math.min(2048, Math.max(128, Math.round(size * 4)));
 
-  // Generate QR code as data URL
   const qrDataUrl = await QRCode.toDataURL(content, {
-    width: size * 4, // Higher resolution for better quality
+    width: qrPixelSize,
     margin: 1,
+    errorCorrectionLevel: 'M',
   });
 
   // Convert data URL to image bytes
@@ -58,7 +57,7 @@ export async function addQrCode(
   } else if (!pageRange || pageRange.trim() === '' || pageRange.toLowerCase() === 'all') {
     pagesToModify = Array.from({ length: totalPages }, (_, i) => i);
   } else {
-    pagesToModify = parsePageRange(pageRange, totalPages).map(p => p - 1);
+    pagesToModify = parsePageRange(pageRange, totalPages);
   }
 
   // Embed QR code image

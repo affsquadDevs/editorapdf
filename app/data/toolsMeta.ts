@@ -56,23 +56,4 @@ export const toolsMeta: Record<string, ToolMeta> = {
   'add-bookmarks':     { id: 'add-bookmarks',     title: 'Add Bookmarks',          description: 'Create or edit bookmarks and table of contents' },
   'add-hyperlinks':    { id: 'add-hyperlinks',    title: 'Add Hyperlinks',         description: 'Add or edit clickable links in your PDF' },
   'add-attachments':   { id: 'add-attachments',   title: 'Embed Attachments',      description: 'Embed files (images, docs, data) inside PDF' },
-  // Forms & Signing
-  'fill-sign':         { id: 'fill-sign',         title: 'Fill & Sign',            description: 'Fill out PDF forms and add your signature' },
-  'stamp':             { id: 'stamp',             title: 'Add Stamp',              description: 'Place stamps: Approved, Draft, Confidential, etc.' },
-  'bates-numbering':   { id: 'bates-numbering',   title: 'Bates Numbering',        description: 'Add sequential Bates numbers for legal documents' },
-  'create-form':       { id: 'create-form',       title: 'Create Form',            description: 'Add interactive form fields to PDF' },
-  // OCR & Text
-  'ocr':               { id: 'ocr',               title: 'OCR — Text Recognition', description: 'Extract text from scanned documents & images' },
-  'searchable-pdf':    { id: 'searchable-pdf',    title: 'Make Searchable',        description: 'Convert scanned PDF into searchable text layer' },
-  // Analyze & Optimize
-  'compare':           { id: 'compare',           title: 'Compare PDFs',           description: 'Highlight differences between two PDF files' },
-  'repair':            { id: 'repair',            title: 'Repair PDF',             description: 'Fix corrupted or damaged PDF files' },
-  'metadata':          { id: 'metadata',          title: 'Edit Metadata',          description: 'View & edit title, author, keywords, dates' },
-  'pdf-statistics':    { id: 'pdf-statistics',    title: 'PDF Statistics',         description: 'Count pages, words, images, fonts, file breakdown' },
-  'linearize':         { id: 'linearize',         title: 'Linearize (Fast Web)',   description: 'Optimize PDF for fast web viewing' },
-  'color-space':       { id: 'color-space',       title: 'Convert Color Space',    description: 'Convert between RGB and CMYK for print' },
-  'accessibility':     { id: 'accessibility',     title: 'Accessibility Check',    description: 'Check PDF for WCAG / Section 508 compliance' },
-  'pdfa':              { id: 'pdfa',              title: 'PDF/A Conversion',       description: 'Convert to PDF/A archival standard' },
-  'pdfx':              { id: 'pdfx',              title: 'PDF/X (Print-Ready)',    description: 'Convert to PDF/X standard for professional print' },
-  'validate':          { id: 'validate',          title: 'Validate PDF',           description: 'Check PDF structure, compliance, and integrity' },
 };

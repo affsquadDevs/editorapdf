@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import ToolView from './ToolView';
 import { useAppTranslations } from '../i18n/TranslationProvider';
@@ -9,24 +9,17 @@ import {
   FilePlus2, Scissors, Trash2, FileOutput, GripVertical, RotateCw,
   FileUp, Copy, ArrowDownUp, HardDrive, Bookmark,
   // Security & Protection
-  Lock, LockOpen, PenTool, EyeOff, SlidersHorizontal, ShieldAlert,
+  Lock, PenTool, EyeOff, ShieldAlert,
   Award,
   // Convert
   Image, FileImage, FileText, Table, AlignLeft, TableProperties,
-  Code, Hash, Presentation, Globe, FileUp as FileUpload, Sheet,
+  Code, Hash, Presentation, Globe, Sheet,
   // Edit & Enhance
-  Minimize2, Droplets, ListOrdered, PanelTop, Palette, Crop,
+  Minimize2, Droplets, ListOrdered, PenLine, Crop,
   Maximize2, Contrast, Moon, Layers, MessageSquareX,
   // Content & Media
   ImageDown, ImageOff, Zap, QrCode, ScanBarcode, BookMarked,
   Link2, Paperclip,
-  // Forms & Signing
-  PenLine, Stamp, Binary, ListChecks,
-  // OCR & Text
-  ScanText, Search,
-  // Analyze & Optimize
-  GitCompareArrows, Wrench, Info, BarChart3, Bolt, Paintbrush,
-  Users, Archive, Printer, BadgeCheck,
 } from 'lucide-react';
 
 export interface PdfTool {
@@ -35,7 +28,6 @@ export interface PdfTool {
   description: string;
   icon: React.ReactNode;
   color: string;
-  comingSoon?: boolean;
 }
 
 interface ToolCategory {
@@ -248,132 +240,34 @@ const toolCategories: ToolCategory[] = [
       {
         id: 'extract-images', title: 'Extract Images', description: 'Pull out all embedded images from a PDF', color: 'accent',
         icon: <ImageDown size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
-        comingSoon: false,
       },
       {
-        id: 'remove-images', title: 'Remove Images', description: 'Strip all images from PDF, keep text only', color: 'error', comingSoon: true,
+        id: 'remove-images', title: 'Remove Images', description: 'Strip all images from PDF, keep text only', color: 'error',
         icon: <ImageOff size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'optimize-images', title: 'Optimize Images', description: 'Downscale and optimize images inside PDF', color: 'success', comingSoon: true,
+        id: 'optimize-images', title: 'Optimize Images', description: 'Downscale and optimize images inside PDF', color: 'success',
         icon: <Zap size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'add-qr-code', title: 'Add QR Code', description: 'Insert QR codes with links or text onto pages', color: 'primary', comingSoon: true,
+        id: 'add-qr-code', title: 'Add QR Code', description: 'Insert QR codes with links or text onto pages', color: 'primary',
         icon: <QrCode size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'add-barcode', title: 'Add Barcode', description: 'Insert barcodes (Code128, EAN, UPC) into PDF', color: 'warning', comingSoon: true,
+        id: 'add-barcode', title: 'Add Barcode', description: 'Insert barcodes (Code128, EAN, UPC) into PDF', color: 'warning',
         icon: <ScanBarcode size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'add-bookmarks', title: 'Add Bookmarks', description: 'Create or edit bookmarks and table of contents', color: 'info', comingSoon: true,
+        id: 'add-bookmarks', title: 'Add Bookmarks', description: 'Create or edit bookmarks and table of contents', color: 'info',
         icon: <BookMarked size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'add-hyperlinks', title: 'Add Hyperlinks', description: 'Add or edit clickable links in your PDF', color: 'accent', comingSoon: true,
+        id: 'add-hyperlinks', title: 'Add Hyperlinks', description: 'Add or edit clickable links in your PDF', color: 'accent',
         icon: <Link2 size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
       {
-        id: 'add-attachments', title: 'Embed Attachments', description: 'Embed files (images, docs, data) inside PDF', color: 'primary', comingSoon: true,
+        id: 'add-attachments', title: 'Embed Attachments', description: 'Embed files (images, docs, data) inside PDF', color: 'primary',
         icon: <Paperclip size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
-      },
-    ],
-  },
-
-  // ═══════════════════════════════════════════
-  // 6. FORMS & SIGNING
-  // ═══════════════════════════════════════════
-  {
-    id: 'forms',
-    title: 'Forms & Signing',
-    icon: <PenLine size={20} strokeWidth={1.5} />,
-    tools: [
-      {
-        id: 'fill-sign', title: 'Fill & Sign', description: 'Fill out forms and add your signature', color: 'primary', comingSoon: true,
-        icon: <PenLine size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
-      },
-      {
-        id: 'stamp', title: 'Add Stamp', description: 'Place stamps: Approved, Draft, Confidential, etc.', color: 'error', comingSoon: true,
-        icon: <Stamp size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
-      },
-      {
-        id: 'bates-numbering', title: 'Bates Numbering', description: 'Add sequential Bates numbers for legal documents', color: 'warning', comingSoon: true,
-        icon: <Binary size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
-      },
-      {
-        id: 'create-form', title: 'Create Form', description: 'Add interactive form fields to PDF', color: 'accent', comingSoon: true,
-        icon: <ListChecks size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
-      },
-    ],
-  },
-
-  // ═══════════════════════════════════════════
-  // 7. OCR & TEXT
-  // ═══════════════════════════════════════════
-  {
-    id: 'ocr',
-    title: 'OCR & Text',
-    icon: <ScanText size={20} strokeWidth={1.5} />,
-    tools: [
-      {
-        id: 'ocr', title: 'OCR — Text Recognition', description: 'Extract text from scanned documents & images', color: 'warning', comingSoon: true,
-        icon: <ScanText size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
-      },
-      {
-        id: 'searchable-pdf', title: 'Make Searchable', description: 'Convert scanned PDF into searchable text layer', color: 'info', comingSoon: true,
-        icon: <Search size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
-      },
-    ],
-  },
-
-  // ═══════════════════════════════════════════
-  // 8. ANALYZE & OPTIMIZE
-  // ═══════════════════════════════════════════
-  {
-    id: 'analyze',
-    title: 'Analyze & Optimize',
-    icon: <BarChart3 size={20} strokeWidth={1.5} />,
-    tools: [
-      {
-        id: 'compare', title: 'Compare PDFs', description: 'Highlight differences between two PDF files', color: 'accent', comingSoon: true,
-        icon: <GitCompareArrows size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
-      },
-      {
-        id: 'repair', title: 'Repair PDF', description: 'Fix corrupted or damaged PDF files', color: 'error', comingSoon: true,
-        icon: <Wrench size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
-      },
-      {
-        id: 'metadata', title: 'Edit Metadata', description: 'View & edit title, author, keywords, dates', color: 'primary', comingSoon: true,
-        icon: <Info size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
-      },
-      {
-        id: 'pdf-statistics', title: 'PDF Statistics', description: 'Count pages, words, images, fonts, file breakdown', color: 'info', comingSoon: true,
-        icon: <BarChart3 size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
-      },
-      {
-        id: 'linearize', title: 'Linearize (Fast Web)', description: 'Optimize PDF for fast web viewing', color: 'success', comingSoon: true,
-        icon: <Bolt size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
-      },
-      {
-        id: 'color-space', title: 'Convert Color Space', description: 'Convert between RGB and CMYK for print', color: 'warning', comingSoon: true,
-        icon: <Paintbrush size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
-      },
-      {
-        id: 'accessibility', title: 'Accessibility Check', description: 'Check PDF for WCAG / Section 508 compliance', color: 'accent', comingSoon: true,
-        icon: <Users size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
-      },
-      {
-        id: 'pdfa', title: 'PDF/A Conversion', description: 'Convert to PDF/A archival standard', color: 'success', comingSoon: true,
-        icon: <Archive size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
-      },
-      {
-        id: 'pdfx', title: 'PDF/X (Print-Ready)', description: 'Convert to PDF/X standard for professional print', color: 'warning', comingSoon: true,
-        icon: <Printer size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
-      },
-      {
-        id: 'validate', title: 'Validate PDF', description: 'Check PDF structure, compliance, and integrity', color: 'primary', comingSoon: true,
-        icon: <BadgeCheck size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
       },
     ],
   },
@@ -384,7 +278,7 @@ export const allTools = toolCategories.flatMap(c => c.tools);
 
 // Calculate tool counts at module level to ensure consistency between server and client
 export const totalToolsCount = allTools.length;
-export const availableToolsCount = allTools.filter(t => !t.comingSoon).length;
+export const availableToolsCount = allTools.length;
 
 // Export toolCategories for use in routes
 export { toolCategories };
@@ -402,12 +296,6 @@ export default function ToolsPanel() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const { t, locale } = useAppTranslations();
   const tr = (key: string, fallback: string) => t(key) === key ? fallback : t(key);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   const visibleCategories = useMemo(() => 
     activeCategory
       ? toolCategories.filter(c => c.id === activeCategory)
@@ -415,16 +303,7 @@ export default function ToolsPanel() {
     [activeCategory]
   );
 
-  // Calculate tool counts - use client-side calculation after mount to avoid hydration mismatch
-  const totalTools = useMemo(() => allTools.length, []);
-  const availableTools = useMemo(() => {
-    if (!mounted) {
-      // Return server value during SSR to match initial render
-      return availableToolsCount;
-    }
-    // Calculate on client after mount
-    return allTools.filter(t => !t.comingSoon).length;
-  }, [mounted]);
+  const totalTools = allTools.length;
 
   return (
     <div className="w-full max-w-5xl mx-auto animate-fade-in">
@@ -434,17 +313,12 @@ export default function ToolsPanel() {
         <p className="text-surface-400 text-base max-w-2xl mx-auto mb-4">
           {t('tools.page.subtitle')}
         </p>
-        <div className="flex items-center justify-center gap-3 text-xs text-surface-500">
-          <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-success-500"></span>
-            {availableTools} {t('tools.available')}
+        <p className="text-xs text-surface-500">
+          <span className="inline-flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-success-500" />
+            {totalTools} {t('tools.available')}
           </span>
-          <span className="text-surface-700">•</span>
-          <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-surface-600"></span>
-            {totalTools - availableTools} {t('tools.comingSoon')}
-          </span>
-        </div>
+        </p>
       </div>
 
       {/* Category Filter */}
@@ -485,15 +359,12 @@ export default function ToolsPanel() {
               {category.tools.map((tool, index) => {
                 const colors = colorMap[tool.color] || colorMap.primary;
                 const commonProps = {
-                  className: `relative group text-left p-5 rounded-2xl border transition-all duration-200 ${colors.bg} ${colors.border} ${colors.hoverBorder} ${tool.comingSoon ? 'opacity-50 cursor-not-allowed' : 'hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] cursor-pointer'} animate-fade-in-up`,
+                  className: `relative group text-left p-5 rounded-2xl border transition-all duration-200 ${colors.bg} ${colors.border} ${colors.hoverBorder} hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] cursor-pointer animate-fade-in-up`,
                   style: { animationDelay: `${index * 40}ms` } as React.CSSProperties,
                 };
                 
                 const content = (
                   <>
-                    {tool.comingSoon && (
-                      <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-surface-700/80 border border-surface-600/50 text-[10px] font-semibold text-surface-300 uppercase tracking-wider">{tr('tools.soon', 'Soon')}</div>
-                    )}
                     <div className={`w-12 h-12 rounded-xl ${colors.iconBg} flex items-center justify-center mb-3 ${colors.text} transition-transform duration-200 group-hover:scale-110`}>
                       {tool.icon}
                     </div>
@@ -503,19 +374,13 @@ export default function ToolsPanel() {
                     <p className="text-sm text-surface-400 leading-relaxed">
                       {tr(`tools.items.${tool.id}.desc`, tool.description)}
                     </p>
-                    {!tool.comingSoon && (
-                      <div className={`absolute bottom-4 right-4 ${colors.text} opacity-0 group-hover:opacity-100 transition-all duration-200 translate-x-1 group-hover:translate-x-0`}>
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
-                      </div>
-                    )}
+                    <div className={`absolute bottom-4 right-4 ${colors.text} opacity-0 group-hover:opacity-100 transition-all duration-200 translate-x-1 group-hover:translate-x-0`}>
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+                    </div>
                   </>
                 );
                 
-                return tool.comingSoon ? (
-                  <div key={tool.id} {...commonProps}>
-                    {content}
-                  </div>
-                ) : (
+                return (
                   <Link key={tool.id} href={`/${locale}/tools/${tool.id}`} {...commonProps}>
                     {content}
                   </Link>

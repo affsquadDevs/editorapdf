@@ -14,7 +14,8 @@ const nextConfig = {
   
   // Experimental features for better performance
   experimental: {
-    optimizePackageImports: ['pdfjs-dist', 'pdf-lib'],
+    // Do not use optimizePackageImports for pdf-lib / pdfjs-dist — it breaks webpack
+    // chunk paths (e.g. Cannot find module './vendor-chunks/pdf-lib.js').
     // NOTE: optimizeCss requires the optional dependency `critters`.
     // It breaks `next export` if `critters` isn't installed, especially on /404 and /500 prerender.
     // Keep disabled unless you explicitly add `critters` to dependencies.

@@ -42,7 +42,7 @@ export async function addStamp(
   if (!pageRange || pageRange.trim() === '' || pageRange.toLowerCase() === 'all') {
     pagesToStamp = Array.from({ length: totalPages }, (_, i) => i);
   } else {
-    pagesToStamp = parsePageRange(pageRange, totalPages).map(p => p - 1);
+    pagesToStamp = parsePageRange(pageRange, totalPages);
   }
 
   // Load stamp image if provided

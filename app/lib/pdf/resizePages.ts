@@ -55,7 +55,7 @@ export async function resizePages(
   if (!pageRange || pageRange.trim() === '' || pageRange.toLowerCase() === 'all') {
     pagesToResize = Array.from({ length: totalPages }, (_, i) => i);
   } else {
-    pagesToResize = parsePageRange(pageRange, totalPages).map(p => p - 1);
+    pagesToResize = parsePageRange(pageRange, totalPages);
   }
 
   // Resize each page

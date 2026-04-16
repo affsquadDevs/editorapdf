@@ -4,7 +4,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import type { PdfTool } from './ToolsPanel';
 import {
   ArrowLeft, CheckCircle, Upload, X, FileText, Plus,
-  CircleCheck, GripVertical, Zap, PenSquare
+  CircleCheck, GripVertical, Zap, PenSquare, Trash2
 } from 'lucide-react';
 import { mergePdf, downloadMergedPdf } from '../lib/pdf/mergePdf';
 import { splitPdf, parsePageRange, downloadSplitPdfs } from '../lib/pdf/splitPdf';
@@ -56,9 +56,14 @@ import { extractImages, downloadExtractedImages } from '../lib/pdf/extractImages
 import { removeImages, downloadNoImagesPdf } from '../lib/pdf/removeImages';
 import { optimizeImages, downloadOptimizedPdf } from '../lib/pdf/optimizeImages';
 import { addQrCode, downloadQrCodePdf } from '../lib/pdf/addQrCode';
+import { MM_TO_PT } from '../lib/pdf/pdfUnits';
+import QrCodePreview from './QrCodePreview';
+import BarcodePreview from './BarcodePreview';
+import type { BarcodeFormat } from '../lib/pdf/addBarcode';
 import { addBarcode, downloadBarcodePdf } from '../lib/pdf/addBarcode';
 import { addBookmarks, downloadBookmarkedPdf } from '../lib/pdf/addBookmarks';
-import { addHyperlinks, downloadHyperlinkedPdf } from '../lib/pdf/addHyperlinks';
+import { addHyperlinks, downloadHyperlinkedPdf, normalizeUrl } from '../lib/pdf/addHyperlinks';
+import HyperlinkPreview from './HyperlinkPreview';
 import { addAttachments, downloadAttachedPdf } from '../lib/pdf/addAttachments';
 import { addStamp, downloadStampedPdf } from '../lib/pdf/addStamp';
 import { batesNumbering, downloadBatesPdf } from '../lib/pdf/batesNumbering';
@@ -170,6 +175,12 @@ const toolConfigs: Record<string, {
   validate:          { acceptMultiple: false, uploadLabel: 'Drop a PDF to validate',                 uploadDescription: 'Upload the PDF to check structure and compliance',       actionLabel: 'Validate PDF',          resultLabel: 'Validation Report', steps: ['Upload a PDF file', 'Choose validation profile', 'Click "Validate PDF" to check compliance'] },
 };
 
+const OPTIMIZE_PROFILE_MAX_RES: Record<'screen' | 'ebook' | 'print', number> = {
+  screen: 960,
+  ebook: 1600,
+  print: 3000,
+};
+
 export default function ToolView({ tool, onBack }: ToolViewProps) {
   const { t } = useAppTranslations();
   const tr = (key: string, fallback: string) => (t(key) === key ? fallback : t(key));
@@ -224,6 +235,36 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
   const [extractedImages, setExtractedImages] = useState<Array<{ dataUrl: string; pageNumber: number; index: number; format: string }> | null>(null); // For extract-images: extracted images
   const [extractImageFormat, setExtractImageFormat] = useState<'PNG' | 'JPEG'>('PNG'); // For extract-images: output format
   const [compressionLevel, setCompressionLevel] = useState<'low' | 'medium' | 'high'>('medium'); // For compress: compression level
+  const [optimizeImageQuality, setOptimizeImageQuality] = useState(75); // 10–100 for optimize-images JPEG quality
+  const [optimizeTargetProfile, setOptimizeTargetProfile] = useState<'screen' | 'ebook' | 'print'>('ebook');
+  const [qrContent, setQrContent] = useState('https://');
+  const [qrSizeMm, setQrSizeMm] = useState(30);
+  const [qrPosition, setQrPosition] = useState({ x: 0.88, y: 0.9 });
+  const [qrPageRange, setQrPageRange] = useState('');
+  const [qrPreviewPage, setQrPreviewPage] = useState(1);
+  const [barcodeData, setBarcodeData] = useState('1234567890128');
+  const [barcodeFormat, setBarcodeFormat] = useState<BarcodeFormat>('CODE128');
+  const [barcodePosition, setBarcodePosition] = useState({ x: 0.5, y: 0.92 });
+  const [barcodeWidthMm, setBarcodeWidthMm] = useState(55);
+  const [barcodeHeightMm, setBarcodeHeightMm] = useState(18);
+  const [barcodePageRange, setBarcodePageRange] = useState('');
+  const [barcodePreviewPage, setBarcodePreviewPage] = useState(1);
+  const [bookmarkRows, setBookmarkRows] = useState<Array<{ id: string; title: string; pageNumber: number }>>([
+    { id: 'bm-1', title: 'Chapter 1', pageNumber: 1 },
+  ]);
+  const [hyperlinkRows, setHyperlinkRows] = useState<
+    Array<{ id: string; url: string; label: string; pageNumber: number; rect: { x: number; y: number; w: number; h: number } }>
+  >([
+    {
+      id: 'hl-1',
+      url: 'https://example.com',
+      label: 'Example',
+      pageNumber: 1,
+      rect: { x: 0.08, y: 0.88, w: 0.42, h: 0.07 },
+    },
+  ]);
+  const [hyperlinkPreviewPage, setHyperlinkPreviewPage] = useState(1);
+  const [selectedHyperlinkId, setSelectedHyperlinkId] = useState('hl-1');
   const [pageNumberPosition, setPageNumberPosition] = useState<'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'>('bottom-center'); // For page-numbers: position
   const [pageNumberStart, setPageNumberStart] = useState<number>(1); // For page-numbers: starting number
   // Load watermarks from localStorage on mount or when tool changes
@@ -264,6 +305,36 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       }
     }
   }, [watermarks, tool.id]);
+
+  useEffect(() => {
+    if (tool.id !== 'add-bookmarks' || !totalPages) return;
+    setBookmarkRows((rows) =>
+      rows.map((r) => ({
+        ...r,
+        pageNumber: Math.min(Math.max(1, r.pageNumber), totalPages),
+      })),
+    );
+  }, [tool.id, totalPages]);
+
+  useEffect(() => {
+    if (tool.id !== 'add-hyperlinks' || !totalPages) return;
+    setHyperlinkRows((rows) =>
+      rows.map((r) => ({
+        ...r,
+        pageNumber: Math.min(Math.max(1, r.pageNumber), totalPages),
+        rect: clampHyperlinkRect(r.rect),
+      })),
+    );
+    setHyperlinkPreviewPage((p) => Math.min(Math.max(1, p), totalPages));
+  }, [tool.id, totalPages]);
+
+  function clampHyperlinkRect(rect: { x: number; y: number; w: number; h: number }) {
+    const w = Math.max(0.02, Math.min(1, rect.w));
+    const h = Math.max(0.02, Math.min(1, rect.h));
+    const x = Math.max(0, Math.min(1 - w, rect.x));
+    const y = Math.max(0, Math.min(1 - h, rect.y));
+    return { x, y, w, h };
+  }
 
   const [isWatermarkPreviewOpen, setIsWatermarkPreviewOpen] = useState(false); // For add-watermark: preview modal
   const [editingWatermarkId, setEditingWatermarkId] = useState<string | null>(null); // For add-watermark: currently editing watermark
@@ -384,6 +455,42 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
           }
         })();
       }
+
+      if (tool.id === 'add-bookmarks' && validFiles[0].type === 'application/pdf') {
+        try {
+          const { PDFDocument } = await import('pdf-lib');
+          const arrayBuffer = await validFiles[0].arrayBuffer();
+          const pdf = await PDFDocument.load(arrayBuffer);
+          const total = pdf.getPageCount();
+          setTotalPages(total);
+          setBookmarkRows([{ id: 'bm-1', title: 'Chapter 1', pageNumber: 1 }]);
+        } catch (err) {
+          console.error('Error loading PDF for bookmarks:', err);
+        }
+      }
+
+      if (tool.id === 'add-hyperlinks' && validFiles[0].type === 'application/pdf') {
+        try {
+          const { PDFDocument } = await import('pdf-lib');
+          const arrayBuffer = await validFiles[0].arrayBuffer();
+          const pdf = await PDFDocument.load(arrayBuffer);
+          const total = pdf.getPageCount();
+          setTotalPages(total);
+          setHyperlinkRows([
+            {
+              id: 'hl-1',
+              url: 'https://example.com',
+              label: 'Example',
+              pageNumber: 1,
+              rect: { x: 0.08, y: 0.88, w: 0.42, h: 0.07 },
+            },
+          ]);
+          setHyperlinkPreviewPage(1);
+          setSelectedHyperlinkId('hl-1');
+        } catch (err) {
+          console.error('Error loading PDF for hyperlinks:', err);
+        }
+      }
     }
   }, [config.acceptMultiple, tool.id]);
 
@@ -405,7 +512,7 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
 
   const handleRemoveFile = (index: number) => {
     setFiles(prev => prev.filter((_, i) => i !== index));
-    if ((tool.id === 'split' || tool.id === 'extract-pages' || tool.id === 'delete-pages' || tool.id === 'reorder' || tool.id === 'rotate' || tool.id === 'insert-blank' || tool.id === 'duplicate-pages' || tool.id === 'split-by-size') && index === 0) {
+    if ((tool.id === 'split' || tool.id === 'extract-pages' || tool.id === 'delete-pages' || tool.id === 'reorder' || tool.id === 'rotate' || tool.id === 'insert-blank' || tool.id === 'duplicate-pages' || tool.id === 'split-by-size' || tool.id === 'add-bookmarks' || tool.id === 'add-hyperlinks') && index === 0) {
       setTotalPages(null);
       setPageRangeWarning(null);
       setPageRange('');
@@ -421,6 +528,22 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       setCustomSizeUnit('MB');
       setUseCustomSize(false);
       setMinSizeBytes(null);
+      if (tool.id === 'add-bookmarks') {
+        setBookmarkRows([{ id: 'bm-1', title: 'Chapter 1', pageNumber: 1 }]);
+      }
+      if (tool.id === 'add-hyperlinks') {
+        setHyperlinkRows([
+          {
+            id: 'hl-1',
+            url: 'https://example.com',
+            label: 'Example',
+            pageNumber: 1,
+            rect: { x: 0.08, y: 0.88, w: 0.42, h: 0.07 },
+          },
+        ]);
+        setHyperlinkPreviewPage(1);
+        setSelectedHyperlinkId('hl-1');
+      }
     setBookmarkLevel(1);
     setBookmarkInfo(null);
     setSignatureType('draw');
@@ -1649,8 +1772,8 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       try {
         const file = files[0];
         const pdfBytes = await optimizeImages(file, {
-          quality: 0.8,
-          maxResolution: 1920,
+          quality: optimizeImageQuality / 100,
+          maxResolution: OPTIMIZE_PROFILE_MAX_RES[optimizeTargetProfile],
         });
         setProcessedPdfBytes(pdfBytes);
         setIsComplete(true);
@@ -1671,11 +1794,17 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       setError(null);
       try {
         const file = files[0];
+        const text = qrContent.trim();
+        if (!text) {
+          setError(tr('tools.qrCode.errorEmpty', 'Please enter text or a URL for the QR code'));
+          setIsProcessing(false);
+          return;
+        }
         const pdfBytes = await addQrCode(file, {
-          content: 'https://example.com', // Should come from UI
-          pageRange: pageRange || undefined,
-          position: { x: 0.9, y: 0.9 },
-          size: 100,
+          content: text,
+          pageRange: qrPageRange.trim() || undefined,
+          position: qrPosition,
+          size: qrSizeMm * MM_TO_PT,
         });
         setProcessedPdfBytes(pdfBytes);
         setIsComplete(true);
@@ -1696,11 +1825,19 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
       setError(null);
       try {
         const file = files[0];
+        const text = barcodeData.trim();
+        if (!text) {
+          setError(tr('tools.barcode.errorEmpty', 'Please enter barcode data'));
+          setIsProcessing(false);
+          return;
+        }
         const pdfBytes = await addBarcode(file, {
-          data: '1234567890', // Should come from UI
-          type: 'CODE128',
-          pageRange: pageRange || undefined,
-          position: { x: 0.5, y: 0.9 },
+          data: text,
+          type: barcodeFormat,
+          pageRange: barcodePageRange.trim() || undefined,
+          position: barcodePosition,
+          width: barcodeWidthMm * MM_TO_PT,
+          height: barcodeHeightMm * MM_TO_PT,
         });
         setProcessedPdfBytes(pdfBytes);
         setIsComplete(true);
@@ -1717,13 +1854,23 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
         setError('Please upload a PDF file');
         return;
       }
+      if (!totalPages) {
+        setError(tr('tools.bookmarks.errorNoPages', 'Could not read the PDF page count. Please re-upload the file.'));
+        return;
+      }
+      if (bookmarkRows.length === 0) {
+        setError(tr('tools.bookmarks.errorEmpty', 'Add at least one bookmark.'));
+        return;
+      }
       setIsProcessing(true);
       setError(null);
       try {
         const file = files[0];
-        const pdfBytes = await addBookmarks(file, {
-          bookmarks: [{ title: 'Bookmark 1', pageNumber: 1, level: 1 }], // Should come from UI
-        });
+        const bookmarks = bookmarkRows.map((r) => ({
+          title: r.title.trim() || tr('tools.bookmarks.untitled', 'Untitled'),
+          pageNumber: Math.min(Math.max(1, r.pageNumber), totalPages),
+        }));
+        const pdfBytes = await addBookmarks(file, { bookmarks, replaceExisting: true });
         setProcessedPdfBytes(pdfBytes);
         setIsComplete(true);
         setError(null);
@@ -1739,13 +1886,33 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
         setError('Please upload a PDF file');
         return;
       }
+      if (!totalPages) {
+        setError(tr('tools.hyperlinks.errorNoPages', 'Could not read the PDF page count. Please re-upload the file.'));
+        return;
+      }
+      if (hyperlinkRows.length === 0) {
+        setError(tr('tools.hyperlinks.errorEmpty', 'Add at least one link.'));
+        return;
+      }
       setIsProcessing(true);
       setError(null);
       try {
         const file = files[0];
-        const pdfBytes = await addHyperlinks(file, {
-          hyperlinks: [{ text: 'Link', url: 'https://example.com', pageNumber: 1 }], // Should come from UI
+        const hyperlinks = hyperlinkRows.map((row) => {
+          const u = normalizeUrl(row.url.trim());
+          return {
+            url: u,
+            pageNumber: Math.min(Math.max(1, row.pageNumber), totalPages),
+            label: row.label.trim(),
+            rect: clampHyperlinkRect(row.rect),
+          };
         });
+        for (const h of hyperlinks) {
+          if (!h.url) {
+            throw new Error(tr('tools.hyperlinks.errorUrl', 'Each link needs a valid URL.'));
+          }
+        }
+        const pdfBytes = await addHyperlinks(file, { hyperlinks });
         setProcessedPdfBytes(pdfBytes);
         setIsComplete(true);
         setError(null);
@@ -2260,6 +2427,30 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
     setImageQuality(0.92);
     setImageScale(2);
     setImageResults(null);
+    setQrContent('https://');
+    setQrSizeMm(30);
+    setQrPosition({ x: 0.88, y: 0.9 });
+    setQrPageRange('');
+    setQrPreviewPage(1);
+    setBarcodeData('1234567890128');
+    setBarcodeFormat('CODE128');
+    setBarcodePosition({ x: 0.5, y: 0.92 });
+    setBarcodeWidthMm(55);
+    setBarcodeHeightMm(18);
+    setBarcodePageRange('');
+    setBarcodePreviewPage(1);
+    setBookmarkRows([{ id: 'bm-1', title: 'Chapter 1', pageNumber: 1 }]);
+    setHyperlinkRows([
+      {
+        id: 'hl-1',
+        url: 'https://example.com',
+        label: 'Example',
+        pageNumber: 1,
+        rect: { x: 0.08, y: 0.88, w: 0.42, h: 0.07 },
+      },
+    ]);
+    setHyperlinkPreviewPage(1);
+    setSelectedHyperlinkId('hl-1');
   };
 
   const handleDownload = async () => {
@@ -4666,16 +4857,41 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {tool.id === 'optimize-images' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
                   <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.optimizeImages.targetQuality', 'Target quality')}</p>
-                    <div className="flex gap-2">
-                      {['Screen (72 DPI)', 'eBook (150 DPI)', 'Print (300 DPI)'].map((q) => (
-                        <button key={q} className={`flex-1 px-3 py-2 rounded-lg text-xs font-medium transition-all ${q.includes('150') ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300' : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'}`}>{q}</button>
+                    <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.optimizeImages.targetQuality', 'Max image size (longest side)')}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {([
+                        { id: 'screen' as const, label: tr('tools.optimizeImages.profileScreen', 'Screen (~960px)') },
+                        { id: 'ebook' as const, label: tr('tools.optimizeImages.profileEbook', 'eBook (~1600px)') },
+                        { id: 'print' as const, label: tr('tools.optimizeImages.profilePrint', 'Print (~3000px)') },
+                      ]).map(({ id, label }) => (
+                        <button
+                          key={id}
+                          type="button"
+                          onClick={() => setOptimizeTargetProfile(id)}
+                          className={`flex-1 min-w-[100px] px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                            optimizeTargetProfile === id
+                              ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300'
+                              : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'
+                          }`}
+                        >
+                          {label}
+                        </button>
                       ))}
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.optimizeImages.imageQuality', 'Image quality')}</p>
-                    <input type="range" min="10" max="100" defaultValue="75" className="w-full" />
+                    <div className="flex justify-between items-baseline mb-2">
+                      <p className="text-sm font-medium text-surface-200">{tr('tools.optimizeImages.imageQuality', 'JPEG quality')}</p>
+                      <span className="text-xs text-surface-500 tabular-nums">{optimizeImageQuality}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min={10}
+                      max={100}
+                      value={optimizeImageQuality}
+                      onChange={(e) => setOptimizeImageQuality(Number(e.target.value))}
+                      className="w-full accent-primary-500"
+                    />
                     <div className="flex justify-between text-xs text-surface-500 mt-1"><span>{tr('tools.optimizeImages.qualityLow', 'Low (smaller size)')}</span><span>{tr('tools.optimizeImages.qualityHigh', 'High (larger size)')}</span></div>
                   </div>
                 </div>
@@ -4683,66 +4899,326 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
 
               {/* QR Code options */}
               {tool.id === 'add-qr-code' && (
-                <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
-                  <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.qrCode.content', 'QR content')}</p>
-                    <input type="text" placeholder="https://example.com or any text" className="w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all" />
-                  </div>
-                  <div className="flex gap-4">
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.qrCode.size', 'Size (mm)')}</p>
-                      <input type="number" defaultValue={30} min={10} max={100} className="w-full px-3 py-2 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all" />
+                <div className="space-y-4">
+                  <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
+                    <div>
+                      <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.qrCode.content', 'QR content')}</p>
+                      <input
+                        type="text"
+                        value={qrContent}
+                        onChange={(e) => setQrContent(e.target.value)}
+                        placeholder="https://example.com or any text"
+                        className="w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all"
+                      />
                     </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.qrCode.page', 'Page')}</p>
-                      <input type="text" placeholder="All or 1,3-5" className="w-full px-3 py-2 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all" />
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <div className="flex-1">
+                        <div className="flex justify-between mb-2">
+                          <p className="text-sm font-medium text-surface-200">{tr('tools.qrCode.size', 'Size (mm)')}</p>
+                          <span className="text-xs text-surface-500 tabular-nums">{qrSizeMm} mm</span>
+                        </div>
+                        <input
+                          type="range"
+                          min={8}
+                          max={80}
+                          value={qrSizeMm}
+                          onChange={(e) => setQrSizeMm(Number(e.target.value))}
+                          className="w-full accent-primary-500"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.qrCode.page', 'Pages to add QR')}</p>
+                        <input
+                          type="text"
+                          value={qrPageRange}
+                          onChange={(e) => setQrPageRange(e.target.value)}
+                          placeholder={tr('tools.qrCode.pagePlaceholder', 'All or 1,3-5')}
+                          className="w-full px-3 py-2 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all"
+                        />
+                        <p className="text-xs text-surface-500 mt-1">{tr('tools.qrCode.pageHint', 'Leave empty to add the QR on every page.')}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.qrCode.position', 'Quick position')}</p>
+                      <div className="grid grid-cols-3 gap-2">
+                        {(
+                          [
+                            ['Top Left', { x: 0.08, y: 0.08 }],
+                            ['Top Center', { x: 0.5, y: 0.08 }],
+                            ['Top Right', { x: 0.92, y: 0.08 }],
+                            ['Center Left', { x: 0.08, y: 0.5 }],
+                            ['Center', { x: 0.5, y: 0.5 }],
+                            ['Center Right', { x: 0.92, y: 0.5 }],
+                            ['Bottom Left', { x: 0.08, y: 0.92 }],
+                            ['Bottom Center', { x: 0.5, y: 0.92 }],
+                            ['Bottom Right', { x: 0.92, y: 0.92 }],
+                          ] as const
+                        ).map(([label, pos]) => {
+                          const active =
+                            Math.abs(qrPosition.x - pos.x) < 0.04 && Math.abs(qrPosition.y - pos.y) < 0.04;
+                          return (
+                            <button
+                              key={label}
+                              type="button"
+                              onClick={() => setQrPosition({ x: pos.x, y: pos.y })}
+                              className={`px-2 py-2 rounded-lg text-xs font-medium transition-all ${
+                                active
+                                  ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300'
+                                  : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'
+                              }`}
+                            >
+                              {label}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.qrCode.position', 'Position')}</p>
-                    <div className="grid grid-cols-3 gap-2">
-                      {['Top Left', 'Top Center', 'Top Right', 'Center Left', 'Center', 'Center Right', 'Bottom Left', 'Bottom Center', 'Bottom Right'].map((pos) => (
-                        <button key={pos} className={`px-2 py-2 rounded-lg text-xs font-medium transition-all ${pos === 'Bottom Right' ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300' : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'}`}>{pos}</button>
-                      ))}
-                    </div>
-                  </div>
+                  {files.length > 0 && (
+                    <QrCodePreview
+                      pdfFile={files[0]}
+                      qrContent={qrContent}
+                      sizeMm={qrSizeMm}
+                      position={qrPosition}
+                      onPositionChange={setQrPosition}
+                      onSizeMmChange={setQrSizeMm}
+                      previewPage={qrPreviewPage}
+                      onPreviewPageChange={setQrPreviewPage}
+                    />
+                  )}
                 </div>
               )}
 
               {/* Barcode options */}
               {tool.id === 'add-barcode' && (
-                <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
-                  <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.barcode.type', 'Barcode type')}</p>
-                    <div className="flex flex-wrap gap-2">
-                      {['Code 128', 'Code 39', 'EAN-13', 'UPC-A', 'QR Code', 'DataMatrix'].map((t) => (
-                        <button key={t} className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${t === 'Code 128' ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300' : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'}`}>{t}</button>
-                      ))}
+                <div className="space-y-4">
+                  <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
+                    <div>
+                      <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.barcode.type', 'Barcode type')}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {(
+                          [
+                            ['CODE128', tr('tools.barcode.typeCode128', 'Code 128')],
+                            ['CODE39', tr('tools.barcode.typeCode39', 'Code 39')],
+                            ['EAN13', tr('tools.barcode.typeEan13', 'EAN-13')],
+                            ['UPC', tr('tools.barcode.typeUpc', 'UPC-A')],
+                            ['ITF14', tr('tools.barcode.typeItf14', 'ITF-14')],
+                            ['QR', tr('tools.barcode.typeQr', 'QR Code')],
+                          ] as [BarcodeFormat, string][]
+                        ).map(([id, label]) => (
+                          <button
+                            key={id}
+                            type="button"
+                            onClick={() => setBarcodeFormat(id)}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                              barcodeFormat === id
+                                ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300'
+                                : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'
+                            }`}
+                          >
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                      <p className="text-xs text-surface-500 mt-2">
+                        {barcodeFormat === 'EAN13' &&
+                          tr('tools.barcode.hintEan', 'EAN-13: 12 or 13 digits.')}
+                        {barcodeFormat === 'UPC' &&
+                          tr('tools.barcode.hintUpc', 'UPC-A: 11 or 12 digits.')}
+                        {barcodeFormat === 'ITF14' &&
+                          tr('tools.barcode.hintItf', 'ITF-14: 13 or 14 digits.')}
+                        {barcodeFormat === 'QR' && tr('tools.barcode.hintQr', 'QR: any text or URL.')}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.barcode.data', 'Barcode data')}</p>
+                      <input
+                        type="text"
+                        value={barcodeData}
+                        onChange={(e) => setBarcodeData(e.target.value)}
+                        placeholder={
+                          barcodeFormat === 'QR'
+                            ? 'https://… or text'
+                            : barcodeFormat === 'EAN13'
+                              ? '5901234123457'
+                              : 'Enter data…'
+                        }
+                        className="w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all"
+                      />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <div className="flex justify-between mb-2">
+                          <p className="text-sm font-medium text-surface-200">{tr('tools.barcode.widthMm', 'Width (mm)')}</p>
+                          <span className="text-xs text-surface-500 tabular-nums">{barcodeWidthMm} mm</span>
+                        </div>
+                        <input
+                          type="range"
+                          min={20}
+                          max={120}
+                          value={barcodeWidthMm}
+                          onChange={(e) => setBarcodeWidthMm(Number(e.target.value))}
+                          className="w-full accent-primary-500"
+                        />
+                      </div>
+                      <div>
+                        <div className="flex justify-between mb-2">
+                          <p className="text-sm font-medium text-surface-200">{tr('tools.barcode.heightMm', 'Height (mm)')}</p>
+                          <span className="text-xs text-surface-500 tabular-nums">{barcodeHeightMm} mm</span>
+                        </div>
+                        <input
+                          type="range"
+                          min={6}
+                          max={50}
+                          value={barcodeHeightMm}
+                          onChange={(e) => setBarcodeHeightMm(Number(e.target.value))}
+                          className="w-full accent-primary-500"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.barcode.pages', 'Pages')}</p>
+                      <input
+                        type="text"
+                        value={barcodePageRange}
+                        onChange={(e) => setBarcodePageRange(e.target.value)}
+                        placeholder={tr('tools.barcode.pagePlaceholder', 'All or 1,3-5')}
+                        className="w-full px-3 py-2 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all"
+                      />
+                      <p className="text-xs text-surface-500 mt-1">{tr('tools.barcode.pageHint', 'Leave empty for all pages.')}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.barcode.position', 'Quick position')}</p>
+                      <div className="grid grid-cols-3 gap-2">
+                        {(
+                          [
+                            ['Top Left', { x: 0.08, y: 0.08 }],
+                            ['Top Center', { x: 0.5, y: 0.08 }],
+                            ['Top Right', { x: 0.92, y: 0.08 }],
+                            ['Center Left', { x: 0.08, y: 0.5 }],
+                            ['Center', { x: 0.5, y: 0.5 }],
+                            ['Center Right', { x: 0.92, y: 0.5 }],
+                            ['Bottom Left', { x: 0.08, y: 0.92 }],
+                            ['Bottom Center', { x: 0.5, y: 0.92 }],
+                            ['Bottom Right', { x: 0.92, y: 0.92 }],
+                          ] as const
+                        ).map(([label, pos]) => {
+                          const active =
+                            Math.abs(barcodePosition.x - pos.x) < 0.04 && Math.abs(barcodePosition.y - pos.y) < 0.04;
+                          return (
+                            <button
+                              key={label}
+                              type="button"
+                              onClick={() => setBarcodePosition({ x: pos.x, y: pos.y })}
+                              className={`px-2 py-2 rounded-lg text-xs font-medium transition-all ${
+                                active
+                                  ? 'bg-primary-500/20 border border-primary-500/40 text-primary-300'
+                                  : 'bg-surface-700/30 border border-surface-600/30 text-surface-400 hover:bg-surface-700/50'
+                              }`}
+                            >
+                              {label}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.barcode.data', 'Barcode data')}</p>
-                    <input type="text" placeholder="Enter barcode data..." className="w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all" />
-                  </div>
+                  {files.length > 0 && (
+                    <BarcodePreview
+                      pdfFile={files[0]}
+                      barcodeData={barcodeData}
+                      barcodeFormat={barcodeFormat}
+                      position={barcodePosition}
+                      widthMm={barcodeWidthMm}
+                      heightMm={barcodeHeightMm}
+                      onPositionChange={setBarcodePosition}
+                      onWidthMmChange={setBarcodeWidthMm}
+                      onHeightMmChange={setBarcodeHeightMm}
+                      previewPage={barcodePreviewPage}
+                      onPreviewPageChange={setBarcodePreviewPage}
+                    />
+                  )}
                 </div>
               )}
 
               {/* Bookmark editor */}
               {tool.id === 'add-bookmarks' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
-                  <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.bookmarks.add', 'Add bookmarks')}</p>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-sm font-medium text-surface-200">{tr('tools.bookmarks.add', 'Add bookmarks')}</p>
+                    {totalPages != null && (
+                      <p className="text-xs text-surface-500">
+                        {tr('tools.bookmarks.pagesInDoc', '{count} pages in document').replace('{count}', String(totalPages))}
+                      </p>
+                    )}
+                  </div>
+                  <p className="text-xs text-surface-500">
+                    {tr(
+                      'tools.bookmarks.replaceHint',
+                      'Existing bookmarks in the file are replaced with this list. Each entry appears in the PDF reader’s bookmarks panel.',
+                    )}
+                  </p>
                   <div className="space-y-2">
-                    {['Chapter 1', 'Chapter 2', 'Chapter 3'].map((ch, i) => (
-                      <div key={ch} className="flex items-center gap-2">
-                        <input type="text" defaultValue={ch} className="flex-1 px-3 py-2 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all" />
-                        <span className="text-xs text-surface-500">{tr('tools.bookmarks.page', '→ Page')}</span>
-                        <input type="number" defaultValue={i * 5 + 1} min={1} className="w-16 px-2 py-2 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 text-sm text-center focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all" />
+                    {bookmarkRows.map((row) => (
+                      <div key={row.id} className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={row.title}
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            setBookmarkRows((prev) =>
+                              prev.map((r) => (r.id === row.id ? { ...r, title: v } : r)),
+                            );
+                          }}
+                          placeholder={tr('tools.bookmarks.titlePlaceholder', 'Bookmark title')}
+                          className="flex-1 min-w-0 px-3 py-2 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all"
+                        />
+                        <span className="text-xs text-surface-500 shrink-0">{tr('tools.bookmarks.page', '→ Page')}</span>
+                        <input
+                          type="number"
+                          min={1}
+                          max={totalPages ?? undefined}
+                          value={row.pageNumber}
+                          onChange={(e) => {
+                            const n = parseInt(e.target.value, 10);
+                            setBookmarkRows((prev) =>
+                              prev.map((r) =>
+                                r.id === row.id ? { ...r, pageNumber: Number.isFinite(n) ? n : 1 } : r,
+                              ),
+                            );
+                          }}
+                          className="w-16 shrink-0 px-2 py-2 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 text-sm text-center focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all"
+                        />
+                        <button
+                          type="button"
+                          disabled={bookmarkRows.length <= 1}
+                          onClick={() =>
+                            setBookmarkRows((prev) => prev.filter((r) => r.id !== row.id))
+                          }
+                          className="p-2 rounded-lg text-surface-500 hover:text-error-400 hover:bg-surface-700/50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                          aria-label={tr('tools.bookmarks.remove', 'Remove bookmark')}
+                        >
+                          <Trash2 size={16} strokeWidth={2} />
+                        </button>
                       </div>
                     ))}
                   </div>
-                  <button className="text-primary-400 hover:text-primary-300 text-sm font-medium flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setBookmarkRows((prev) => [
+                        ...prev,
+                        {
+                          id: `bm-${Date.now()}`,
+                          title: tr('tools.bookmarks.newTitle', 'New bookmark'),
+                          pageNumber: totalPages ? Math.min(prev.length + 1, totalPages) : 1,
+                        },
+                      ])
+                    }
+                    className="text-primary-400 hover:text-primary-300 text-sm font-medium flex items-center gap-1"
+                  >
                     <Plus size={16} strokeWidth={2} />
-                    Add Bookmark
+                    {tr('tools.bookmarks.addRow', 'Add bookmark')}
                   </button>
                 </div>
               )}
@@ -4750,15 +5226,161 @@ export default function ToolView({ tool, onBack }: ToolViewProps) {
               {/* Hyperlink options */}
               {tool.id === 'add-hyperlinks' && (
                 <div className="p-4 rounded-xl bg-surface-800/40 border border-surface-700/50 space-y-4">
-                  <p className="text-sm font-medium text-surface-200 mb-2">{tr('tools.hyperlinks.add', 'Add hyperlinks')}</p>
-                  <div>
-                    <p className="text-xs text-surface-400 mb-1">{tr('tools.hyperlinks.linkText', 'Link text / area')}</p>
-                    <input type="text" placeholder="Text to make clickable..." className="w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all" />
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-sm font-medium text-surface-200">{tr('tools.hyperlinks.add', 'Add hyperlinks')}</p>
+                    {totalPages != null && (
+                      <p className="text-xs text-surface-500">
+                        {tr('tools.hyperlinks.pagesInDoc', '{count} pages').replace('{count}', String(totalPages))}
+                      </p>
+                    )}
                   </div>
-                  <div>
-                    <p className="text-xs text-surface-400 mb-1">URL</p>
-                    <input type="url" placeholder="https://..." className="w-full px-4 py-2.5 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 placeholder-surface-500 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25 transition-all" />
+                  <p className="text-xs text-surface-500">
+                    {tr(
+                      'tools.hyperlinks.hint',
+                      'Drag the rectangle on the preview to position the clickable area. URLs open in the browser when the reader clicks the link.',
+                    )}
+                  </p>
+                  <div className="space-y-3">
+                    {hyperlinkRows.map((row) => {
+                      const selected = row.id === selectedHyperlinkId;
+                      return (
+                        <div
+                          key={row.id}
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => {
+                            setSelectedHyperlinkId(row.id);
+                            setHyperlinkPreviewPage(row.pageNumber);
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              setSelectedHyperlinkId(row.id);
+                              setHyperlinkPreviewPage(row.pageNumber);
+                            }
+                          }}
+                          className={`rounded-lg border p-3 space-y-2 transition-colors ${
+                            selected
+                              ? 'border-primary-500/50 bg-primary-500/10'
+                              : 'border-surface-600/40 bg-surface-900/30'
+                          }`}
+                        >
+                          <div className="flex gap-2">
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs text-surface-400 mb-1">{tr('tools.hyperlinks.url', 'URL')}</p>
+                              <input
+                                type="text"
+                                value={row.url}
+                                onChange={(e) => {
+                                  const v = e.target.value;
+                                  setHyperlinkRows((prev) =>
+                                    prev.map((r) => (r.id === row.id ? { ...r, url: v } : r)),
+                                  );
+                                }}
+                                placeholder="https://example.com"
+                                className="w-full px-3 py-2 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25"
+                              />
+                            </div>
+                            <div className="w-20 shrink-0">
+                              <p className="text-xs text-surface-400 mb-1">{tr('tools.hyperlinks.page', 'Page')}</p>
+                              <input
+                                type="number"
+                                min={1}
+                                max={totalPages ?? undefined}
+                                value={row.pageNumber}
+                                onChange={(e) => {
+                                  const n = parseInt(e.target.value, 10);
+                                  setHyperlinkRows((prev) =>
+                                    prev.map((r) =>
+                                      r.id === row.id
+                                        ? { ...r, pageNumber: Number.isFinite(n) ? n : 1 }
+                                        : r,
+                                    ),
+                                  );
+                                }}
+                                className="w-full px-2 py-2 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 text-sm text-center"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-xs text-surface-400 mb-1">{tr('tools.hyperlinks.linkText', 'Label (optional)')}</p>
+                            <input
+                              type="text"
+                              value={row.label}
+                              onChange={(e) => {
+                                const v = e.target.value;
+                                setHyperlinkRows((prev) =>
+                                  prev.map((r) => (r.id === row.id ? { ...r, label: v } : r)),
+                                );
+                              }}
+                              placeholder={tr('tools.hyperlinks.labelPlaceholder', 'Visible text in the box')}
+                              className="w-full px-3 py-2 rounded-lg bg-surface-900/50 border border-surface-600/50 text-surface-200 text-sm focus:outline-none focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/25"
+                            />
+                          </div>
+                          <div className="flex justify-end">
+                            <button
+                              type="button"
+                              disabled={hyperlinkRows.length <= 1}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setHyperlinkRows((prev) => {
+                                  const next = prev.filter((r) => r.id !== row.id);
+                                  if (selectedHyperlinkId === row.id && next.length > 0) {
+                                    setSelectedHyperlinkId(next[0].id);
+                                    setHyperlinkPreviewPage(next[0].pageNumber);
+                                  }
+                                  return next;
+                                });
+                              }}
+                              className="text-xs text-error-400 hover:text-error-300 disabled:opacity-30"
+                            >
+                              {tr('tools.hyperlinks.remove', 'Remove link')}
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setHyperlinkRows((prev) => {
+                        const id = `hl-${Date.now()}`;
+                        const next = [
+                          ...prev,
+                          {
+                            id,
+                            url: 'https://',
+                            label: '',
+                            pageNumber: totalPages ? Math.min(prev.length + 1, totalPages) : 1,
+                            rect: { x: 0.08, y: 0.88, w: 0.4, h: 0.06 },
+                          },
+                        ];
+                        setSelectedHyperlinkId(id);
+                        setHyperlinkPreviewPage(next[next.length - 1].pageNumber);
+                        return next;
+                      })
+                    }
+                    className="text-primary-400 hover:text-primary-300 text-sm font-medium flex items-center gap-1"
+                  >
+                    <Plus size={16} strokeWidth={2} />
+                    {tr('tools.hyperlinks.addRow', 'Add link')}
+                  </button>
+                  {files.length > 0 && (
+                    <HyperlinkPreview
+                      pdfFile={files[0]}
+                      rows={hyperlinkRows}
+                      selectedId={selectedHyperlinkId}
+                      onSelectId={setSelectedHyperlinkId}
+                      onRectChange={(id, rect) => {
+                        setHyperlinkRows((prev) =>
+                          prev.map((r) => (r.id === id ? { ...r, rect: clampHyperlinkRect(rect) } : r)),
+                        );
+                      }}
+                      previewPage={hyperlinkPreviewPage}
+                      onPreviewPageChange={setHyperlinkPreviewPage}
+                    />
+                  )}
                 </div>
               )}
 

@@ -38,7 +38,7 @@ export async function batesNumbering(
   if (!pageRange || pageRange.trim() === '' || pageRange.toLowerCase() === 'all') {
     pagesToNumber = Array.from({ length: totalPages }, (_, i) => i);
   } else {
-    pagesToNumber = parsePageRange(pageRange, totalPages).map(p => p - 1);
+    pagesToNumber = parsePageRange(pageRange, totalPages);
   }
 
   const font = await pdfDoc.embedFont('Helvetica');

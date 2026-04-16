@@ -121,10 +121,9 @@ export default function ToolInfo({ tool }: ToolInfoProps) {
     return null; // Don't show anything if tool info is not defined
   }
 
-  // Get related tools (only show available ones, not comingSoon)
   const relatedTools = info.relatedTools
     .map(id => allTools.find(t => t.id === id))
-    .filter((t): t is PdfTool => t !== undefined && !t.comingSoon)
+    .filter((t): t is PdfTool => t !== undefined)
     .slice(0, 3); // Limit to 3 related tools
 
   if (relatedTools.length === 0) {

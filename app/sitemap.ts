@@ -3,7 +3,6 @@ import { MetadataRoute } from 'next'
 const baseUrl = 'https://editorapdf.com'
 const locales = ['en', 'fr', 'de', 'es', 'it', 'uk']
 
-// All available PDF tools (excluding comingSoon ones)
 const tools = [
   // Organize & Pages
   'merge', 'split', 'delete-pages', 'extract-pages', 'reorder', 'rotate',
@@ -19,13 +18,6 @@ const tools = [
   // Content & Media
   'extract-images', 'remove-images', 'optimize-images', 'add-qr-code',
   'add-barcode', 'add-bookmarks', 'add-hyperlinks', 'add-attachments',
-  // Forms & Signing
-  'fill-sign', 'stamp', 'bates-numbering', 'create-form',
-  // OCR & Text
-  'ocr', 'searchable-pdf',
-  // Analyze & Optimize
-  'compare', 'repair', 'metadata', 'pdf-statistics', 'linearize',
-  'color-space', 'accessibility', 'pdfa', 'pdfx', 'validate',
 ]
 
 // Blog posts

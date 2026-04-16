@@ -7,7 +7,7 @@ import {
   FilePlus2, Scissors, GripVertical, RotateCw, Trash2,
   Lock, PenTool, EyeOff,
   Image, FileText, Table, Code, AlignLeft,
-  Minimize2, Droplets, PenLine, QrCode, Info,
+  Minimize2, Droplets, ListOrdered, QrCode, Crop,
   ArrowRight, Shield, Zap, Globe, Sparkles,
   AlertCircle, PenSquare,
 } from 'lucide-react';
@@ -478,9 +478,9 @@ export default function Home({ params }: { params: { locale: AppLocale } }) {
                       const tools = [
                         { title: t('tools.compress.title'), desc: t('tools.compress.desc'), color: 'success', icon: <Minimize2 size={20} strokeWidth={1.5} /> },
                         { title: t('tools.watermark.title'), desc: t('tools.watermark.desc'), color: 'info', icon: <Droplets size={20} strokeWidth={1.5} /> },
-                        { title: t('tools.fillSign.title'), desc: t('tools.fillSign.desc'), color: 'primary', icon: <PenLine size={20} strokeWidth={1.5} /> },
+                        { title: t('tools.pageNumbers.title'), desc: t('tools.pageNumbers.desc'), color: 'primary', icon: <ListOrdered size={20} strokeWidth={1.5} /> },
                         { title: t('tools.qr.title'), desc: t('tools.qr.desc'), color: 'accent', icon: <QrCode size={20} strokeWidth={1.5} /> },
-                        { title: t('tools.metadata.title'), desc: t('tools.metadata.desc'), color: 'warning', icon: <Info size={20} strokeWidth={1.5} /> },
+                        { title: t('tools.crop.title'), desc: t('tools.crop.desc'), color: 'warning', icon: <Crop size={20} strokeWidth={1.5} /> },
                       ];
                       const colorClasses: Record<string, { bg: string; border: string; text: string; iconBg: string }> = { primary: { bg: 'bg-primary-500/5', border: 'border-primary-500/20 hover:border-primary-500/40', text: 'text-primary-400', iconBg: 'bg-primary-500/15' }, accent: { bg: 'bg-accent-500/5', border: 'border-accent-500/20 hover:border-accent-500/40', text: 'text-accent-400', iconBg: 'bg-accent-500/15' }, success: { bg: 'bg-success-500/5', border: 'border-success-500/20 hover:border-success-500/40', text: 'text-success-400', iconBg: 'bg-success-500/15' }, error: { bg: 'bg-error-500/5', border: 'border-error-500/20 hover:border-error-500/40', text: 'text-error-400', iconBg: 'bg-error-500/15' }, warning: { bg: 'bg-warning-500/5', border: 'border-warning-500/20 hover:border-warning-500/40', text: 'text-warning-400', iconBg: 'bg-warning-500/15' }, info: { bg: 'bg-info-500/5', border: 'border-info-500/20 hover:border-info-500/40', text: 'text-info-400', iconBg: 'bg-info-500/15' } };
                       return (
