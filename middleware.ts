@@ -65,6 +65,25 @@ export function middleware(req: NextRequest) {
 		}
 	}
 
+	// Blog posts live under `app/blog/[slug]` only. Locale-prefixed URLs like `/en/blog/slug`
+	// must rewrite internally to `/blog/slug` so the route matches while the URL bar stays localized.
+	if (hasLocalePrefix) {
+		const segments = pathname.split('/').filter(Boolean);
+		if (
+			segments.length === 3 &&
+			segments[1] === 'blog' &&
+			isSupportedLocale(segments[0]) &&
+			/^[a-z0-9-]+$/i.test(segments[2])
+		) {
+			const requestHeaders = new Headers(req.headers);
+			requestHeaders.set('x-locale', activeLocale);
+			requestHeaders.set('x-pathname', pathname);
+			return NextResponse.rewrite(new URL(`/blog/${segments[2]}`, req.url), {
+				request: { headers: requestHeaders },
+			});
+		}
+	}
+
 	const requestHeaders = new Headers(req.headers);
 	requestHeaders.set('x-locale', activeLocale);
 	requestHeaders.set('x-pathname', pathname);
