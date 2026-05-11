@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Header from '../components/Header'
 import {
-  Github, ShieldCheck, Lock, BarChart3, ArrowRight, Code,
+  Github, ShieldCheck, Lock, BarChart3, ArrowRight, Code, FileX, Database,
 } from 'lucide-react'
 
 export const metadata: Metadata = {
@@ -31,6 +31,56 @@ export default function BlogPage() {
 
             {/* Blog Posts Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Blog Post: How to Redact PDF for Legal Compliance */}
+            <Link href="/blog/how-to-redact-pdf-for-legal-compliance" className="card overflow-hidden hover:scale-105 transition-transform duration-300 group">
+              <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-error-500/20 to-primary-500/20">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <FileX className="w-24 h-24 text-error-400/50" strokeWidth={1.5} />
+                </div>
+              </div>
+              <div className="p-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="px-2 py-0.5 rounded bg-error-500/20 text-error-300 text-xs font-medium">Security</span>
+                  <span className="px-2 py-0.5 rounded bg-primary-500/20 text-primary-300 text-xs font-medium">Compliance</span>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-primary-400 transition-colors">
+                  How to Redact a PDF for Legal Compliance: GDPR, HIPAA &amp; FOIA Guide
+                </h3>
+                <p className="text-surface-400 mb-4 line-clamp-3">
+                  Learn how to permanently redact sensitive information to meet GDPR, HIPAA, FOIA, and court filing requirements. Avoid the mistakes that have leaked classified data.
+                </p>
+                <span className="text-primary-400 text-sm font-medium inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+                  Read more
+                  <ArrowRight className="w-4 h-4" strokeWidth={2} />
+                </span>
+              </div>
+            </Link>
+
+            {/* Blog Post: PDF Metadata */}
+            <Link href="/blog/pdf-metadata-what-is-it-and-how-to-remove" className="card overflow-hidden hover:scale-105 transition-transform duration-300 group">
+              <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-accent-500/20 to-success-500/20">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Database className="w-24 h-24 text-accent-400/50" strokeWidth={1.5} />
+                </div>
+              </div>
+              <div className="p-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="px-2 py-0.5 rounded bg-accent-500/20 text-accent-300 text-xs font-medium">Privacy</span>
+                  <span className="px-2 py-0.5 rounded bg-success-500/20 text-success-300 text-xs font-medium">Security</span>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2 group-hover:text-primary-400 transition-colors">
+                  PDF Metadata: What It Is, What It Reveals, and How to Remove It
+                </h3>
+                <p className="text-surface-400 mb-4 line-clamp-3">
+                  Every PDF contains hidden metadata — author name, creation date, GPS coordinates, revision history. Learn what your files might be leaking and how to strip it all.
+                </p>
+                <span className="text-primary-400 text-sm font-medium inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+                  Read more
+                  <ArrowRight className="w-4 h-4" strokeWidth={2} />
+                </span>
+              </div>
+            </Link>
+
             {/* Blog Post: How to Merge PDF Files Online */}
             <Link href="/blog/how-to-merge-pdf-files-online" className="card overflow-hidden hover:scale-105 transition-transform duration-300 group">
               <div className="relative w-full h-48 overflow-hidden bg-surface-800">

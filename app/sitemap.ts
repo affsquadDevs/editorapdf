@@ -54,6 +54,8 @@ const blogPosts = [
   'how-to-insert-blank-pages-in-pdf',
   'split-by-bookmarks',
   'split-by-size',
+  'how-to-redact-pdf-for-legal-compliance',
+  'pdf-metadata-what-is-it-and-how-to-remove',
 ]
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -69,8 +71,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/blog',          priority: 0.75, freq: 'weekly'  as const },
     { path: '/faq',           priority: 0.75, freq: 'monthly' as const },
     { path: '/contact',       priority: 0.65, freq: 'monthly' as const },
-    { path: '/privacy-policy',priority: 0.45, freq: 'monthly' as const },
-    { path: '/terms',         priority: 0.45, freq: 'monthly' as const },
+    { path: '/privacy-policy',          priority: 0.45, freq: 'monthly' as const },
+    { path: '/terms',                   priority: 0.45, freq: 'monthly' as const },
+    { path: '/your-files-stay-private', priority: 0.80, freq: 'monthly' as const },
   ]
 
   const localizedPages: MetadataRoute.Sitemap = locales.flatMap((locale) =>

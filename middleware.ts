@@ -13,6 +13,7 @@ const LOCALE_AWARE_PREFIXES = [
 	'/faq',
 	'/terms',
 	'/privacy-policy',
+	'/your-files-stay-private',
 ] as const;
 
 export function middleware(req: NextRequest) {

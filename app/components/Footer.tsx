@@ -47,6 +47,9 @@ export default function Footer({ locale = 'en' as AppLocale }: { locale?: AppLoc
           <Link href={withLocale('/how-it-works')} className="text-sm font-semibold text-primary-400 hover:text-primary-300 transition-colors">
             {t('footer.how')}
           </Link>
+          <Link href={withLocale('/your-files-stay-private')} className="text-sm text-success-400 hover:text-success-300 transition-colors font-medium">
+            Your Files Stay Private
+          </Link>
           <Link href={withLocale('/about')} className="text-sm text-surface-400 hover:text-primary-400 transition-colors">
             {t('footer.about')}
           </Link>
