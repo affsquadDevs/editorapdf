@@ -5,7 +5,7 @@ import Header from '../components/Header'
 import {
   Shield, Server, Wifi, Eye, Lock, CheckCircle2, ArrowRight,
   FileText, Cpu, Globe, AlertCircle, ExternalLink, HardDrive,
-  XCircle, Zap, MonitorSmartphone
+  XCircle, Zap, MonitorSmartphone, MemoryStick, AlertTriangle, CheckCheck
 } from 'lucide-react'
 
 const siteUrl = 'https://editorapdf.com'
@@ -314,6 +314,79 @@ export default function YourFilesStayPrivatePage() {
                     </div>
                   </div>
                 </div>
+              </div>
+            </section>
+
+            {/* Browser Limitations */}
+            <section className="mb-16 animate-fade-in-up" style={{ animationDelay: '350ms' }} aria-labelledby="limits-heading">
+              <h2 id="limits-heading" className="text-2xl md:text-3xl font-bold text-white text-center mb-3">
+                Practical Limitations
+              </h2>
+              <p className="text-center text-surface-400 text-sm mb-8 max-w-2xl mx-auto">
+                Because all processing happens inside your browser tab, the limits are set by your device&apos;s hardware — not our servers.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+                {/* File size */}
+                <div className="p-5 rounded-xl bg-surface-800/40 border border-surface-700/50">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-lg bg-warning-500/15 flex items-center justify-center flex-shrink-0">
+                      <HardDrive size={20} strokeWidth={1.5} className="text-warning-400" />
+                    </div>
+                    <h3 className="text-sm font-semibold text-white">File Size</h3>
+                  </div>
+                  <p className="text-xs text-surface-400 leading-relaxed mb-3">
+                    Works smoothly up to <span className="text-white font-medium">~200 MB</span>. Files up to 500 MB typically process fine on modern hardware. Above 500 MB the browser may feel sluggish depending on available RAM.
+                  </p>
+                  <ul className="space-y-1.5 text-xs">
+                    <li className="flex items-center gap-2 text-success-400"><CheckCheck size={13} strokeWidth={2} /><span className="text-surface-300">Under 200 MB — fast, no issues</span></li>
+                    <li className="flex items-center gap-2 text-warning-400"><AlertTriangle size={13} strokeWidth={2} /><span className="text-surface-300">200–500 MB — close other tabs</span></li>
+                    <li className="flex items-center gap-2 text-error-400"><XCircle size={13} strokeWidth={2} /><span className="text-surface-300">Above 500 MB — may run out of RAM</span></li>
+                  </ul>
+                </div>
+
+                {/* Memory / RAM */}
+                <div className="p-5 rounded-xl bg-surface-800/40 border border-surface-700/50">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-lg bg-info-500/15 flex items-center justify-center flex-shrink-0">
+                      <MemoryStick size={20} strokeWidth={1.5} className="text-info-400" />
+                    </div>
+                    <h3 className="text-sm font-semibold text-white">Memory (RAM)</h3>
+                  </div>
+                  <p className="text-xs text-surface-400 leading-relaxed mb-3">
+                    The browser holds the original PDF, the modified copy, and rendering buffers in RAM simultaneously. Merging many large files can use several GB.
+                  </p>
+                  <ul className="space-y-1.5 text-xs">
+                    <li className="flex items-center gap-2 text-success-400"><CheckCheck size={13} strokeWidth={2} /><span className="text-surface-300">8 GB RAM — handles most tasks</span></li>
+                    <li className="flex items-center gap-2 text-warning-400"><AlertTriangle size={13} strokeWidth={2} /><span className="text-surface-300">Close unused tabs to free RAM</span></li>
+                    <li className="flex items-center gap-2 text-info-400"><Zap size={13} strokeWidth={2} /><span className="text-surface-300">Refresh page to release memory</span></li>
+                  </ul>
+                </div>
+
+                {/* Browser compatibility */}
+                <div className="p-5 rounded-xl bg-surface-800/40 border border-surface-700/50">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-lg bg-primary-500/15 flex items-center justify-center flex-shrink-0">
+                      <Globe size={20} strokeWidth={1.5} className="text-primary-400" />
+                    </div>
+                    <h3 className="text-sm font-semibold text-white">Browser Support</h3>
+                  </div>
+                  <p className="text-xs text-surface-400 leading-relaxed mb-3">
+                    All tools require a modern browser with <span className="text-white">WebAssembly</span> and <span className="text-white">ES2020</span> support. Chrome and Edge are the safest choice for the largest files.
+                  </p>
+                  <ul className="space-y-1.5 text-xs">
+                    <li className="flex items-center gap-2 text-success-400"><CheckCheck size={13} strokeWidth={2} /><span className="text-surface-300">Chrome / Edge — best performance</span></li>
+                    <li className="flex items-center gap-2 text-success-400"><CheckCheck size={13} strokeWidth={2} /><span className="text-surface-300">Firefox — full support</span></li>
+                    <li className="flex items-center gap-2 text-warning-400"><AlertTriangle size={13} strokeWidth={2} /><span className="text-surface-300">Safari — may lag on large files</span></li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-xl bg-surface-800/30 border border-surface-700/30 flex items-start gap-3">
+                <AlertCircle size={16} strokeWidth={2} className="text-surface-500 flex-shrink-0 mt-0.5" />
+                <p className="text-xs text-surface-500 leading-relaxed">
+                  <span className="text-surface-400 font-medium">No persistence:</span> once you close or refresh the tab, all processed files are discarded from memory. Your edited PDF is never stored — download it before leaving the page.
+                </p>
               </div>
             </section>
 

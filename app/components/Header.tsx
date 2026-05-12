@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import MobileMenu from './MobileMenu';
+import GlobalSearch from './GlobalSearch';
 import { PenSquare } from 'lucide-react';
 import LanguageSwitcher from './LanguageSwitcher';
 import { useAppTranslations } from '../i18n/TranslationProvider';
@@ -85,27 +86,30 @@ export default function Header({ showCloseButton = false, onClose, closeButtonLa
             </div>
           </nav>
           
-          {/* CTA Button or Close Button */}
-          {showCloseButton && onClose ? (
-            <button
-              onClick={onClose}
-              className="btn-ghost btn-md group"
-              aria-label={closeButtonLabel}
-            >
-              <svg className="w-5 h-5 text-surface-400 group-hover:text-error-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-              <span className="text-surface-300 group-hover:text-surface-100">{closeButtonLabel}</span>
-            </button>
-          ) : (
-            <Link
-              href={withLocale('/edit')}
-              className="btn-primary btn-md hidden sm:flex"
-            >
-              <PenSquare size={20} strokeWidth={2} />
-              {t('cta.edit')}
-            </Link>
-          )}
+          {/* Search + CTA */}
+          <div className="flex items-center gap-2">
+            <GlobalSearch />
+            {showCloseButton && onClose ? (
+              <button
+                onClick={onClose}
+                className="btn-ghost btn-md group"
+                aria-label={closeButtonLabel}
+              >
+                <svg className="w-5 h-5 text-surface-400 group-hover:text-error-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                <span className="text-surface-300 group-hover:text-surface-100">{closeButtonLabel}</span>
+              </button>
+            ) : (
+              <Link
+                href={withLocale('/edit')}
+                className="btn-primary btn-md hidden sm:flex"
+              >
+                <PenSquare size={20} strokeWidth={2} />
+                {t('cta.edit')}
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     </header>
