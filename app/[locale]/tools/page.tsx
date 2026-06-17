@@ -23,7 +23,8 @@ export function generateMetadata({
   };
 
   return {
-    title: 'Free Online PDF Tools — No Signup Required | EditoraPDF',
+    // Brand suffix is added once by the locale layout's title.template.
+    title: 'Free Online PDF Tools — No Signup Required',
     description: 'All free PDF tools in one place: merge, split, compress, convert, edit, sign, and more. No installation, no account. Files processed locally in your browser.',
     openGraph: {
       type: 'website',

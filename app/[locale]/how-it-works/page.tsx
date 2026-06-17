@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: { params: { locale: string } 
   const t = (key: string) => messages[key] ?? key
 
   return {
-    title: t('nav.how') + ' | EditoraPDF',
+    title: t('nav.how'),
     description: t('hiw.subtitle'),
   }
 }

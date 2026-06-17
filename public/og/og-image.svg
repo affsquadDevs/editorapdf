@@ -1,0 +1,63 @@
+<svg width="1200" height="1200" viewBox="0 0 1200 1200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="1200" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0f172a"/>
+      <stop offset="1" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="doc" x1="0" y1="0" x2="0" y2="1" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3B82F6"/>
+      <stop offset="1" stop-color="#2563EB"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8b5cf6"/>
+      <stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="1200" fill="url(#bg)"/>
+
+  <!-- Design lives in the vertically-centered 630px band (y 285..915) so a centered
+       crop to 1200x630 yields the final Open Graph card. -->
+  <g transform="translate(0, 285)">
+    <!-- subtle decorative glows -->
+    <circle cx="1080" cy="90" r="220" fill="#8b5cf6" opacity="0.12"/>
+    <circle cx="120" cy="560" r="200" fill="#3B82F6" opacity="0.12"/>
+
+    <!-- accent bar -->
+    <rect x="100" y="120" width="64" height="6" rx="3" fill="url(#accent)"/>
+
+    <!-- PDF document + edit mark (enlarged from logo) -->
+    <g transform="translate(100, 168)">
+      <rect x="0" y="0" width="150" height="200" rx="14" fill="url(#doc)"/>
+      <path d="M100 0H25C11.2 0 0 11.2 0 25V37L100 0Z" fill="#ffffff" opacity="0.25"/>
+      <line x1="30" y1="62" x2="120" y2="62" stroke="white" stroke-width="9" stroke-linecap="round"/>
+      <line x1="30" y1="92" x2="120" y2="92" stroke="white" stroke-width="9" stroke-linecap="round"/>
+      <line x1="30" y1="122" x2="92" y2="122" stroke="white" stroke-width="9" stroke-linecap="round"/>
+      <g transform="translate(108, 132)">
+        <path d="M6 30L30 6L54 30L30 54L6 30Z" fill="#60A5FA"/>
+        <path d="M30 6L54 30" stroke="#3B82F6" stroke-width="6"/>
+      </g>
+    </g>
+
+    <!-- wordmark -->
+    <text x="300" y="250" font-family="'Helvetica Neue', Arial, sans-serif" font-size="92" font-weight="800" fill="#ffffff">Editora<tspan fill="#60A5FA">PDF</tspan></text>
+
+    <!-- headline -->
+    <text x="302" y="330" font-family="'Helvetica Neue', Arial, sans-serif" font-size="44" font-weight="700" fill="#e2e8f0">Edit PDF Online — Free &amp; Private</text>
+
+    <!-- subline -->
+    <text x="302" y="386" font-family="'Helvetica Neue', Arial, sans-serif" font-size="30" font-weight="400" fill="#94a3b8">No installation. No signup. Files never leave your browser.</text>
+
+    <!-- feature pills -->
+    <g font-family="'Helvetica Neue', Arial, sans-serif" font-size="26" font-weight="600">
+      <rect x="100" y="470" width="230" height="58" rx="29" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+      <text x="215" y="508" fill="#a78bfa" text-anchor="middle">100% Free</text>
+
+      <rect x="350" y="470" width="270" height="58" rx="29" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+      <text x="485" y="508" fill="#22d3ee" text-anchor="middle">Private by Design</text>
+
+      <rect x="640" y="470" width="300" height="58" rx="29" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+      <text x="790" y="508" fill="#60A5FA" text-anchor="middle">40+ PDF Tools</text>
+    </g>
+  </g>
+</svg>

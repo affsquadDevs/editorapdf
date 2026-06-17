@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
+import { notFound } from 'next/navigation';
 import { toolsMeta } from '../../../data/toolsMeta';
 import { supportedLocales } from '../../../../i18n/config';
 import ToolPageClient from './ToolPageClient';
@@ -7,6 +8,9 @@ import RelatedArticles from '../../../components/RelatedArticles';
 
 const siteUrl = 'https://editorapdf.com';
 const defaultLocale = 'en';
+
+// Unknown toolIds must return a real 404 instead of an indexable soft-404 homepage.
+export const dynamicParams = false;
 
 export function generateStaticParams() {
   const params: { locale: string; toolId: string }[] = [];
@@ -27,13 +31,16 @@ export function generateMetadata({
   const locale = params.locale;
 
   if (!tool) {
+    // Unreachable now that dynamicParams = false, but keep it noindex defensively.
     return {
-      title: 'PDF Tool | EditoraPDF',
+      title: 'PDF Tool',
       description: 'Free online PDF tools — no installation, no signup required.',
+      robots: { index: false, follow: false },
     };
   }
 
-  const title = `${tool.title} Online Free — No Signup | EditoraPDF`;
+  // Brand suffix is added once by the locale layout's title.template.
+  const title = `${tool.title} Online Free — No Signup`;
   const description = `${tool.description}. Free online PDF tool — no installation, no account required. Files processed locally in your browser. 100% private.`;
   const url = `${siteUrl}/${locale}/tools/${tool.id}`;
 
@@ -87,6 +94,7 @@ export default function ToolPage({
   params: { locale: string; toolId: string };
 }) {
   const tool = toolsMeta[params.toolId];
+  if (!tool) notFound();
   const url = `${siteUrl}/${params.locale}/tools/${params.toolId}`;
 
   const breadcrumbSchema = tool
@@ -169,13 +177,8 @@ export default function ToolPage({
         operatingSystem: 'Any',
         browserRequirements: 'Requires a modern browser (Chrome, Edge, Firefox, Safari). JavaScript enabled.',
         isAccessibleForFree: true,
-        aggregateRating: {
-          '@type': 'AggregateRating',
-          ratingValue: '4.8',
-          reviewCount: '1250',
-          bestRating: '5',
-          worstRating: '1',
-        },
+        // aggregateRating intentionally omitted — no real on-page reviews exist.
+        // Hardcoded ratings violate Google's review-snippet policy (manual-action risk).
         offers: {
           '@type': 'Offer',
           price: '0',

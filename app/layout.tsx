@@ -267,7 +267,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 5,
+  // No maximumScale — let users zoom freely (WCAG 1.4.4 / a11y).
   userScalable: true,
   viewportFit: 'cover', // Enable safe-area-inset support
   themeColor: [
@@ -363,14 +363,8 @@ export default function RootLayout({
       availability: 'https://schema.org/InStock',
       url: siteUrl,
     },
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: {
-        '@type': 'EntryPoint',
-        urlTemplate: `${siteUrl}/search?q={search_term_string}`,
-      },
-      'query-input': 'required name=search_term_string',
-    },
+    // SearchAction removed: there is no /search results page (it soft-404s to the
+    // homepage). Re-add only when a real search endpoint exists.
   }
 
   const websiteJsonLd = {
@@ -387,14 +381,7 @@ export default function RootLayout({
         url: `${siteUrl}/logo.svg`,
       },
     },
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: {
-        '@type': 'EntryPoint',
-        urlTemplate: `${siteUrl}/search?q={search_term_string}`,
-      },
-      'query-input': 'required name=search_term_string',
-    },
+    // SearchAction removed: no working /search results page exists yet.
     inLanguage: 'en-US',
     copyrightYear: new Date().getFullYear(),
     copyrightHolder: {
@@ -589,40 +576,17 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         {/* OpenSearch */}
         <link rel="search" type="application/opensearchdescription+xml" title={siteName} href={`${siteUrl}/opensearch.xml`} />
         
-        {/* Open Graph Meta Tags - Explicit for full compatibility */}
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content={siteUrl} />
-        <meta property="og:title" content={siteTitle} />
-        <meta property="og:description" content={siteDescription} />
-        <meta property="og:site_name" content={siteName} />
-        <meta property="og:image" content={`${siteUrl}/og/og-image.png`} />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta property="og:image:alt" content="EditoraPDF - Professional PDF Editor - Edit PDF documents online instantly without installation or signup" />
-        <meta property="og:locale" content="en_US" />
-        
-        {/* Twitter Card Meta Tags */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="@editora_pdf" />
-        <meta name="twitter:creator" content="@editora_pdf" />
-        <meta name="twitter:title" content={siteTitle} />
-        <meta name="twitter:description" content={siteDescription} />
-        <meta name="twitter:image" content={`${siteUrl}/og/og-image.png`} />
-        <meta name="twitter:image:alt" content="EditoraPDF - Professional PDF Editor" />
-        
-        {/* Article Tags for AI Crawlers & Social Media */}
-        <meta property="article:tag" content="open-source" />
-        <meta property="article:tag" content="free-software" />
-        <meta property="article:tag" content="pdf-editor" />
-        <meta property="article:tag" content="privacy-first" />
-        <meta property="article:tag" content="client-side" />
-        
-        {/* Social Media Profile Links */}
-        <meta property="og:see_also" content="https://www.facebook.com/people/Editorapdf/61587362633003/" />
-        <meta property="og:see_also" content="https://www.instagram.com/editora_pdf" />
-        <meta property="og:see_also" content="https://www.threads.com/@editora_pdf" />
-        <meta property="og:see_also" content="https://www.youtube.com/@EditoraPDF" />
-        
+        {/*
+          NOTE: Hand-written og:* / twitter:* / article:tag / og:see_also tags were
+          removed. They hardcoded the English homepage URL/title/locale and were emitted
+          on every page, producing duplicate, conflicting Open Graph/Twitter tags (two
+          og:url, og:title, og:locale, etc.) that pointed scrapers at the wrong page.
+          Open Graph and Twitter metadata are now generated per-route/per-locale by the
+          Next.js Metadata API (root metadata + each page's generateMetadata), which sets
+          the correct og:url/title/locale for every page. Social profile links live in the
+          Organization JSON-LD `sameAs`.
+        */}
+
         {/* Additional structured data hints */}
         <meta name="application-name" content={siteName} />
         <meta name="msapplication-TileColor" content="#0f172a" />

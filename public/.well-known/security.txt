@@ -1,9 +1,8 @@
-Contact: security@docuflow.app
+Contact: mailto:hello@editorapdf.com
+Contact: https://editorapdf.com/en/contact
 Expires: 2027-12-31T23:59:59.000Z
 Preferred-Languages: en, uk
-Canonical: https://docuflow.app/.well-known/security.txt
-Policy: https://docuflow.app/security-policy
-Acknowledgments: https://docuflow.app/security-acknowledgments
+Canonical: https://editorapdf.com/.well-known/security.txt
 
 # Security Policy
 # If you discover a security vulnerability, please report it to us immediately.

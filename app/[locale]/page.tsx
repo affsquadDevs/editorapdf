@@ -95,60 +95,11 @@ export default function Home({ params }: { params: { locale: AppLocale } }) {
     ],
   };
 
-  // Review Schema for SEO
-  const reviewSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: isUk ? 'PDF-редактор EditoraPDF' : 'EditoraPDF PDF Editor',
-    description: isUk
-      ? 'Безкоштовний PDF-редактор із фокусом на приватність, який повністю працює у вашому браузері'
-      : 'Free, privacy-focused PDF editor that runs entirely in your browser',
-    brand: {
-      '@type': 'Brand',
-      name: 'EditoraPDF',
-    },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.8',
-      reviewCount: '1250',
-      bestRating: '5',
-      worstRating: '1',
-    },
-    review: [
-      {
-        '@type': 'Review',
-        author: {
-          '@type': 'Person',
-          name: 'Sarah M.',
-        },
-        datePublished: '2024-01-15',
-        reviewBody: isUk
-          ? 'Чудовий інструмент! Мені подобається, що файли не залишають мій комп’ютер. Саме таке редагування тексту мені й було потрібне.'
-          : 'Amazing tool! I love that my files never leave my computer. The text editing feature is exactly what I needed.',
-        reviewRating: {
-          '@type': 'Rating',
-          ratingValue: '5',
-          bestRating: '5',
-        },
-      },
-      {
-        '@type': 'Review',
-        author: {
-          '@type': 'Person',
-          name: 'John D.',
-        },
-        datePublished: '2024-01-20',
-        reviewBody: isUk
-          ? 'Ідеально для швидких правок PDF. Без реєстрації, працює офлайн і повністю безкоштовно. Дуже рекомендую!'
-          : 'Perfect for quick PDF edits. No signup required, works offline, and completely free. Highly recommend!',
-        reviewRating: {
-          '@type': 'Rating',
-          ratingValue: '5',
-          bestRating: '5',
-        },
-      },
-    ],
-  };
+  // NOTE: Product/Review structured data intentionally removed.
+  // Hardcoded aggregateRating + fabricated reviews violate Google's review-snippet
+  // policy (self-serving markup with no real, on-page user reviews) and risk a
+  // "Spammy structured markup" manual action. Only re-add rating/Review markup when
+  // genuine, user-generated reviews are visibly rendered on the page.
 
   // WebApplication Schema - ONLY on actual tool page
   const webAppSchema = {
@@ -279,13 +230,7 @@ export default function Home({ params }: { params: { locale: AppLocale } }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }}
         strategy="lazyOnload"
       />
-      <Script
-        id="jsonld-review"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(reviewSchema) }}
-        strategy="lazyOnload"
-      />
-      
+
       {/* Google AdSense - Load only on homepage after page is interactive */}
       <Script
         async

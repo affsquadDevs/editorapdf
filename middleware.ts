@@ -61,7 +61,11 @@ export function middleware(req: NextRequest) {
 		if (shouldRedirect) {
 			const redirectPath = pathname === '/' ? `/${detected}` : `/${detected}${pathname}`;
 			const redirectUrl = new URL(redirectPath, req.url);
-			return NextResponse.redirect(redirectUrl);
+			// 308 (permanent) for crawlers — their target is deterministically the default
+			// locale, so link equity consolidates on the /<defaultLocale>/… URLs. For humans
+			// the target depends on Accept-Language/cookie, so keep 307 (temporary) to avoid
+			// the browser caching a locale-specific redirect.
+			return NextResponse.redirect(redirectUrl, isBot ? 308 : 307);
 		}
 	}
 

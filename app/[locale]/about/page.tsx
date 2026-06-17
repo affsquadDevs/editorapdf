@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: { locale: string } 
   const messages = getMessages(locale)
   const t = (key: string) => messages[key] ?? key
   return {
-    title: t('nav.about') + ' | EditoraPDF',
+    title: t('nav.about'),
     description: t('about.subtitle'),
   }
 }

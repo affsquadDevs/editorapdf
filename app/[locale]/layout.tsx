@@ -15,32 +15,32 @@ const GTM_ID = 'GTM-P5DF8WL7'
 // Per-locale SEO title & description
 const localeSeo: Record<AppLocale, { title: string; description: string; ogLocale: string }> = {
   en: {
-    title: 'Edit PDF Online Free - No Installation, No Signup Required | EditoraPDF',
+    title: 'Edit PDF Online Free - No Installation, No Signup Required',
     description: 'Edit PDF documents online instantly without installing software or creating an account. Quick, powerful PDF editing in your browser. No downloads, no signup, 100% free and private.',
     ogLocale: 'en_US',
   },
   uk: {
-    title: 'Редагувати PDF онлайн безкоштовно, без встановлення та реєстрації | EditoraPDF',
+    title: 'Редагувати PDF онлайн безкоштовно, без встановлення та реєстрації',
     description: 'Редагуйте PDF онлайн миттєво без встановлення програм і без створення акаунта. Швидке та потужне редагування PDF у браузері. Без завантажень, без реєстрації, 100% безкоштовно та приватно.',
     ogLocale: 'uk_UA',
   },
   fr: {
-    title: 'Éditer PDF en ligne gratuitement - Sans installation ni inscription | EditoraPDF',
+    title: 'Éditer PDF en ligne gratuitement - Sans installation ni inscription',
     description: 'Modifiez des documents PDF en ligne instantanément sans installer de logiciel ni créer de compte. Édition PDF rapide dans votre navigateur. Sans téléchargement, 100% gratuit et privé.',
     ogLocale: 'fr_FR',
   },
   de: {
-    title: 'PDF online kostenlos bearbeiten - Ohne Installation und Anmeldung | EditoraPDF',
+    title: 'PDF online kostenlos bearbeiten - Ohne Installation und Anmeldung',
     description: 'Bearbeiten Sie PDF-Dokumente sofort online, ohne Software zu installieren oder ein Konto zu erstellen. Schnelle PDF-Bearbeitung im Browser. Ohne Downloads, 100% kostenlos und privat.',
     ogLocale: 'de_DE',
   },
   es: {
-    title: 'Editar PDF en línea gratis - Sin instalación ni registro | EditoraPDF',
+    title: 'Editar PDF en línea gratis - Sin instalación ni registro',
     description: 'Edite documentos PDF en línea al instante sin instalar software ni crear una cuenta. Edición PDF rápida en su navegador. Sin descargas, 100% gratuito y privado.',
     ogLocale: 'es_ES',
   },
   it: {
-    title: 'Modifica PDF online gratis - Senza installazione e registrazione | EditoraPDF',
+    title: 'Modifica PDF online gratis - Senza installazione e registrazione',
     description: 'Modifica documenti PDF online istantaneamente senza installare software o creare un account. Modifica PDF rapida nel browser. Senza download, 100% gratuito e privato.',
     ogLocale: 'it_IT',
   },
@@ -113,7 +113,7 @@ export function generateMetadata({ params }: { params: { locale: string } }): Me
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 5,
+  // No maximumScale — let users zoom freely (WCAG 1.4.4 / a11y).
   userScalable: true,
   viewportFit: 'cover',
   themeColor: [
