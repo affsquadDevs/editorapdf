@@ -14,8 +14,12 @@ const nextConfig = {
   
   // Experimental features for better performance
   experimental: {
-    // Do not use optimizePackageImports for pdf-lib / pdfjs-dist — it breaks webpack
-    // chunk paths (e.g. Cannot find module './vendor-chunks/pdf-lib.js').
+    // Tree-shake barrel imports for icon-heavy packages so only the icons actually
+    // used are bundled (lucide-react is imported in ~34 files). This is a per-package
+    // allow-list — it deliberately does NOT include pdf-lib / pdfjs-dist, because
+    // optimizePackageImports breaks their webpack chunk paths
+    // (e.g. Cannot find module './vendor-chunks/pdf-lib.js').
+    optimizePackageImports: ['lucide-react'],
     // NOTE: optimizeCss requires the optional dependency `critters`.
     // It breaks `next export` if `critters` isn't installed, especially on /404 and /500 prerender.
     // Keep disabled unless you explicitly add `critters` to dependencies.

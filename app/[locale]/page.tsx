@@ -231,14 +231,9 @@ export default function Home({ params }: { params: { locale: AppLocale } }) {
         strategy="lazyOnload"
       />
 
-      {/* Google AdSense - Load only on homepage after page is interactive */}
-      <Script
-        async
-        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2980943706375055"
-        crossOrigin="anonymous"
-        strategy="lazyOnload"
-      />
-      
+      {/* AdSense is loaded once globally in the root layout — the duplicate loader that
+          used to live here was removed to avoid fetching adsbygoogle.js twice on the home page. */}
+
       <main className="min-h-screen flex flex-col" role="main">
       <Header />
 

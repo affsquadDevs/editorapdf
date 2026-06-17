@@ -517,19 +517,21 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           }}
         />
         {/* End Google Tag Manager */}
-        {/* Google AdSense */}
+        {/* Google AdSense — lazyOnload: ads are below the fold, so defer until the
+            browser is idle to protect LCP/INP/TBT instead of competing during load. */}
         <Script
           id="adsense-script"
           async
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2980943706375055"
           crossOrigin="anonymous"
         />
         {/* End Google AdSense */}
-        {/* Trustpilot TrustBox script */}
+        {/* Trustpilot TrustBox script — below-fold footer widget; lazyOnload to keep it
+            off the critical path. */}
         <Script
           id="trustpilot-script"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"
         />
         {/* End Trustpilot TrustBox script */}
