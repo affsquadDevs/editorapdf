@@ -1,16 +1,8 @@
 import { PDFDocument } from 'pdf-lib';
-import * as pdfjsLib from 'pdfjs-dist';
+import { getPdfjs } from './pdfjsLoader';
 
-// Configure pdfjs worker
-if (typeof window !== 'undefined') {
-  // Use CDN for worker or local build
-  try {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
-  } catch (e) {
-    // Fallback to unpkg if cdnjs fails
-    pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
-  }
-}
+// pdfjs-dist is loaded lazily (see ./pdfjsLoader) so it stays out of the tool-page
+// first-load bundle; the worker is configured inside the loader on first use.
 
 interface Bookmark {
   title: string;
@@ -24,10 +16,11 @@ interface Bookmark {
  */
 async function extractBookmarksFromPdfjs(file: File): Promise<Bookmark[]> {
   try {
+    const pdfjsLib = await getPdfjs();
     const arrayBuffer = await file.arrayBuffer();
-    
+
     // Configure pdfjs with error handling
-    const loadingTask = pdfjsLib.getDocument({ 
+    const loadingTask = pdfjsLib.getDocument({
       data: arrayBuffer,
       verbosity: 0, // Reduce console output
     });

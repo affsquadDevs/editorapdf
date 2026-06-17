@@ -1,5 +1,5 @@
-import * as pdfjsLib from 'pdfjs-dist';
 import { loadPdfDocument } from './pdfRender';
+import { getPdfjs } from './pdfjsLoader';
 
 export interface ExtractImagesOptions {
   pageRange?: string;
@@ -29,6 +29,7 @@ export async function extractImages(
   } = options;
 
   const pdfDoc = await loadPdfDocument(file);
+  const { OPS } = await getPdfjs();
   const totalPages = pdfDoc.numPages;
 
   // Parse page range
@@ -82,7 +83,7 @@ export async function extractImages(
         const fn = operatorList.fnArray[i];
         
         // Check for image operations
-        if (fn === pdfjsLib.OPS.paintImageXObject || fn === pdfjsLib.OPS.paintInlineImageXObject) {
+        if (fn === OPS.paintImageXObject || fn === OPS.paintInlineImageXObject) {
           try {
             const args = operatorList.argsArray[i];
             const imageName = args[0];

@@ -1,5 +1,5 @@
-import * as pdfjsLib from 'pdfjs-dist';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
+import { getPdfjs } from './pdfjsLoader';
 
 export interface ExtractedText {
   id: string;
@@ -79,6 +79,7 @@ export async function extractImagesFromPage(
   pageNumber: number
 ): Promise<ExtractedImage[]> {
   try {
+    const { OPS } = await getPdfjs();
     const page = await pdfDoc.getPage(pageNumber);
     const viewport = page.getViewport({ scale: 1 });
     const operatorList = await page.getOperatorList();
@@ -91,7 +92,7 @@ export async function extractImagesFromPage(
       const fn = operatorList.fnArray[i];
       
       // paintImageXObject operation
-      if (fn === pdfjsLib.OPS.paintImageXObject || fn === pdfjsLib.OPS.paintInlineImageXObject) {
+      if (fn === OPS.paintImageXObject || fn === OPS.paintInlineImageXObject) {
         try {
           // This is a simplified extraction - full implementation would need more work
           const args = operatorList.argsArray[i];

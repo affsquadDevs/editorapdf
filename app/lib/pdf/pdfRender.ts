@@ -1,11 +1,8 @@
-import * as pdfjsLib from 'pdfjs-dist';
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist';
+import { getPdfjs } from './pdfjsLoader';
 
-// Configure PDF.js worker
-// This must be set before any PDF operations
-if (typeof window !== 'undefined') {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
-}
+// pdfjs-dist is loaded lazily (see ./pdfjsLoader) so it stays out of the tool-page
+// first-load bundle. The worker is configured inside the loader on first use.
 
 export interface PageInfo {
   index: number;
@@ -17,6 +14,7 @@ export interface PageInfo {
  * Load a PDF document from a file
  */
 export async function loadPdfDocument(file: File): Promise<PDFDocumentProxy> {
+  const pdfjsLib = await getPdfjs();
   const arrayBuffer = await file.arrayBuffer();
   const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
   return loadingTask.promise;
