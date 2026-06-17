@@ -667,8 +667,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <div className="fixed inset-0 bg-mesh -z-10" aria-hidden="true" />
         <div className="fixed inset-0 bg-grid opacity-30 -z-10" aria-hidden="true" />
         
-        {/* Main Content */}
-        <div id="main-content" className="relative min-h-screen flex flex-col">
+        {/* Main Content — skip-link target; tabIndex=-1 so the skip link moves focus here */}
+        <div id="main-content" tabIndex={-1} className="relative min-h-screen flex flex-col outline-none">
           {children}
         </div>
       </body>

@@ -27,73 +27,9 @@ export default function Home({ params }: { params: { locale: AppLocale } }) {
   // FAQ Schema for SEO - Generated from reusable data
   const faqSchema = generateFAQSchema(siteUrl, isUk ? 'uk' : 'en');
 
-  // HowTo Schema for SEO
-  const howToSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'HowTo',
-    name: isUk ? 'Як редагувати PDF онлайн з EditoraPDF' : 'How to Edit a PDF Online with EditoraPDF',
-    description: isUk
-      ? 'Покрокова інструкція з редагування PDF в EditoraPDF, безкоштовному браузерному PDF-редакторі'
-      : 'Step-by-step guide to editing PDFs using EditoraPDF, a free browser-based PDF editor',
-    image: `${siteUrl}/og/og-image.png`,
-    totalTime: 'PT5M',
-    estimatedCost: {
-      '@type': 'MonetaryAmount',
-      currency: 'USD',
-      value: '0',
-    },
-    step: [
-      {
-        '@type': 'HowToStep',
-        position: 1,
-        name: isUk ? 'Відкрийте свій PDF' : 'Open Your PDF',
-        text: isUk
-          ? 'Натисніть «Редагувати PDF» або перетягніть PDF-файл. EditoraPDF підтримує файли до 25 МБ і обробляє все локально у вашому браузері.'
-          : 'Click "Edit PDF" or drag and drop your PDF file. EditoraPDF supports files up to 25MB and processes everything locally in your browser.',
-        image: `${siteUrl}/screenshot-desktop.png`,
-      },
-      {
-        '@type': 'HowToStep',
-        position: 2,
-        name: isUk ? 'Навігація та перегляд' : 'Navigate and View',
-        text: isUk
-          ? 'Використовуйте панель мініатюр для переходу між сторінками. Користуйтеся масштабуванням для зміни вигляду.'
-          : 'Use the thumbnail sidebar to navigate between pages. Use zoom controls to adjust the view.',
-      },
-      {
-        '@type': 'HowToStep',
-        position: 3,
-        name: isUk ? 'Редагуйте текст' : 'Edit Text',
-        text: isUk
-          ? 'Натисніть на наявний текст, щоб редагувати його. Можна змінювати вміст, розмір, колір і позицію. Інструмент «Текст» додає новий текст у будь-якому місці сторінки.'
-          : 'Click on any existing text to edit it. You can change the content, size, color, or position. Use the Text tool to add new text anywhere on the page.',
-      },
-      {
-        '@type': 'HowToStep',
-        position: 4,
-        name: isUk ? 'Додавайте зображення і фігури' : 'Add Images and Shapes',
-        text: isUk
-          ? 'Інструмент «Зображення» додає картинки, а інструмент «Фігура» дозволяє малювати прямокутники, кола, лінії, стрілки та виділення.'
-          : 'Use the Image tool to add pictures, or the Shape tool to draw rectangles, circles, lines, arrows, or highlights.',
-      },
-      {
-        '@type': 'HowToStep',
-        position: 5,
-        name: isUk ? 'Керуйте сторінками' : 'Manage Pages',
-        text: isUk
-          ? 'Повертайте, видаляйте та змінюйте порядок сторінок за допомогою панелі інструментів. Перетягуйте мініатюри для перевпорядкування.'
-          : 'Rotate, delete, or reorder pages using the toolbar controls. Drag thumbnails to reorder pages.',
-      },
-      {
-        '@type': 'HowToStep',
-        position: 6,
-        name: isUk ? 'Експортуйте PDF' : 'Export Your PDF',
-        text: isUk
-          ? 'Натисніть кнопку експорту, щоб завантажити відредагований PDF з усіма змінами. Файл буде збережено на ваш пристрій.'
-          : 'Click the Export button to download your edited PDF with all changes applied. The file will be saved to your device.',
-      },
-    ],
-  };
+  // NOTE: HowTo structured data intentionally removed. Google deprecated HowTo rich
+  // results in 2023 (no SERP feature on desktop or mobile), so it added payload with
+  // zero rich-result benefit. The page's WebApplication + FAQ schema remain.
 
   // NOTE: Product/Review structured data intentionally removed.
   // Hardcoded aggregateRating + fabricated reviews violate Google's review-snippet
@@ -222,12 +158,6 @@ export default function Home({ params }: { params: { locale: AppLocale } }) {
         id="jsonld-faq"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-        strategy="lazyOnload"
-      />
-      <Script
-        id="jsonld-howto"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }}
         strategy="lazyOnload"
       />
 

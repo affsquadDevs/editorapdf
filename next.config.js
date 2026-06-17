@@ -1,3 +1,22 @@
+// Content-Security-Policy (Report-Only for now). Allows the third parties the site
+// actually loads: Google AdSense/Ads/DoubleClick, Google Tag Manager, Trustpilot, and
+// the pdf.js worker (cdnjs + unpkg fallback). Tighten before switching to enforcing.
+const CSP_REPORT_ONLY = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "object-src 'none'",
+  "frame-ancestors 'self'",
+  "form-action 'self'",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://pagead2.googlesyndication.com https://*.googlesyndication.com https://www.googletagmanager.com https://www.google-analytics.com https://googleads.g.doubleclick.net https://*.doubleclick.net https://adservice.google.com https://*.google.com https://widget.trustpilot.com https://*.trustpilot.com https://cdnjs.cloudflare.com https://unpkg.com",
+  "style-src 'self' 'unsafe-inline' https://*.trustpilot.com",
+  "img-src 'self' data: blob: https:",
+  "font-src 'self' data:",
+  "connect-src 'self' https:",
+  "frame-src https://googleads.g.doubleclick.net https://*.doubleclick.net https://*.google.com https://widget.trustpilot.com https://*.trustpilot.com",
+  "worker-src 'self' blob:",
+  "upgrade-insecure-requests",
+].join('; ')
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // SEO & Performance optimizations
@@ -71,11 +90,19 @@ const nextConfig = {
           },
           {
             key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin'
+            value: 'strict-origin-when-cross-origin'
           },
           {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=()'
+          },
+          {
+            // Report-Only: observe violations without blocking anything. Promote to a
+            // real `Content-Security-Policy` after confirming the live ad/analytics/
+            // Trustpilot/pdf-worker flows produce no violations. 'unsafe-inline' is
+            // required by the inline GTM bootstrap and JSON-LD until a nonce is wired in.
+            key: 'Content-Security-Policy-Report-Only',
+            value: CSP_REPORT_ONLY
           }
         ],
       },

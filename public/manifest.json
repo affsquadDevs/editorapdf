@@ -2,7 +2,7 @@
   "name": "EditoraPDF - Professional PDF Editor",
   "short_name": "EditoraPDF",
   "description": "EditoraPDF provides easy-to-use online tools for editing, modifying, and managing PDF documents directly in the browser.",
-  "start_url": "/",
+  "start_url": "/en",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
@@ -63,26 +63,12 @@
     "utilities",
     "business"
   ],
-  "screenshots": [
-    {
-      "src": "/screenshot-desktop.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "platform": "wide"
-    },
-    {
-      "src": "/screenshot-mobile.png",
-      "sizes": "750x1334",
-      "type": "image/png",
-      "platform": "narrow"
-    }
-  ],
   "shortcuts": [
     {
       "name": "Open PDF Editor",
       "short_name": "Editor",
       "description": "Start editing PDFs immediately",
-      "url": "/",
+      "url": "/en",
       "icons": [
         {
           "src": "/icon-192.png",

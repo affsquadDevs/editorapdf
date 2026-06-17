@@ -202,85 +202,11 @@ export default function ToolPage({
       }
     : null;
 
-  const howToSchema = tool
-    ? {
-        '@context': 'https://schema.org',
-        '@type': 'HowTo',
-        '@id': `${url}#howto`,
-        name: `How to ${tool.title} Online`,
-        description: `Step-by-step guide to use ${tool.title} free online — no installation or signup required.`,
-        image: `${siteUrl}/og/og-image.png`,
-        totalTime: 'PT1M',
-        estimatedCost: { '@type': 'MonetaryAmount', currency: 'USD', value: '0' },
-        step: [
-          {
-            '@type': 'HowToStep',
-            position: 1,
-            name: 'Open the tool',
-            text: `Go to the ${tool.title} tool on EditoraPDF. No account or installation required — it works directly in your browser.`,
-          },
-          {
-            '@type': 'HowToStep',
-            position: 2,
-            name: 'Upload your PDF',
-            text: 'Click the upload area or drag and drop your PDF file. Your file is processed locally and never sent to any server.',
-          },
-          {
-            '@type': 'HowToStep',
-            position: 3,
-            name: `${tool.title}`,
-            text: `${tool.description}. Adjust any settings as needed and apply the changes.`,
-          },
-          {
-            '@type': 'HowToStep',
-            position: 4,
-            name: 'Download the result',
-            text: 'Click the Download button to save your processed PDF to your device. The file is ready immediately.',
-          },
-        ],
-      }
-    : null;
-
-  const faqSchema = tool
-    ? {
-        '@context': 'https://schema.org',
-        '@type': 'FAQPage',
-        mainEntity: [
-          {
-            '@type': 'Question',
-            name: `How do I ${tool.title.toLowerCase()} online?`,
-            acceptedAnswer: {
-              '@type': 'Answer',
-              text: `${tool.description}. Simply open the tool on EditoraPDF, upload your PDF file, and the processing happens instantly in your browser — no installation or signup required.`,
-            },
-          },
-          {
-            '@type': 'Question',
-            name: `Is the ${tool.title} tool free?`,
-            acceptedAnswer: {
-              '@type': 'Answer',
-              text: `Yes, ${tool.title} on EditoraPDF is completely free. There are no subscriptions, no hidden fees, and no account required. You can use it as many times as you need.`,
-            },
-          },
-          {
-            '@type': 'Question',
-            name: `Are my files safe when using ${tool.title}?`,
-            acceptedAnswer: {
-              '@type': 'Answer',
-              text: `Your files are 100% private. All processing happens locally in your browser — your PDF is never uploaded to any server. EditoraPDF does not store, transmit, or have access to your documents.`,
-            },
-          },
-          {
-            '@type': 'Question',
-            name: `Do I need to install anything to use ${tool.title}?`,
-            acceptedAnswer: {
-              '@type': 'Answer',
-              text: `No installation needed. ${tool.title} works entirely in your browser. Just open the page and start working — it's compatible with Chrome, Edge, Firefox, and Safari on any device.`,
-            },
-          },
-        ],
-      }
-    : null;
+  // HowTo + FAQPage structured data intentionally removed from tool pages:
+  //  - HowTo rich results were deprecated by Google in 2023 (no SERP benefit).
+  //  - The FAQPage markup had no matching VISIBLE Q&A rendered on the page, which
+  //    violates Google's FAQ policy. Re-add FAQPage only if/when the questions are
+  //    rendered as visible content (which would also fix the thin-content concern).
 
   return (
     <>
@@ -306,22 +232,6 @@ export default function ToolPage({
           type="application/ld+json"
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
-        />
-      )}
-      {howToSchema && (
-        <Script
-          id="howto-schema"
-          type="application/ld+json"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }}
-        />
-      )}
-      {faqSchema && (
-        <Script
-          id="faq-schema"
-          type="application/ld+json"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
         />
       )}
       <ToolPageClient />

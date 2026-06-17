@@ -143,7 +143,9 @@ export default function LocaleLayout({
 
   return (
     <TranslationProvider locale={locale} messages={messages}>
-      <div id="main-content" className="relative min-h-screen flex flex-col">
+      {/* No id="main-content" here — the skip-link target lives in the root layout;
+          a second one would be a duplicate id and break the skip link. */}
+      <div className="relative min-h-screen flex flex-col">
         <div className="fixed inset-0 bg-mesh -z-10" aria-hidden="true" />
         <div className="fixed inset-0 bg-grid opacity-30 -z-10" aria-hidden="true" />
         {children}
