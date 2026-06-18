@@ -4,7 +4,7 @@ import Header from '../../components/Header'
 import { Shield, Mail, ExternalLink, AlertCircle } from 'lucide-react'
 import { defaultLocale, isSupportedLocale, normalizeLocale, type AppLocale } from '../../../i18n/config'
 import { getMessages } from '../../i18n/messages'
-import { localeAlternates } from '../../lib/seo'
+import { localeAlternates, pageOpenGraph } from '../../lib/seo'
 
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
   const locale = (isSupportedLocale(params.locale) ? normalizeLocale(params.locale) : defaultLocale) as AppLocale
@@ -13,6 +13,7 @@ export async function generateMetadata({ params }: { params: { locale: string } 
   return {
     title: t('privacy.title'),
     description: t('privacy.desc'),
+    openGraph: pageOpenGraph(locale, '/privacy-policy', t('privacy.title'), t('privacy.desc'), 'EditoraPDF — Privacy Policy'),
     alternates: localeAlternates(locale, '/privacy-policy'),
   }
 }

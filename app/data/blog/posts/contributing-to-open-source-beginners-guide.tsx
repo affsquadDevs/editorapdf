@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Header from '../../../components/Header'
 import { getMessages } from '../../../i18n/messages'
-import { localeAlternates } from '../../../lib/seo'
+import { localeAlternates, getOgLocale } from '../../../lib/seo'
 import type { AppLocale } from '../../../../i18n/config'
 
 const siteUrl = 'https://editorapdf.com'
@@ -251,6 +251,7 @@ export function meta(locale: AppLocale): Metadata {
       'open source community',
     ],
     openGraph: {
+      locale: getOgLocale(locale),
       title: c.ogTitle,
       description: c.ogDesc,
       url,

@@ -8,7 +8,7 @@ import {
   XCircle, Zap, MonitorSmartphone, MemoryStick, AlertTriangle, CheckCheck,
 } from 'lucide-react'
 import { defaultLocale, isSupportedLocale, normalizeLocale, type AppLocale } from '../../../i18n/config'
-import { localeAlternates } from '../../lib/seo'
+import { localeAlternates, getOgLocale } from '../../lib/seo'
 import { yourFilesContent } from '../../data/yourFilesContent'
 
 const siteUrl = 'https://editorapdf.com'
@@ -30,6 +30,7 @@ export function generateMetadata({ params }: { params: { locale: string } }): Me
       title: c['meta.title'],
       description: c['meta.desc'],
       siteName: 'EditoraPDF',
+      locale: getOgLocale(loc),
       images: [{ url: `${siteUrl}/og/og-image.png`, width: 1200, height: 630, alt: 'EditoraPDF — Files Stay Private' }],
     },
     twitter: {

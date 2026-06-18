@@ -4,6 +4,7 @@ import { toolsMeta } from '../../../data/toolsMeta';
 import { supportedLocales, normalizeLocale } from '../../../../i18n/config';
 import { getMessages } from '../../../i18n/messages';
 import { generateToolFaqSchema } from '../../../data/toolFaq';
+import { getOgLocale } from '../../../lib/seo';
 import ToolPageClient from './ToolPageClient';
 import RelatedArticles from '../../../components/RelatedArticles';
 
@@ -76,6 +77,7 @@ export function generateMetadata({
       title,
       description,
       siteName: 'EditoraPDF',
+      locale: getOgLocale(locale),
       images: [
         {
           url: `${siteUrl}/og/og-image.png`,

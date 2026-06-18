@@ -7,7 +7,7 @@ import {
 } from 'lucide-react'
 import { defaultLocale, isSupportedLocale, normalizeLocale, type AppLocale } from '../../../i18n/config'
 import { getMessages } from '../../i18n/messages'
-import { localeAlternates } from '../../lib/seo'
+import { localeAlternates, pageOpenGraph } from '../../lib/seo'
 
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
   const locale = (isSupportedLocale(params.locale) ? normalizeLocale(params.locale) : defaultLocale) as AppLocale
@@ -16,9 +16,12 @@ export async function generateMetadata({ params }: { params: { locale: string } 
   return {
     title: t('contact.h1'),
     description: t('contact.subtitle'),
+    openGraph: pageOpenGraph(locale, '/contact', t('contact.h1'), t('contact.subtitle'), 'EditoraPDF — Contact'),
     alternates: localeAlternates(locale, '/contact'),
   }
 }
+
+const siteUrl = 'https://editorapdf.com'
 
 export default function ContactLocalePage({ params }: { params: { locale: string } }) {
   const locale = (isSupportedLocale(params.locale) ? normalizeLocale(params.locale) : defaultLocale) as AppLocale
@@ -26,9 +29,24 @@ export default function ContactLocalePage({ params }: { params: { locale: string
   const t = (key: string) => messages[key] ?? key
   const withLocale = (path: string) => `/${locale}${path}`
 
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    '@id': `${siteUrl}/${locale}/contact#breadcrumbs`,
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: t('nav.home'), item: `${siteUrl}/${locale}` },
+      { '@type': 'ListItem', position: 2, name: t('nav.contact'), item: `${siteUrl}/${locale}/contact` },
+    ],
+  }
+
   return (
-    <main className="min-h-screen flex flex-col">
-      <Header />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <main className="min-h-screen flex flex-col">
+        <Header />
 
       <div className="flex-1 flex items-center justify-center p-6 py-12">
         <div className="max-w-3xl w-full">
@@ -113,5 +131,6 @@ export default function ContactLocalePage({ params }: { params: { locale: string
         </div>
       </div>
     </main>
+    </>
   )
 }

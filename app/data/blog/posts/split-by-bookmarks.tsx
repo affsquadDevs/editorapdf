@@ -3,7 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import Header from '../../../components/Header'
 import { getMessages } from '../../../i18n/messages'
-import { localeAlternates } from '../../../lib/seo'
+import { localeAlternates, getOgLocale } from '../../../lib/seo'
 import type { AppLocale } from '../../../../i18n/config'
 
 const siteUrl = 'https://editorapdf.com'
@@ -364,6 +364,7 @@ export function meta(locale: AppLocale): Metadata {
     title: c.metaTitle,
     description: c.metaDesc,
     openGraph: {
+      locale: getOgLocale(locale),
       title: c.ogTitle,
       description: c.ogDesc,
       url,

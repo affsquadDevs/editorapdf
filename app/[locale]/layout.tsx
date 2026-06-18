@@ -152,7 +152,7 @@ export default function LocaleLayout({
       'https://www.youtube.com/@EditoraPDF',
       'https://www.threads.com/@editora_pdf',
     ],
-    contactPoint: { '@type': 'ContactPoint', contactType: 'customer support', email: 'hello@affsquad.com', availableLanguage: ['English'] },
+    contactPoint: { '@type': 'ContactPoint', contactType: 'customer support', email: 'hello@affsquad.com', availableLanguage: ['English', 'Ukrainian', 'German', 'Spanish', 'French', 'Italian'] },
     publishingPrinciples: `${siteUrl}/terms`,
     privacyPolicy: `${siteUrl}/privacy-policy`,
     termsOfService: `${siteUrl}/terms`,

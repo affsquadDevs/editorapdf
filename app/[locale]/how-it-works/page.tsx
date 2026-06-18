@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 import { defaultLocale, isSupportedLocale, normalizeLocale, type AppLocale } from '../../../i18n/config'
 import { getMessages } from '../../i18n/messages'
-import { localeAlternates } from '../../lib/seo'
+import { localeAlternates, pageOpenGraph } from '../../lib/seo'
 
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
   const locale = (isSupportedLocale(params.locale) ? normalizeLocale(params.locale) : defaultLocale) as AppLocale
@@ -19,6 +19,7 @@ export async function generateMetadata({ params }: { params: { locale: string } 
   return {
     title: t('nav.how'),
     description: t('hiw.subtitle'),
+    openGraph: pageOpenGraph(locale, '/how-it-works', t('nav.how'), t('hiw.subtitle'), 'EditoraPDF — How It Works'),
     alternates: localeAlternates(locale, '/how-it-works'),
   }
 }

@@ -5,6 +5,7 @@ import ToolsPanel from '../../components/ToolsPanel';
 import { toolsMeta } from '../../data/toolsMeta';
 import { supportedLocales, defaultLocale, normalizeLocale } from '../../../i18n/config';
 import { getMessages } from '../../i18n/messages';
+import { getOgLocale } from '../../lib/seo';
 
 const siteUrl = 'https://editorapdf.com';
 
@@ -38,6 +39,7 @@ export function generateMetadata({
       title: `${metaTitle} | EditoraPDF`,
       description: metaDesc,
       siteName: 'EditoraPDF',
+      locale: getOgLocale(locale),
       images: [{ url: `${siteUrl}/og/og-image.png`, width: 1200, height: 630, alt: 'EditoraPDF — Free PDF Tools' }],
     },
     twitter: {

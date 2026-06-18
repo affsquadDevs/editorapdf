@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { metadata as baseMetadata } from '../../faq/page';
-import { localeAlternates } from '../../lib/seo';
+import { localeAlternates, getOgLocale } from '../../lib/seo';
 import { getMessages } from '../../i18n/messages';
 import { normalizeLocale } from '../../../i18n/config';
 
@@ -21,6 +21,7 @@ export function generateMetadata({ params }: { params: { locale: string } }): Me
       title,
       description,
       url: `${siteUrl}/${params.locale}/faq`,
+      locale: getOgLocale(params.locale),
     },
     alternates: localeAlternates(params.locale, '/faq'),
   };

@@ -7,7 +7,7 @@ import {
 } from 'lucide-react'
 import { defaultLocale, isSupportedLocale, normalizeLocale, type AppLocale } from '../../../i18n/config'
 import { getMessages } from '../../i18n/messages'
-import { localeAlternates } from '../../lib/seo'
+import { localeAlternates, pageOpenGraph } from '../../lib/seo'
 
 export async function generateMetadata({ params }: { params: { locale: string } }): Promise<Metadata> {
   const locale = (isSupportedLocale(params.locale) ? normalizeLocale(params.locale) : defaultLocale) as AppLocale
@@ -16,6 +16,7 @@ export async function generateMetadata({ params }: { params: { locale: string } 
   return {
     title: t('nav.about'),
     description: t('about.subtitle'),
+    openGraph: pageOpenGraph(locale, '/about', t('nav.about'), t('about.subtitle'), 'EditoraPDF — About'),
     alternates: localeAlternates(locale, '/about'),
   }
 }

@@ -3,7 +3,7 @@ import Link from 'next/link'
 import Script from 'next/script'
 import Header from '../../../components/Header'
 import { getMessages } from '../../../i18n/messages'
-import { localeAlternates } from '../../../lib/seo'
+import { localeAlternates, getOgLocale } from '../../../lib/seo'
 import type { AppLocale } from '../../../../i18n/config'
 import {
   WifiOff, ShieldCheck, Plane, Building2, ArrowRight, Cpu, HardDrive,
@@ -159,6 +159,7 @@ export function meta(locale: AppLocale): Metadata {
     description: c.metaDesc,
     openGraph: {
       type: 'article',
+      locale: getOgLocale(locale),
       url,
       title: c.ogTitle,
       description: c.ogDesc,

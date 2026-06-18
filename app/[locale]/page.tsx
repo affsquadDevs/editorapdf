@@ -15,14 +15,20 @@ import {
 import type { Metadata } from 'next';
 import type { AppLocale } from '../../i18n/config';
 import { getMessages } from '../i18n/messages';
-import { localeAlternates } from '../lib/seo';
+import { localeAlternates, pageOpenGraph } from '../lib/seo';
 
 const siteUrl = 'https://editorapdf.com';
 
 // Canonical + hreflang for the locale home (was provided by the [locale] layout's
 // headers()-based metadata; now per-page so the route can be statically rendered).
 export function generateMetadata({ params }: { params: { locale: AppLocale } }): Metadata {
-  return { alternates: localeAlternates(params.locale, '') };
+  const m = getMessages(params.locale) as Record<string, string>;
+  const t = (k: string) => m[k] ?? k;
+  const title = `${t('hero.title.leading')} ${t('hero.title.trailing')}`.trim();
+  return {
+    openGraph: pageOpenGraph(params.locale, '', title, t('hero.desc')),
+    alternates: localeAlternates(params.locale, ''),
+  };
 }
 
 export default function Home({ params }: { params: { locale: AppLocale } }) {
@@ -232,11 +238,11 @@ export default function Home({ params }: { params: { locale: AppLocale } }) {
                     {/* Row 1: Organize & Pages */}
                     {(() => {
                       const tools = [
-                        { title: t('tools.merge.title'), desc: t('tools.merge.desc'), color: 'primary', icon: <FilePlus2 size={20} strokeWidth={1.5} /> },
-                        { title: t('tools.split.title'), desc: t('tools.split.desc'), color: 'accent', icon: <Scissors size={20} strokeWidth={1.5} /> },
-                        { title: t('tools.reorder.title'), desc: t('tools.reorder.desc'), color: 'warning', icon: <GripVertical size={20} strokeWidth={1.5} /> },
-                        { title: t('tools.rotate.title'), desc: t('tools.rotate.desc'), color: 'info', icon: <RotateCw size={20} strokeWidth={1.5} /> },
-                        { title: t('tools.delete.title'), desc: t('tools.delete.desc'), color: 'error', icon: <Trash2 size={20} strokeWidth={1.5} /> },
+                        { id: 'merge', title: t('tools.merge.title'), desc: t('tools.merge.desc'), color: 'primary', icon: <FilePlus2 size={20} strokeWidth={1.5} /> },
+                        { id: 'split', title: t('tools.split.title'), desc: t('tools.split.desc'), color: 'accent', icon: <Scissors size={20} strokeWidth={1.5} /> },
+                        { id: 'reorder', title: t('tools.reorder.title'), desc: t('tools.reorder.desc'), color: 'warning', icon: <GripVertical size={20} strokeWidth={1.5} /> },
+                        { id: 'rotate', title: t('tools.rotate.title'), desc: t('tools.rotate.desc'), color: 'info', icon: <RotateCw size={20} strokeWidth={1.5} /> },
+                        { id: 'delete-pages', title: t('tools.delete.title'), desc: t('tools.delete.desc'), color: 'error', icon: <Trash2 size={20} strokeWidth={1.5} /> },
                       ];
                       const colorClasses: Record<string, { bg: string; border: string; text: string; iconBg: string }> = { primary: { bg: 'bg-primary-500/5', border: 'border-primary-500/20 hover:border-primary-500/40', text: 'text-primary-400', iconBg: 'bg-primary-500/15' }, accent: { bg: 'bg-accent-500/5', border: 'border-accent-500/20 hover:border-accent-500/40', text: 'text-accent-400', iconBg: 'bg-accent-500/15' }, success: { bg: 'bg-success-500/5', border: 'border-success-500/20 hover:border-success-500/40', text: 'text-success-400', iconBg: 'bg-success-500/15' }, error: { bg: 'bg-error-500/5', border: 'border-error-500/20 hover:border-error-500/40', text: 'text-error-400', iconBg: 'bg-error-500/15' }, warning: { bg: 'bg-warning-500/5', border: 'border-warning-500/20 hover:border-warning-500/40', text: 'text-warning-400', iconBg: 'bg-warning-500/15' }, info: { bg: 'bg-info-500/5', border: 'border-info-500/20 hover:border-info-500/40', text: 'text-info-400', iconBg: 'bg-info-500/15' } };
                       return (
@@ -248,7 +254,7 @@ export default function Home({ params }: { params: { locale: AppLocale } }) {
                           </div>
                           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                             {tools.map((tool, i) => { const c = colorClasses[tool.color] || colorClasses.primary; return (
-                              <Link key={tool.title} href={withLocale('/tools')} className={`group flex flex-col items-center text-center p-3 rounded-xl border transition-all duration-200 hover:scale-[1.04] hover:shadow-lg active:scale-[0.97] ${c.bg} ${c.border} animate-fade-in-up`} style={{ animationDelay: `${300 + i * 50}ms` }}>
+                              <Link key={tool.title} href={withLocale(`/tools/${tool.id}`)} className={`group flex flex-col items-center text-center p-3 rounded-xl border transition-all duration-200 hover:scale-[1.04] hover:shadow-lg active:scale-[0.97] ${c.bg} ${c.border} animate-fade-in-up`} style={{ animationDelay: `${300 + i * 50}ms` }}>
                                 <div className={`w-9 h-9 rounded-lg ${c.iconBg} flex items-center justify-center mb-2 ${c.text} transition-transform duration-200 group-hover:scale-110`}>{tool.icon}</div>
                                 <h3 className="text-xs font-semibold text-white mb-0.5">{tool.title}</h3>
                                 <p className="text-[10px] text-surface-500 hidden sm:block">{tool.desc}</p>
@@ -262,8 +268,8 @@ export default function Home({ params }: { params: { locale: AppLocale } }) {
                     {/* Row 2: Security & Protection */}
                     {(() => {
                       const tools = [
-                        { title: t('tools.sign.title'), desc: t('tools.sign.desc'), color: 'primary', icon: <PenTool size={20} strokeWidth={1.5} /> },
-                        { title: t('tools.redact.title'), desc: t('tools.redact.desc'), color: 'error', icon: <EyeOff size={20} strokeWidth={1.5} /> },
+                        { id: 'sign', title: t('tools.sign.title'), desc: t('tools.sign.desc'), color: 'primary', icon: <PenTool size={20} strokeWidth={1.5} /> },
+                        { id: 'redact', title: t('tools.redact.title'), desc: t('tools.redact.desc'), color: 'error', icon: <EyeOff size={20} strokeWidth={1.5} /> },
                       ];
                       const colorClasses: Record<string, { bg: string; border: string; text: string; iconBg: string }> = { primary: { bg: 'bg-primary-500/5', border: 'border-primary-500/20 hover:border-primary-500/40', text: 'text-primary-400', iconBg: 'bg-primary-500/15' }, accent: { bg: 'bg-accent-500/5', border: 'border-accent-500/20 hover:border-accent-500/40', text: 'text-accent-400', iconBg: 'bg-accent-500/15' }, success: { bg: 'bg-success-500/5', border: 'border-success-500/20 hover:border-success-500/40', text: 'text-success-400', iconBg: 'bg-success-500/15' }, error: { bg: 'bg-error-500/5', border: 'border-error-500/20 hover:border-error-500/40', text: 'text-error-400', iconBg: 'bg-error-500/15' }, warning: { bg: 'bg-warning-500/5', border: 'border-warning-500/20 hover:border-warning-500/40', text: 'text-warning-400', iconBg: 'bg-warning-500/15' }, info: { bg: 'bg-info-500/5', border: 'border-info-500/20 hover:border-info-500/40', text: 'text-info-400', iconBg: 'bg-info-500/15' } };
                       return (
@@ -275,7 +281,7 @@ export default function Home({ params }: { params: { locale: AppLocale } }) {
                           </div>
                           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                             {tools.map((tool, i) => { const c = colorClasses[tool.color] || colorClasses.primary; return (
-                              <Link key={tool.title} href={withLocale('/edit?tab=tools')} className={`group flex flex-col items-center text-center p-3 rounded-xl border transition-all duration-200 hover:scale-[1.04] hover:shadow-lg active:scale-[0.97] ${c.bg} ${c.border} animate-fade-in-up`} style={{ animationDelay: `${500 + i * 50}ms` }}>
+                              <Link key={tool.title} href={withLocale(`/tools/${tool.id}`)} className={`group flex flex-col items-center text-center p-3 rounded-xl border transition-all duration-200 hover:scale-[1.04] hover:shadow-lg active:scale-[0.97] ${c.bg} ${c.border} animate-fade-in-up`} style={{ animationDelay: `${500 + i * 50}ms` }}>
                                 <div className={`w-9 h-9 rounded-lg ${c.iconBg} flex items-center justify-center mb-2 ${c.text} transition-transform duration-200 group-hover:scale-110`}>{tool.icon}</div>
                                 <h3 className="text-xs font-semibold text-white mb-0.5">{tool.title}</h3>
                                 <p className="text-[10px] text-surface-500 hidden sm:block">{tool.desc}</p>
@@ -289,11 +295,11 @@ export default function Home({ params }: { params: { locale: AppLocale } }) {
                     {/* Row 3: Convert */}
                     {(() => {
                       const tools = [
-                        { title: t('tools.pdfToImages.title'), desc: t('tools.pdfToImages.desc'), color: 'accent', icon: <Image size={20} strokeWidth={1.5} /> },
-                        { title: t('tools.pdfToWord.title'), desc: t('tools.pdfToWord.desc'), color: 'info', icon: <FileText size={20} strokeWidth={1.5} /> },
-                        { title: t('tools.pdfToExcel.title'), desc: t('tools.pdfToExcel.desc'), color: 'success', icon: <Table size={20} strokeWidth={1.5} /> },
-                        { title: t('tools.pdfToHtml.title'), desc: t('tools.pdfToHtml.desc'), color: 'error', icon: <Code size={20} strokeWidth={1.5} /> },
-                        { title: t('tools.pdfToText.title'), desc: t('tools.pdfToText.desc'), color: 'warning', icon: <AlignLeft size={20} strokeWidth={1.5} /> },
+                        { id: 'pdf-to-images', title: t('tools.pdfToImages.title'), desc: t('tools.pdfToImages.desc'), color: 'accent', icon: <Image size={20} strokeWidth={1.5} /> },
+                        { id: 'pdf-to-word', title: t('tools.pdfToWord.title'), desc: t('tools.pdfToWord.desc'), color: 'info', icon: <FileText size={20} strokeWidth={1.5} /> },
+                        { id: 'pdf-to-excel', title: t('tools.pdfToExcel.title'), desc: t('tools.pdfToExcel.desc'), color: 'success', icon: <Table size={20} strokeWidth={1.5} /> },
+                        { id: 'pdf-to-html', title: t('tools.pdfToHtml.title'), desc: t('tools.pdfToHtml.desc'), color: 'error', icon: <Code size={20} strokeWidth={1.5} /> },
+                        { id: 'pdf-to-text', title: t('tools.pdfToText.title'), desc: t('tools.pdfToText.desc'), color: 'warning', icon: <AlignLeft size={20} strokeWidth={1.5} /> },
                       ];
                       const colorClasses: Record<string, { bg: string; border: string; text: string; iconBg: string }> = { primary: { bg: 'bg-primary-500/5', border: 'border-primary-500/20 hover:border-primary-500/40', text: 'text-primary-400', iconBg: 'bg-primary-500/15' }, accent: { bg: 'bg-accent-500/5', border: 'border-accent-500/20 hover:border-accent-500/40', text: 'text-accent-400', iconBg: 'bg-accent-500/15' }, success: { bg: 'bg-success-500/5', border: 'border-success-500/20 hover:border-success-500/40', text: 'text-success-400', iconBg: 'bg-success-500/15' }, error: { bg: 'bg-error-500/5', border: 'border-error-500/20 hover:border-error-500/40', text: 'text-error-400', iconBg: 'bg-error-500/15' }, warning: { bg: 'bg-warning-500/5', border: 'border-warning-500/20 hover:border-warning-500/40', text: 'text-warning-400', iconBg: 'bg-warning-500/15' }, info: { bg: 'bg-info-500/5', border: 'border-info-500/20 hover:border-info-500/40', text: 'text-info-400', iconBg: 'bg-info-500/15' } };
                       return (
@@ -305,7 +311,7 @@ export default function Home({ params }: { params: { locale: AppLocale } }) {
                           </div>
                           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                             {tools.map((tool, i) => { const c = colorClasses[tool.color] || colorClasses.primary; return (
-                              <Link key={tool.title} href={withLocale('/edit?tab=tools')} className={`group flex flex-col items-center text-center p-3 rounded-xl border transition-all duration-200 hover:scale-[1.04] hover:shadow-lg active:scale-[0.97] ${c.bg} ${c.border} animate-fade-in-up`} style={{ animationDelay: `${650 + i * 50}ms` }}>
+                              <Link key={tool.title} href={withLocale(`/tools/${tool.id}`)} className={`group flex flex-col items-center text-center p-3 rounded-xl border transition-all duration-200 hover:scale-[1.04] hover:shadow-lg active:scale-[0.97] ${c.bg} ${c.border} animate-fade-in-up`} style={{ animationDelay: `${650 + i * 50}ms` }}>
                                 <div className={`w-9 h-9 rounded-lg ${c.iconBg} flex items-center justify-center mb-2 ${c.text} transition-transform duration-200 group-hover:scale-110`}>{tool.icon}</div>
                                 <h3 className="text-xs font-semibold text-white mb-0.5">{tool.title}</h3>
                                 <p className="text-[10px] text-surface-500 hidden sm:block">{tool.desc}</p>
@@ -319,11 +325,11 @@ export default function Home({ params }: { params: { locale: AppLocale } }) {
                     {/* Row 4: Edit & Content */}
                     {(() => {
                       const tools = [
-                        { title: t('tools.compress.title'), desc: t('tools.compress.desc'), color: 'success', icon: <Minimize2 size={20} strokeWidth={1.5} /> },
-                        { title: t('tools.watermark.title'), desc: t('tools.watermark.desc'), color: 'info', icon: <Droplets size={20} strokeWidth={1.5} /> },
-                        { title: t('tools.pageNumbers.title'), desc: t('tools.pageNumbers.desc'), color: 'primary', icon: <ListOrdered size={20} strokeWidth={1.5} /> },
-                        { title: t('tools.qr.title'), desc: t('tools.qr.desc'), color: 'accent', icon: <QrCode size={20} strokeWidth={1.5} /> },
-                        { title: t('tools.crop.title'), desc: t('tools.crop.desc'), color: 'warning', icon: <Crop size={20} strokeWidth={1.5} /> },
+                        { id: 'compress', title: t('tools.compress.title'), desc: t('tools.compress.desc'), color: 'success', icon: <Minimize2 size={20} strokeWidth={1.5} /> },
+                        { id: 'add-watermark', title: t('tools.watermark.title'), desc: t('tools.watermark.desc'), color: 'info', icon: <Droplets size={20} strokeWidth={1.5} /> },
+                        { id: 'page-numbers', title: t('tools.pageNumbers.title'), desc: t('tools.pageNumbers.desc'), color: 'primary', icon: <ListOrdered size={20} strokeWidth={1.5} /> },
+                        { id: 'add-qr-code', title: t('tools.qr.title'), desc: t('tools.qr.desc'), color: 'accent', icon: <QrCode size={20} strokeWidth={1.5} /> },
+                        { id: 'crop', title: t('tools.crop.title'), desc: t('tools.crop.desc'), color: 'warning', icon: <Crop size={20} strokeWidth={1.5} /> },
                       ];
                       const colorClasses: Record<string, { bg: string; border: string; text: string; iconBg: string }> = { primary: { bg: 'bg-primary-500/5', border: 'border-primary-500/20 hover:border-primary-500/40', text: 'text-primary-400', iconBg: 'bg-primary-500/15' }, accent: { bg: 'bg-accent-500/5', border: 'border-accent-500/20 hover:border-accent-500/40', text: 'text-accent-400', iconBg: 'bg-accent-500/15' }, success: { bg: 'bg-success-500/5', border: 'border-success-500/20 hover:border-success-500/40', text: 'text-success-400', iconBg: 'bg-success-500/15' }, error: { bg: 'bg-error-500/5', border: 'border-error-500/20 hover:border-error-500/40', text: 'text-error-400', iconBg: 'bg-error-500/15' }, warning: { bg: 'bg-warning-500/5', border: 'border-warning-500/20 hover:border-warning-500/40', text: 'text-warning-400', iconBg: 'bg-warning-500/15' }, info: { bg: 'bg-info-500/5', border: 'border-info-500/20 hover:border-info-500/40', text: 'text-info-400', iconBg: 'bg-info-500/15' } };
                       return (
@@ -335,7 +341,7 @@ export default function Home({ params }: { params: { locale: AppLocale } }) {
                           </div>
                           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                             {tools.map((tool, i) => { const c = colorClasses[tool.color] || colorClasses.primary; return (
-                              <Link key={tool.title} href={withLocale('/edit?tab=tools')} className={`group flex flex-col items-center text-center p-3 rounded-xl border transition-all duration-200 hover:scale-[1.04] hover:shadow-lg active:scale-[0.97] ${c.bg} ${c.border} animate-fade-in-up`} style={{ animationDelay: `${800 + i * 50}ms` }}>
+                              <Link key={tool.title} href={withLocale(`/tools/${tool.id}`)} className={`group flex flex-col items-center text-center p-3 rounded-xl border transition-all duration-200 hover:scale-[1.04] hover:shadow-lg active:scale-[0.97] ${c.bg} ${c.border} animate-fade-in-up`} style={{ animationDelay: `${800 + i * 50}ms` }}>
                                 <div className={`w-9 h-9 rounded-lg ${c.iconBg} flex items-center justify-center mb-2 ${c.text} transition-transform duration-200 group-hover:scale-110`}>{tool.icon}</div>
                                 <h3 className="text-xs font-semibold text-white mb-0.5">{tool.title}</h3>
                                 <p className="text-[10px] text-surface-500 hidden sm:block">{tool.desc}</p>
