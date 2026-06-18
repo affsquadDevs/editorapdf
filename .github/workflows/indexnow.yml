@@ -1,0 +1,39 @@
+name: IndexNow
+
+# Notify IndexNow (Bing + other participating engines) to recrawl the site after every
+# successful PRODUCTION deployment, so freshly-deployed content is picked up quickly.
+#
+# Triggered by Vercel's GitHub deployment status (state=success, environment=Production),
+# so it runs only once the new build is live — not on previews and not before the deploy
+# finishes. The IndexNow key is public (hosted at /<key>.txt), so no secrets are required.
+on:
+  deployment_status:
+  workflow_dispatch: # allow a manual run from the Actions tab
+
+permissions:
+  contents: read
+
+# Don't run overlapping submissions if several production deploys land in quick succession.
+concurrency:
+  group: indexnow
+  cancel-in-progress: false
+
+jobs:
+  submit:
+    # Only on a successful Vercel *production* deployment (or a manual dispatch).
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.deployment_status.state == 'success' &&
+       github.event.deployment_status.environment == 'Production')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Submit all sitemap URLs to IndexNow
+        run: node scripts/submit-indexnow.js
