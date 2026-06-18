@@ -1073,5 +1073,11 @@
   "tools.meta.titleSuffix": "Gratis en línea, sin registro",
   "tools.meta.descSuffix": "Herramienta PDF en línea gratuita — sin instalación ni cuenta. Los archivos se procesan localmente en tu navegador. 100 % privado.",
   "tools.indexMeta.title": "Herramientas PDF en línea gratis — sin registro",
-  "tools.indexMeta.description": "Todas las herramientas PDF gratuitas en un solo lugar: unir, dividir, comprimir, convertir, editar, firmar y más. Sin instalación ni cuenta. Los archivos se procesan localmente en tu navegador."
+  "tools.indexMeta.description": "Todas las herramientas PDF gratuitas en un solo lugar: unir, dividir, comprimir, convertir, editar, firmar y más. Sin instalación ni cuenta. Los archivos se procesan localmente en tu navegador.",
+  "faq.contactPrompt": "¿No encuentras lo que buscas?",
+  "faq.contactUs": "Contáctanos",
+  "faq.stillTitle": "¿Aún tienes preguntas?",
+  "faq.stillDesc": "¡Estamos aquí para ayudarte! Ponte en contacto con nuestro equipo o consulta nuestra documentación.",
+  "faq.viewGithub": "Ver en GitHub",
+  "faq.metaDesc": "Encuentra respuestas a las preguntas más comunes sobre EditoraPDF, un editor de PDF gratuito y de código abierto. Conoce sus funciones, privacidad, seguridad y cómo usar nuestra herramienta de edición de PDF en línea."
 }

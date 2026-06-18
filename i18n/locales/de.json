@@ -1073,5 +1073,11 @@
   "tools.meta.titleSuffix": "Kostenlos online, ohne Anmeldung",
   "tools.meta.descSuffix": "Kostenloses Online-PDF-Tool — keine Installation, kein Konto erforderlich. Dateien werden lokal in Ihrem Browser verarbeitet. 100 % privat.",
   "tools.indexMeta.title": "Kostenlose Online-PDF-Werkzeuge — ohne Anmeldung",
-  "tools.indexMeta.description": "Alle kostenlosen PDF-Werkzeuge an einem Ort: zusammenführen, teilen, komprimieren, konvertieren, bearbeiten, signieren und mehr. Keine Installation, kein Konto. Dateien werden lokal in Ihrem Browser verarbeitet."
+  "tools.indexMeta.description": "Alle kostenlosen PDF-Werkzeuge an einem Ort: zusammenführen, teilen, komprimieren, konvertieren, bearbeiten, signieren und mehr. Keine Installation, kein Konto. Dateien werden lokal in Ihrem Browser verarbeitet.",
+  "faq.contactPrompt": "Sie finden nicht, wonach Sie suchen?",
+  "faq.contactUs": "Kontaktieren Sie uns",
+  "faq.stillTitle": "Noch Fragen?",
+  "faq.stillDesc": "Wir helfen Ihnen gerne! Kontaktieren Sie unser Team oder werfen Sie einen Blick in unsere Dokumentation.",
+  "faq.viewGithub": "Auf GitHub ansehen",
+  "faq.metaDesc": "Antworten auf häufige Fragen zu EditoraPDF — einem kostenlosen, quelloffenen PDF-Editor. Erfahren Sie mehr über Funktionen, Datenschutz, Sicherheit und die Nutzung unseres Online-PDF-Editors."
 }

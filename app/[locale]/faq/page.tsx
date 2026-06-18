@@ -1,11 +1,29 @@
 import type { Metadata } from 'next';
 import { metadata as baseMetadata } from '../../faq/page';
 import { localeAlternates } from '../../lib/seo';
+import { getMessages } from '../../i18n/messages';
+import { normalizeLocale } from '../../../i18n/config';
 
-// Preserve the FAQ page's title/description/OG, add locale-aware canonical + hreflang
-// (previously supplied by the [locale] layout's headers()-based metadata).
+const siteUrl = 'https://editorapdf.com';
+
+// Localized title/description + locale-aware canonical/hreflang. The FAQ accordion
+// content itself is localized in the FAQ component (per-locale data files).
 export function generateMetadata({ params }: { params: { locale: string } }): Metadata {
-  return { ...baseMetadata, alternates: localeAlternates(params.locale, '/faq') };
+  const m = getMessages(normalizeLocale(params.locale));
+  const title = m['faq.title'] || 'Frequently Asked Questions';
+  const description = m['faq.metaDesc'] || (baseMetadata.description as string);
+  return {
+    ...baseMetadata,
+    title,
+    description,
+    openGraph: {
+      ...(baseMetadata.openGraph as object),
+      title,
+      description,
+      url: `${siteUrl}/${params.locale}/faq`,
+    },
+    alternates: localeAlternates(params.locale, '/faq'),
+  };
 }
 
 export { default } from '../../faq/page';

@@ -1073,5 +1073,11 @@
   "tools.meta.titleSuffix": "Free Online, No Signup",
   "tools.meta.descSuffix": "Free online PDF tool — no installation, no account required. Files are processed locally in your browser. 100% private.",
   "tools.indexMeta.title": "Free Online PDF Tools — No Signup Required",
-  "tools.indexMeta.description": "All free PDF tools in one place: merge, split, compress, convert, edit, sign, and more. No installation, no account. Files are processed locally in your browser."
+  "tools.indexMeta.description": "All free PDF tools in one place: merge, split, compress, convert, edit, sign, and more. No installation, no account. Files are processed locally in your browser.",
+  "faq.contactPrompt": "Can't find what you're looking for?",
+  "faq.contactUs": "Contact us",
+  "faq.stillTitle": "Still Have Questions?",
+  "faq.stillDesc": "We're here to help! Get in touch with our team or check out our documentation.",
+  "faq.viewGithub": "View on GitHub",
+  "faq.metaDesc": "Find answers to common questions about EditoraPDF — a free, open-source PDF editor. Learn about features, privacy, security, and how to use our online PDF editing tool."
 }

@@ -1073,5 +1073,11 @@
   "tools.meta.titleSuffix": "Gratis online, senza registrazione",
   "tools.meta.descSuffix": "Strumento PDF online gratuito — senza installazione né account. I file vengono elaborati localmente nel tuo browser. 100% privato.",
   "tools.indexMeta.title": "Strumenti PDF online gratuiti — senza registrazione",
-  "tools.indexMeta.description": "Tutti gli strumenti PDF gratuiti in un unico posto: unire, dividere, comprimere, convertire, modificare, firmare e altro. Senza installazione né account. I file vengono elaborati localmente nel tuo browser."
+  "tools.indexMeta.description": "Tutti gli strumenti PDF gratuiti in un unico posto: unire, dividere, comprimere, convertire, modificare, firmare e altro. Senza installazione né account. I file vengono elaborati localmente nel tuo browser.",
+  "faq.contactPrompt": "Non trovi quello che cerchi?",
+  "faq.contactUs": "Contattaci",
+  "faq.stillTitle": "Hai ancora domande?",
+  "faq.stillDesc": "Siamo qui per aiutarti! Contatta il nostro team o consulta la nostra documentazione.",
+  "faq.viewGithub": "Vedi su GitHub",
+  "faq.metaDesc": "Trova risposte alle domande più comuni su EditoraPDF, un editor PDF gratuito e open source. Scopri le funzionalità, la privacy, la sicurezza e come usare il nostro strumento di modifica PDF online."
 }
