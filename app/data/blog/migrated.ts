@@ -34,6 +34,10 @@ export const MIGRATED_BLOG_SLUGS = [
   'split-by-bookmarks',
   'split-by-size',
   'how-to-insert-duplicate-pages-in-pdf',
+  'why-we-made-editorapdf-open-source',
+  'how-we-built-open-source-pdf-editor',
+  'technology-behind-privacy-first-pdf-editing',
+  'open-source-vs-closed-source-pdf-editors',
 ] as const
 
 export type MigratedSlug = (typeof MIGRATED_BLOG_SLUGS)[number]

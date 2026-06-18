@@ -26,6 +26,10 @@ import * as howToSplitPdfFilesOnline from './posts/how-to-split-pdf-files-online
 import * as splitByBookmarks from './posts/split-by-bookmarks'
 import * as splitBySize from './posts/split-by-size'
 import * as howToInsertDuplicatePagesInPdf from './posts/how-to-insert-duplicate-pages-in-pdf'
+import * as whyWeMadeEditorapdfOpenSource from './posts/why-we-made-editorapdf-open-source'
+import * as howWeBuiltOpenSourcePdfEditor from './posts/how-we-built-open-source-pdf-editor'
+import * as technologyBehindPrivacyFirstPdfEditing from './posts/technology-behind-privacy-first-pdf-editing'
+import * as openSourceVsClosedSourcePdfEditors from './posts/open-source-vs-closed-source-pdf-editors'
 
 // slug → post module. Add an entry here (and to MIGRATED_BLOG_SLUGS) when a post is
 // migrated to the locale-aware route. Static imports keep every post in the SSG bundle.
@@ -57,6 +61,10 @@ export const BLOG_POST_REGISTRY: Record<string, BlogPostModule> = {
   'split-by-bookmarks': splitByBookmarks,
   'split-by-size': splitBySize,
   'how-to-insert-duplicate-pages-in-pdf': howToInsertDuplicatePagesInPdf,
+  'why-we-made-editorapdf-open-source': whyWeMadeEditorapdfOpenSource,
+  'how-we-built-open-source-pdf-editor': howWeBuiltOpenSourcePdfEditor,
+  'technology-behind-privacy-first-pdf-editing': technologyBehindPrivacyFirstPdfEditing,
+  'open-source-vs-closed-source-pdf-editors': openSourceVsClosedSourcePdfEditors,
 }
 
 export function getBlogPost(slug: string): BlogPostModule | undefined {
