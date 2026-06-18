@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from 'next'
-import Script from 'next/script'
 import { notFound } from 'next/navigation'
 import Footer from '../components/Footer'
 import { defaultLocale, supportedLocales, type AppLocale, normalizeLocale, isSupportedLocale } from '../../i18n/config'
@@ -130,9 +129,69 @@ export default function LocaleLayout({
   const locale = (isSupportedLocale(params.locale) ? normalizeLocale(params.locale) : defaultLocale) as AppLocale;
 
   const messages = getMessages(locale);
+  const seo = localeSeo[locale] ?? localeSeo.en;
+  const t = (k: string) => (messages[k] && messages[k].trim() ? messages[k] : k);
+
+  // Locale-aware site-wide structured data. Moved here from the root layout (which
+  // statically renders <html lang="en"> and cannot read the locale), so the
+  // Organization / WebSite / ItemList descriptions are in the page's language.
+  const organizationJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    '@id': `${siteUrl}/#organization`,
+    name: 'EditoraPDF',
+    alternateName: 'EditoraPDF Online PDF Editor',
+    url: siteUrl,
+    logo: { '@type': 'ImageObject', url: `${siteUrl}/logo.svg`, width: 120, height: 40 },
+    image: `${siteUrl}/og/og-image.png`,
+    description: seo.description,
+    foundingDate: '2026',
+    sameAs: [
+      'https://www.instagram.com/editora_pdf',
+      'https://www.facebook.com/people/Editorapdf/61587362633003/',
+      'https://www.youtube.com/@EditoraPDF',
+      'https://www.threads.com/@editora_pdf',
+    ],
+    contactPoint: { '@type': 'ContactPoint', contactType: 'customer support', email: 'hello@affsquad.com', availableLanguage: ['English'] },
+    publishingPrinciples: `${siteUrl}/terms`,
+    privacyPolicy: `${siteUrl}/privacy-policy`,
+    termsOfService: `${siteUrl}/terms`,
+    knowsAbout: ['PDF editing', 'Online document tools', 'PDF management', 'Document editing software', 'Browser-based PDF tools'],
+    makesOffer: { '@type': 'Offer', name: 'Online PDF Editing Tools', price: '0', priceCurrency: 'USD', availability: 'https://schema.org/InStock', url: siteUrl },
+  };
+
+  const websiteJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: siteName,
+    url: siteUrl,
+    description: seo.description,
+    publisher: { '@type': 'Organization', name: 'EditoraPDF', logo: { '@type': 'ImageObject', url: `${siteUrl}/logo.svg` } },
+    inLanguage: seo.ogLocale.replace('_', '-'),
+    copyrightYear: 2026,
+    copyrightHolder: { '@type': 'Organization', name: 'EditoraPDF' },
+  };
+
+  const itemListJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: t('schema.featuresTitle'),
+    description: t('schema.featuresDesc'),
+    itemListElement: [1, 2, 3, 4, 5].map((n) => ({
+      '@type': 'ListItem',
+      position: n,
+      name: t(`schema.f${n}Name`),
+      description: t(`schema.f${n}Desc`),
+    })),
+  };
 
   return (
     <TranslationProvider locale={locale} messages={messages}>
+      {/* Locale-aware site-wide JSON-LD (Organization / WebSite / ItemList). Plain
+          server-rendered <script> so the localized schema is in the initial HTML. */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
       {/* The document root <html lang> is statically "en" (set in the root layout so
           pages can be statically rendered). Correct it to this route's locale on the
           live DOM for screen readers / assistive tech and JS-aware crawlers. hreflang

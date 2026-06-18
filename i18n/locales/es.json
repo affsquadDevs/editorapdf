@@ -1079,5 +1079,17 @@
   "faq.stillTitle": "¿Aún tienes preguntas?",
   "faq.stillDesc": "¡Estamos aquí para ayudarte! Ponte en contacto con nuestro equipo o consulta nuestra documentación.",
   "faq.viewGithub": "Ver en GitHub",
-  "faq.metaDesc": "Encuentra respuestas a las preguntas más comunes sobre EditoraPDF, un editor de PDF gratuito y de código abierto. Conoce sus funciones, privacidad, seguridad y cómo usar nuestra herramienta de edición de PDF en línea."
+  "faq.metaDesc": "Encuentra respuestas a las preguntas más comunes sobre EditoraPDF, un editor de PDF gratuito y de código abierto. Conoce sus funciones, privacidad, seguridad y cómo usar nuestra herramienta de edición de PDF en línea.",
+  "schema.featuresTitle": "Funciones de EditoraPDF",
+  "schema.featuresDesc": "Funciones principales del editor de PDF EditoraPDF",
+  "schema.f1Name": "Ver y navegar",
+  "schema.f1Desc": "Renderiza páginas con una claridad cristalina, haz zoom sin problemas y navega con miniaturas inteligentes",
+  "schema.f2Name": "Editar y anotar",
+  "schema.f2Desc": "Reordena, rota y elimina páginas. Añade texto, imágenes, formas y resaltados",
+  "schema.f3Name": "Exporta al instante",
+  "schema.f3Desc": "Descarga tu PDF editado con todos los cambios aplicados. Sin pérdida de calidad garantizada",
+  "schema.f4Name": "100% privado",
+  "schema.f4Desc": "Todo el procesamiento ocurre localmente en tu navegador. Tus documentos nunca salen de tu dispositivo",
+  "schema.f5Name": "Sin subidas necesarias",
+  "schema.f5Desc": "Seguridad de nivel empresarial por diseño. Sin subidas al servidor ni suscripciones"
 }

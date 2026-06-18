@@ -316,117 +316,8 @@ export default function RootLayout({
     },
   }
 
-  const organizationJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Organization',
-    '@id': `${siteUrl}/#organization`,
-    name: 'EditoraPDF',
-    alternateName: 'EditoraPDF Online PDF Editor',
-    url: siteUrl,
-    logo: {
-      '@type': 'ImageObject',
-      url: `${siteUrl}/logo.svg`,
-      width: 120,
-      height: 40,
-    },
-    image: `${siteUrl}/og/og-image.png`,
-    description: 'EditoraPDF provides easy-to-use online tools for editing, modifying, and managing PDF documents directly in the browser.',
-    foundingDate: '2026',
-    sameAs: [
-      'https://www.instagram.com/editora_pdf',
-      'https://www.facebook.com/people/Editorapdf/61587362633003/',
-      'https://www.youtube.com/@EditoraPDF',
-      'https://www.threads.com/@editora_pdf',
-    ],
-    contactPoint: {
-      '@type': 'ContactPoint',
-      contactType: 'customer support',
-      email: 'hello@affsquad.com',
-      availableLanguage: ['English'],
-    },
-    publishingPrinciples: `${siteUrl}/terms`,
-    privacyPolicy: `${siteUrl}/privacy-policy`,
-    termsOfService: `${siteUrl}/terms`,
-    knowsAbout: [
-      'PDF editing',
-      'Online document tools',
-      'PDF management',
-      'Document editing software',
-      'Browser-based PDF tools',
-    ],
-    makesOffer: {
-      '@type': 'Offer',
-      name: 'Online PDF Editing Tools',
-      price: '0',
-      priceCurrency: 'USD',
-      availability: 'https://schema.org/InStock',
-      url: siteUrl,
-    },
-    // SearchAction removed: there is no /search results page (it soft-404s to the
-    // homepage). Re-add only when a real search endpoint exists.
-  }
-
-  const websiteJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    name: siteName,
-    url: siteUrl,
-    description: siteDescription,
-    publisher: {
-      '@type': 'Organization',
-      name: 'EditoraPDF',
-      logo: {
-        '@type': 'ImageObject',
-        url: `${siteUrl}/logo.svg`,
-      },
-    },
-    // SearchAction removed: no working /search results page exists yet.
-    inLanguage: 'en-US',
-    copyrightYear: new Date().getFullYear(),
-    copyrightHolder: {
-      '@type': 'Organization',
-      name: 'EditoraPDF',
-    },
-  }
-
-  const itemListJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'ItemList',
-    name: 'EditoraPDF Features',
-    description: 'Key features of EditoraPDF PDF Editor',
-    itemListElement: [
-      {
-        '@type': 'ListItem',
-        position: 1,
-        name: 'View & Navigate',
-        description: 'Render pages with crystal clarity, zoom seamlessly, and navigate with smart thumbnails',
-      },
-      {
-        '@type': 'ListItem',
-        position: 2,
-        name: 'Edit & Annotate',
-        description: 'Reorder, rotate, delete pages. Add text, images, shapes, and highlights',
-      },
-      {
-        '@type': 'ListItem',
-        position: 3,
-        name: 'Export Instantly',
-        description: 'Download your edited PDF with all changes applied. No quality loss guaranteed',
-      },
-      {
-        '@type': 'ListItem',
-        position: 4,
-        name: '100% Private',
-        description: 'All processing happens locally in your browser. Your documents never leave your device',
-      },
-      {
-        '@type': 'ListItem',
-        position: 5,
-        name: 'No Uploads Required',
-        description: 'Enterprise-level security by design. No server uploads, no subscriptions',
-      },
-    ],
-  }
+  // Organization / WebSite / ItemList JSON-LD moved to app/[locale]/layout.tsx so their
+  // descriptions render in the page locale (this root layout can't read the locale).
 
   // SoftwareSourceCode schema - Open Source Project
   const softwareSourceCodeJsonLd = {
@@ -610,24 +501,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
           strategy="lazyOnload"
         />
-        <Script
-          id="jsonld-organization"
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
-          strategy="lazyOnload"
-        />
-        <Script
-          id="jsonld-website"
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
-          strategy="lazyOnload"
-        />
-        <Script
-          id="jsonld-itemlist"
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
-          strategy="lazyOnload"
-        />
+        {/* Organization / WebSite / ItemList JSON-LD moved to app/[locale]/layout.tsx so
+            their descriptions are localized (the root layout can't read the locale). */}
         <Script
           id="jsonld-sourcecode"
           type="application/ld+json"
