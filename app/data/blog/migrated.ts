@@ -14,6 +14,13 @@ export const MIGRATED_BLOG_SLUGS = [
   'how-to-reorder-pdf-pages',
   'how-to-reverse-pdf-page-order',
   'how-to-rotate-pdf-pages-online',
+  'pdf-to-text',
+  'pdf-to-html',
+  'pdf-to-markdown',
+  'how-to-convert-pdf-to-word-online',
+  'how-to-convert-pdf-to-excel-online',
+  'how-to-convert-pdf-to-csv-online',
+  'how-to-convert-images-to-pdf-online',
 ] as const
 
 export type MigratedSlug = (typeof MIGRATED_BLOG_SLUGS)[number]
