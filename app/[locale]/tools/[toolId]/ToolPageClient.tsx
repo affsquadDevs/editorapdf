@@ -3,6 +3,7 @@
 import { useParams, useRouter } from 'next/navigation';
 import { allTools } from '../../../components/ToolsPanel';
 import ToolView from '../../../components/ToolView';
+import ToolFAQ from '../../../components/ToolFAQ';
 import Header from '../../../components/Header';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
@@ -46,6 +47,8 @@ export default function LocalizedToolPage() {
           titleAs="h1"
         />
       </div>
+      <ToolFAQ toolId={tool.id} />
+      <div className="pb-12" />
     </main>
   );
 }

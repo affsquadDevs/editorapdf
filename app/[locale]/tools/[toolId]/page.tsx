@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
-import Script from 'next/script';
 import { notFound } from 'next/navigation';
 import { toolsMeta } from '../../../data/toolsMeta';
 import { supportedLocales, normalizeLocale } from '../../../../i18n/config';
 import { getMessages } from '../../../i18n/messages';
+import { generateToolFaqSchema } from '../../../data/toolFaq';
 import ToolPageClient from './ToolPageClient';
 import RelatedArticles from '../../../components/RelatedArticles';
 
@@ -226,36 +226,39 @@ export default function ToolPage({
       }
     : null;
 
-  // HowTo + FAQPage structured data intentionally removed from tool pages:
-  //  - HowTo rich results were deprecated by Google in 2023 (no SERP benefit).
-  //  - The FAQPage markup had no matching VISIBLE Q&A rendered on the page, which
-  //    violates Google's FAQ policy. Re-add FAQPage only if/when the questions are
-  //    rendered as visible content (which would also fix the thin-content concern).
+  // FAQPage structured data: built from the SAME localized per-tool FAQ data that the
+  // visible <ToolFAQ> accordion renders (in ToolPageClient), so the markup always has
+  // matching on-page Q&A per Google's FAQ policy. (HowTo schema stays removed — Google
+  // deprecated HowTo rich results in 2023.)
+  const faqSchema = generateToolFaqSchema(siteUrl, tool.id, normalizeLocale(params.locale));
 
   return (
     <>
+      {/* JSON-LD rendered as plain SSR <script> tags (in the initial HTML) so crawlers see
+          the structured data without executing JS — important for the FAQPage rich result,
+          whose markup must match the visible <ToolFAQ> Q&A. */}
       {breadcrumbSchema && (
-        <Script
-          id="breadcrumb-schema"
+        <script
           type="application/ld+json"
-          strategy="afterInteractive"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
         />
       )}
       {webAppSchema && (
-        <Script
-          id="webapp-schema"
+        <script
           type="application/ld+json"
-          strategy="afterInteractive"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(webAppSchema) }}
         />
       )}
       {serviceSchema && (
-        <Script
-          id="service-schema"
+        <script
           type="application/ld+json"
-          strategy="afterInteractive"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
+        />
+      )}
+      {faqSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
         />
       )}
       <ToolPageClient />
