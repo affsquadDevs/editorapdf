@@ -8,6 +8,12 @@
 // `app/data/blog/posts/<slug>.tsx` and is wired into the registry.
 export const MIGRATED_BLOG_SLUGS = [
   'how-to-edit-a-pdf-online',
+  'how-to-delete-pages-from-pdf',
+  'how-to-extract-pages-from-pdf-online',
+  'how-to-insert-blank-pages-in-pdf',
+  'how-to-reorder-pdf-pages',
+  'how-to-reverse-pdf-page-order',
+  'how-to-rotate-pdf-pages-online',
 ] as const
 
 export type MigratedSlug = (typeof MIGRATED_BLOG_SLUGS)[number]
