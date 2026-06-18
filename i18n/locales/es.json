@@ -1114,5 +1114,20 @@
   "schema.app.aud1": "Estudiantes",
   "schema.app.aud2": "Profesionales",
   "schema.app.aud3": "Pequeñas empresas",
-  "schema.app.aud4": "Público general"
+  "schema.app.aud4": "Público general",
+  "blog.bcHome": "Inicio",
+  "blog.bcBlog": "Blog",
+  "blog.faqTitle": "Preguntas frecuentes",
+  "blog.backToBlog": "Volver al Blog",
+  "blog.disclaimerLabel": "Aviso legal:",
+  "blog.disclaimerBody": "EditoraPDF ofrece herramientas de edición de PDF en línea únicamente para uso general. No ofrecemos ninguna garantía respecto a la exactitud, integridad o idoneidad para cualquier fin específico. Los usuarios son responsables de revisar todos los documentos antes de usarlos. Al utilizar este sitio web, aceptas nuestros",
+  "blog.terms": "Términos",
+  "blog.and": "y",
+  "blog.privacyPolicy": "Política de Privacidad",
+  "blog.rights": "Todos los derechos reservados.",
+  "blog.followUs": "Síguenos:",
+  "blog.followFacebook": "Síguenos en Facebook",
+  "blog.followInstagram": "Síguenos en Instagram",
+  "blog.followThreads": "Síguenos en Threads",
+  "blog.subscribeYouTube": "Suscríbete en YouTube"
 }

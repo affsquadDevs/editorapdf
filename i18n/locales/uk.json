@@ -1114,5 +1114,20 @@
   "schema.app.aud1": "Студенти",
   "schema.app.aud2": "Фахівці",
   "schema.app.aud3": "Малий бізнес",
-  "schema.app.aud4": "Широка аудиторія"
+  "schema.app.aud4": "Широка аудиторія",
+  "blog.bcHome": "Головна",
+  "blog.bcBlog": "Блог",
+  "blog.faqTitle": "Поширені запитання",
+  "blog.backToBlog": "Назад до блогу",
+  "blog.disclaimerLabel": "Застереження:",
+  "blog.disclaimerBody": "EditoraPDF надає онлайн-інструменти для редагування PDF лише для загального використання. Ми не даємо жодних гарантій щодо точності, повноти чи придатності для будь-якої конкретної мети. Користувачі несуть відповідальність за перевірку всіх документів перед використанням. Користуючись цим вебсайтом, ви погоджуєтеся з нашими",
+  "blog.terms": "Умовами",
+  "blog.and": "та",
+  "blog.privacyPolicy": "Політикою конфіденційності",
+  "blog.rights": "Усі права захищені.",
+  "blog.followUs": "Стежте за нами:",
+  "blog.followFacebook": "Стежте за нами у Facebook",
+  "blog.followInstagram": "Стежте за нами в Instagram",
+  "blog.followThreads": "Стежте за нами у Threads",
+  "blog.subscribeYouTube": "Підпишіться на YouTube"
 }

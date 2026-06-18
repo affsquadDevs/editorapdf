@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { defaultLocale, detectPreferredLocale, isSupportedLocale } from './i18n/config';
+import { isMigratedBlogSlug } from './app/data/blog/migrated';
 
 const PUBLIC_FILE = /\.(.*)$/;
 const LOCALE_AWARE_PREFIXES = [
@@ -69,15 +70,18 @@ export function middleware(req: NextRequest) {
 		}
 	}
 
-	// Blog posts live under `app/blog/[slug]` only. Locale-prefixed URLs like `/en/blog/slug`
-	// must rewrite internally to `/blog/slug` so the route matches while the URL bar stays localized.
+	// Legacy English blog posts live under `app/blog/[slug]` only. Locale-prefixed URLs like
+	// `/en/blog/slug` rewrite internally to `/blog/slug` so the route matches while the URL bar
+	// stays localized. MIGRATED slugs have a real localized route at `app/[locale]/blog/[slug]`,
+	// so they must NOT be rewritten — let them fall through to that route.
 	if (hasLocalePrefix) {
 		const segments = pathname.split('/').filter(Boolean);
 		if (
 			segments.length === 3 &&
 			segments[1] === 'blog' &&
 			isSupportedLocale(segments[0]) &&
-			/^[a-z0-9-]+$/i.test(segments[2])
+			/^[a-z0-9-]+$/i.test(segments[2]) &&
+			!isMigratedBlogSlug(segments[2])
 		) {
 			const requestHeaders = new Headers(req.headers);
 			requestHeaders.set('x-locale', activeLocale);

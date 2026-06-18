@@ -1,8 +1,11 @@
 import { MetadataRoute } from 'next'
+import { MIGRATED_BLOG_SLUGS } from './data/blog/migrated'
 
 const baseUrl = 'https://editorapdf.com'
 const defaultLocale = 'en'
 const locales = ['en', 'fr', 'de', 'es', 'it', 'uk']
+
+const migratedBlogSet = new Set<string>(MIGRATED_BLOG_SLUGS)
 
 // Build hreflang alternates (xhtml:link) for a locale-varying path. x-default points
 // at the default-locale URL (which resolves 200, never a redirect).
@@ -122,16 +125,29 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority,
   }))
 
-  // ── Blog posts (English only) ───────────────────────────────────────────────
-  // Blog content is not translated, so every /<locale>/blog/<slug> canonicalizes to
-  // the /en URL. Advertise only the English URL here (no hreflang) until posts are
-  // translated, to avoid 175 duplicate near-identical locale URLs.
-  const blogUrls: MetadataRoute.Sitemap = blogPosts.map((slug) => ({
-    url: `${baseUrl}/${defaultLocale}/blog/${slug}`,
-    lastModified: now,
-    changeFrequency: 'monthly' as const,
-    priority: 0.7,
-  }))
+  // ── Blog posts ──────────────────────────────────────────────────────────────
+  // Migrated posts are fully translated (per-locale route + self canonical), so they get
+  // one URL per locale with reciprocal hreflang. Not-yet-migrated posts are still
+  // English-only (every /<locale>/blog/<slug> canonicalizes to /en), so they get a single
+  // /en entry with no hreflang to match that canonical.
+  const blogUrls: MetadataRoute.Sitemap = blogPosts.flatMap((slug) => {
+    const path = `/blog/${slug}`
+    if (migratedBlogSet.has(slug)) {
+      return locales.map((locale) => ({
+        url: `${baseUrl}/${locale}${path}`,
+        lastModified: now,
+        changeFrequency: 'monthly' as const,
+        priority: 0.7,
+        alternates: { languages: altLanguages(path) },
+      }))
+    }
+    return [{
+      url: `${baseUrl}/${defaultLocale}${path}`,
+      lastModified: now,
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+    }]
+  })
 
   // ── Single canonical pages (no locale variants) ────────────────────────────
   const canonicalPages: MetadataRoute.Sitemap = [
