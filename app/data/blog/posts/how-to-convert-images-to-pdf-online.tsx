@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import Header from '../../../components/Header'
+import BlogByline from '../../../components/BlogByline'
 import { getMessages } from '../../../i18n/messages'
 import { localeAlternates, getOgLocale } from '../../../lib/seo'
 import type { AppLocale } from '../../../../i18n/config'
@@ -495,7 +496,7 @@ export function schemas(locale: AppLocale): Record<string, unknown>[] {
     description: c.artDesc,
     image: `${siteUrl}${heroImage}`,
     inLanguage: locale,
-    author: { '@type': 'Organization', name: 'EditoraPDF', url: siteUrl },
+    author: { '@type': 'Organization', name: 'EditoraPDF Team', url: siteUrl },
     publisher: {
       '@type': 'Organization',
       name: 'EditoraPDF',
@@ -556,6 +557,7 @@ export function Article({ locale }: { locale: AppLocale }) {
             <p className="text-lg md:text-xl text-surface-200 leading-relaxed max-w-3xl drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]">
               {c.heroSubtitle}
             </p>
+            <BlogByline locale={locale} datePublished={datePublished} />
           </div>
         </div>
       </div>

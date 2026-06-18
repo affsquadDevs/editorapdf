@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Script from 'next/script'
 import Header from '../../../components/Header'
+import BlogByline from '../../../components/BlogByline'
 import { getMessages } from '../../../i18n/messages'
 import { localeAlternates, getOgLocale } from '../../../lib/seo'
 import type { AppLocale } from '../../../../i18n/config'
@@ -203,7 +204,7 @@ export function schemas(locale: AppLocale): Record<string, unknown>[] {
     dateModified: publishDate,
     author: {
       '@type': 'Organization',
-      name: 'EditoraPDF',
+      name: 'EditoraPDF Team',
       url: siteUrl,
     },
     publisher: {
@@ -341,9 +342,7 @@ export function Article({ locale }: { locale: AppLocale }) {
               <p className="text-base md:text-lg text-surface-300 leading-relaxed">
                 {c.heroSubtitle}
               </p>
-              <p className="text-xs text-surface-500 mt-4">
-                <time dateTime={publishDate}>{c.heroPublished} {publishDate}</time> · {c.heroReadTime}
-              </p>
+              <BlogByline locale={locale} datePublished={publishDate} />
             </header>
 
             {/* TL;DR */}

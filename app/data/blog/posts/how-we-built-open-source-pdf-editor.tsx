@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import Header from '../../../components/Header'
+import BlogByline from '../../../components/BlogByline'
 import { getMessages } from '../../../i18n/messages'
 import { localeAlternates, getOgLocale } from '../../../lib/seo'
 import type { AppLocale } from '../../../../i18n/config'
@@ -402,12 +403,6 @@ export function Article({ locale }: { locale: AppLocale }) {
             <span className="px-3 py-1 rounded-full bg-accent-500/20 border border-accent-500/40 text-accent-300 text-sm font-medium">
               {c.badgeTechnical}
             </span>
-            <span className="text-sm text-surface-400">
-              {c.published}
-            </span>
-            <span className="text-sm text-surface-400">
-              {c.readTime}
-            </span>
           </div>
 
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
@@ -416,6 +411,7 @@ export function Article({ locale }: { locale: AppLocale }) {
           <p className="text-xl md:text-2xl text-surface-300 leading-relaxed">
             {c.heroSubtitle}
           </p>
+          <BlogByline locale={locale} datePublished={datePublished} />
 
           {/* GitHub CTA */}
           <div className="mt-8 flex flex-wrap items-center gap-4">
