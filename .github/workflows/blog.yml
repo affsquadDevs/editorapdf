@@ -1,0 +1,93 @@
+name: Daily Blog
+
+# Generates brand-new blog posts with the Claude API (matching the existing posts'
+# style + on-page SEO) and wires each one into THIS repo's TSX blog system:
+#   • app/data/blog/posts/<slug>.tsx + <slug>.i18n.ts   (the post module)
+#   • app/data/blog/registry.ts                          (so the [slug] route renders it)
+#   • app/data/blog/migrated.ts                          (so it lands in the sitemap)
+#   • app/components/BlogIndex.tsx                        (the blog-index card)
+# then commits those changed files to main. That push triggers the Vercel production
+# deploy.
+#
+# The cron fires daily, but scripts/should-run-blog.mjs gates it down to 2 random days
+# per ISO week, so posts are generated only ~twice a week. A manual "Run workflow"
+# always generates, regardless of the day.
+#
+# IndexNow: this repo has NO scripts/indexnow.mjs. The existing .github/workflows/
+# indexnow.yml runs on `deployment_status` (Vercel production deploys) and submits the
+# changed URLs — that path DOES fire for the Vercel deploy this push creates, so we do
+# not need to ping IndexNow from here. As a belt-and-braces fallback we also submit the
+# new post URLs directly via the repo's existing scripts/submit-indexnow.js after the
+# deploy has had time to go live.
+
+on:
+  schedule:
+    - cron: "0 6 * * *" # daily at 06:00 UTC — gated to 2 random days/week below
+  workflow_dispatch:
+    inputs:
+      count:
+        description: "How many new posts to generate"
+        type: string
+        default: "2"
+
+concurrency:
+  group: daily-blog
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # On scheduled runs, only proceed on this week's 2 random days. Manual runs
+      # skip the gate (always generate).
+      - name: Weekly run gate
+        id: gate
+        run: echo "run=$(node scripts/should-run-blog.mjs)" >> "$GITHUB_OUTPUT"
+
+      - name: Generate posts
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.run == 'true'
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_MODEL: claude-opus-4-8
+        run: node scripts/generate-blog.mjs --count "${{ inputs.count || '2' }}"
+
+      - name: Commit & push
+        id: commit
+        if: github.event_name == 'workflow_dispatch' || steps.gate.outputs.run == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet; then
+            echo "No changes to commit."
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          DATE=$(date -u +%Y-%m-%d)
+          # Commit ONLY the files the generator touches (posts + the four wiring files).
+          git add \
+            app/data/blog/posts/ \
+            app/data/blog/registry.ts \
+            app/data/blog/migrated.ts \
+            app/components/BlogIndex.tsx
+          git commit -m "blog: add daily posts ($DATE)"
+          git push
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+
+      # A push made with GITHUB_TOKEN does NOT trigger indexnow.yml's `deployment_status`
+      # event directly — but the Vercel deploy this push creates DOES fire indexnow.yml.
+      # This step is a belt-and-braces direct submission: wait for the deploy to go live,
+      # then submit the whole (updated) sitemap via the repo's existing IndexNow script.
+      - name: Ping IndexNow (fallback)
+        if: steps.commit.outputs.pushed == 'true'
+        run: |
+          sleep 120
+          node scripts/submit-indexnow.js
